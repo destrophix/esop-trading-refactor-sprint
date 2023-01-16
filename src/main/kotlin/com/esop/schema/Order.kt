@@ -3,6 +3,10 @@ package com.esop.schema
 class OrderFiller{
     var quantity: Int = 0
     var amount: Int = 0
+    constructor(quantity: Int, amount: Int){
+        this.quantity = quantity
+        this.amount = amount
+    }
 }
 
 class Order{
@@ -22,7 +26,7 @@ class Order{
         this.orderId = orderId
 
     }
-    fun updateOrderQuantity(quantity: Int){
+    fun updateOrderQuantity(quantity: Int, amount: Int){
         // This function will execute when the user's order was partially or fully
         // filled/sold
         if((currentQuantity - quantity) >= 0){
@@ -30,6 +34,11 @@ class Order{
             if(currentQuantity == 0){
                 orderStatus = "COMPLETED"
             }
+            else{
+                orderStatus = "PARTIAL"
+            }
+            val newOrder = OrderFiller(quantity, amount)
+            filled.add(newOrder)
         }
     }
 }

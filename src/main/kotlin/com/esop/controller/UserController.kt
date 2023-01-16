@@ -13,4 +13,9 @@ class UserController {
     fun register(): String {
         return "Example Response"
     }
+
+    @Post(uri="/{userName}/order", consumes = [MediaType.APPLICATION_JSON],produces=[MediaType.APPLICATION_JSON])
+    fun order(userName: String): String {
+        return "Example Response"
+    }
 }

@@ -19,6 +19,7 @@ class User {
         lastName = lName
         phoneNumber = pNumber
         email = em
+        username = uname
     }
 
     fun addWallet(amount: Int){
@@ -43,7 +44,7 @@ class User {
     }
 
     fun orderWalletFree(amount: Int){
-        // Function which adds given amount to ther users wallets
+        // Function which adds given amount to the users wallets
         // after successful selling of his inventory
         // Or when a Users buy order is satisfied for less amount
         wallet.free += amount

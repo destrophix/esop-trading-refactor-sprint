@@ -156,9 +156,6 @@ class OrderService{
     }
 
     fun orderHistory(userName: String): Any {
-        for(i in all_orders[userName]!!){
-            println(i.orderId)
-        }
         val order_history = all_orders[userName]?.toList()
 
 

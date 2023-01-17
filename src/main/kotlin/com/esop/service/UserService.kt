@@ -29,7 +29,7 @@ class UserService {
         var userErrors = mutableListOf<String>()
         if(!all_users.containsKey(userName)){
             userErrors.add("User doesn't exist")
-            return mapOf("errors" to userErrors)
+            return mapOf("error" to userErrors)
         }
         if(type == "BUY"){
             if(!check_wallet(price*quantity, userName)){
@@ -49,7 +49,7 @@ class UserService {
                 all_users[userName]?.sellAndUpdateInventory(quantity)
             }
         }
-        return mapOf("errors" to userErrors)
+        return mapOf("error" to userErrors)
     }
     fun user_exists(userName: String): Boolean{
         return all_users.containsKey(userName)

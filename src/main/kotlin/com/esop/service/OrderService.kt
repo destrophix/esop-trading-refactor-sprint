@@ -73,7 +73,7 @@ class OrderService{
             userOrder.price * (prevQuantity - remainingQuantity)
         )!!
         // Add money to sellers wallet
-        this.userService.all_users[userName]?.wallet?.free = this.userService.all_users[userName]?.wallet?.free?.minus(
+        this.userService.all_users[userName]?.wallet?.free = this.userService.all_users[userName]?.wallet?.free?.plus(
             userOrder.price * (prevQuantity - remainingQuantity)
         )!!
         // Add buyers luck back to free from locked
@@ -89,7 +89,7 @@ class OrderService{
         var userErrors = checkOrderParameters(quantity, price, type)
         if(userErrors.isNotEmpty()){
             // add to list of errors
-            return mapOf("errors" to userErrors)
+            return mapOf("error" to userErrors)
         }
         else{
             var userOrder = Order(quantity, type, price, orderCount, userName)

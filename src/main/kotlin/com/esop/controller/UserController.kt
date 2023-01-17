@@ -3,10 +3,10 @@ package com.esop.controller
 import com.esop.schema.User
 import com.esop.service.*
 import io.micronaut.http.HttpResponse
+import com.esop.service.*
 import io.micronaut.http.annotation.Body
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
-import io.micronaut.http.HttpStatus
 import io.micronaut.http.MediaType
 import io.micronaut.http.annotation.Post
 import io.micronaut.json.tree.JsonObject
@@ -28,8 +28,8 @@ class UserController {
     }
 
     @Post(uri="/{userName}/order", consumes = [MediaType.APPLICATION_JSON],produces=[MediaType.APPLICATION_JSON])
-    fun order(@Body body: JsonObject) {
-
+    fun order(@Body response: JsonObject):String {
+        return place_order(response)
     }
 
     @Get(uri = "/{userName}/accountInformation", produces = [MediaType.APPLICATION_JSON])

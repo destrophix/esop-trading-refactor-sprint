@@ -1,0 +1,58 @@
+{
+	"info": {
+		"_postman_id": "1b3d6f52-3775-4f43-93cc-8521c073d582",
+		"name": "ESOP",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "25352199"
+	},
+	"item": [
+		{
+			"name": "REGISTER USER",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"firstName\": \"Vaishnavi\",\n\t\"lastName\": \"Mahajan\",\n\t\"phoneNumber\": \"911947qera\",\n      \"email\": \"mvaishnavie1@gmail.com\",\n      \"username\": \"vaishnav\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/user/register",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"user",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Account information",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/user/vaishna/accountInformation",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"user",
+						"vaishna",
+						"accountInformation"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

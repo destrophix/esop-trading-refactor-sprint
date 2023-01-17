@@ -1,8 +1,8 @@
 package com.esop.schema
 
 class ItemData{
-    var free: Int = 0
-    var locked: Int = 0
+    var free: Long = 0
+    var locked: Long = 0
 }
 class User {
     var firstName: String = ""
@@ -22,28 +22,28 @@ class User {
         username = uname
     }
 
-    fun addWallet(amount: Int){
+    fun addWallet(amount: Long){
         // A function to add amount to the users free wallet
         wallet.free += amount
     }
-    fun addInventory(quantity: Int){
+    fun addInventory(quantity: Long){
         // A function to add quantity to the users inventory
         inventory.free += quantity
     }
-    fun buyAndUpdateWallet(amount: Int){
+    fun buyAndUpdateWallet(amount: Long){
         // A function which after buy order,
         // updates the free amount and places it into the locked amount
         wallet.free -= amount
         wallet.locked += amount
     }
-    fun sellAndUpdateInventory(quantity: Int){
+    fun sellAndUpdateInventory(quantity: Long){
         // A function which after sell order,
         // updates the free quantity and places it into the locked quantity
         inventory.free -= quantity
         inventory.locked += quantity
     }
 
-    fun orderWalletFree(amount: Int){
+    fun orderWalletFree(amount: Long){
         // Function which adds given amount to the users wallets
         // after successful selling of his inventory
         // Or when a Users buy order is satisfied for less amount

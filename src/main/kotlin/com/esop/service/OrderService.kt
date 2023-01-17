@@ -25,30 +25,25 @@ class OrderService{
     var sellOrders = mutableListOf<Order>()
 
     fun placeOrder(body: JsonObject, userName: String){
-        if(all_users.containsKey(userName)){
-            var quantity: Long = body.get("quantity").longValue
-            var type: String = body.get("type").stringValue
-            var price: Long = body.get("price").longValue
 
-            if(!checkOrderParameters(quantity, price, type)){
-                // add to list of errors
-            }
-            else{
-                var userOrder = Order(quantity, type, price, orderCount)
-                orderCount += 1
-                if(type == "BUY"){
-                    buyOrders.add(userOrder)
-                }
-                else{
-                    sellOrders.add(userOrder)
-                }
-                all_orders[userName]?.add(userOrder)
+        var quantity: Long = body.get("quantity").longValue
+        var type: String = body.get("type").stringValue
+        var price: Long = body.get("price").longValue
 
-            }
-
+        if(!checkOrderParameters(quantity, price, type)){
+            // add to list of errors
         }
         else{
-            // Error messages
+            var userOrder = Order(quantity, type, price, orderCount)
+            orderCount += 1
+            if(type == "BUY"){
+                buyOrders.add(userOrder)
+            }
+            else{
+                sellOrders.add(userOrder)
+            }
+            all_orders[userName]?.add(userOrder)
+
         }
     }
 

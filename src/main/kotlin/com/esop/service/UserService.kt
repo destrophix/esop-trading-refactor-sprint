@@ -49,7 +49,12 @@ class UserService {
             }
         }
         if(errors.isEmpty()){
-            all_users[userName]?.buyAndUpdateWallet(quantity)
+            if(type == "BUY"){
+                all_users[userName]?.buyAndUpdateWallet(price)
+            }
+            if(type == "SELL"){
+                all_users[userName]?.sellAndUpdateInventory(quantity)
+            }
         }
         return errors
     }

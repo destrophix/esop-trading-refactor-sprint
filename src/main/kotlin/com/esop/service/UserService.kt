@@ -21,13 +21,13 @@ class UserService {
     var all_users = HashMap<String, User>()
 
     fun check_inventory(quantity: Long, userName: String): Boolean{
-        if(user_exists(userName) && all_users[userName]?.inventory?.free!! > quantity){
+        if(user_exists(userName) && all_users[userName]?.inventory?.free!! >= quantity){
             return true
         }
         return false
     }
     fun check_wallet(amount: Long, userName: String): Boolean{
-        if(user_exists(userName) && all_users[userName]?.wallet?.free!! > amount){
+        if(user_exists(userName) && all_users[userName]?.wallet?.free!! >= amount){
             return true
         }
         return false

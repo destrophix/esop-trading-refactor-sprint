@@ -22,6 +22,7 @@ class Order{
 
     var userName: String = ""
     constructor(quantity: Long, type: String, price: Long, orderId: Int, userName: String){
+        this.currentQuantity = quantity
         this.quantity = quantity
 
         this.type = type
@@ -36,22 +37,27 @@ class Order{
     fun updateOrderQuantity(quantity: Long, amount: Long): Long{
         // This function will execute when the user's order was partially or fully
         // filled/sold
+        println("UPDATE ORDER QUANTITY")
         var remainingQuantity: Long = quantity
         val prevQuantity = currentQuantity
         if(currentQuantity>0){
+            println(5)
             if(quantity > currentQuantity){
+                println(1)
                 remainingQuantity -= currentQuantity
-                currentQuantity = 0
+                currentQuantity = 0L
             }
             else{
+                println(2)
                 currentQuantity -= quantity
                 remainingQuantity = 0L
             }
             if(currentQuantity == 0L){
-
+                println(3)
                 orderStatus = "COMPLETED"
             }
             else{
+                println(4)
                 orderStatus = "PARTIAL"
             }
 

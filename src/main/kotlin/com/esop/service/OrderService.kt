@@ -27,7 +27,7 @@ class OrderService{
     var sellOrders = mutableListOf<Order>()
 
 
-    fun placeOrder(userName: String, quantity: Long, type: String, price: Long){
+    fun placeOrder(userName: String, quantity: Long, type: String, price: Long): Order? {
 
 
         if(!checkOrderParameters(quantity, price, type)){
@@ -36,6 +36,9 @@ class OrderService{
         else{
             var userOrder = Order(quantity, type, price, orderCount, userName)
             orderCount += 1
+            if(!all_orders.containsKey(userName)){
+                all_orders[userName] = ArrayList()
+            }
             all_orders[userName]?.add(userOrder)
             if(type == "BUY"){
                 buyOrders.add(userOrder)
@@ -44,13 +47,17 @@ class OrderService{
                 for(anOrder in sortedSellOrders){
                    if((userOrder.price >= anOrder.price) && (anOrder.orderAvailable())){
                        var prevQuantity = remainingQuantity
-                       remainingQuantity = anOrder.updateOrderQuantity(remainingQuantity, userOrder.price)
+                       remainingQuantity = anOrder.updateOrderQuantity(remainingQuantity, anOrder.price)
                        if(!anOrder.orderAvailable()){
                            sellOrders.remove(anOrder)
                        }
                        if(remainingQuantity == 0L){
                            buyOrders.remove(userOrder)
+                           userOrder.updateOrderQuantity(prevQuantity - remainingQuantity, anOrder.price)
                            break
+                       }
+                       else{
+                           userOrder.updateOrderQuantity(prevQuantity - remainingQuantity, anOrder.price)
                        }
                        // Deduct money of quantity taken from buyer
                        this.userService.all_users[userName]?.wallet?.locked = this.userService.all_users[userName]?.wallet?.locked?.minus(
@@ -74,6 +81,9 @@ class OrderService{
             else{
                 sellOrders.add(userOrder)
                 var sortedBuyOrders = buyOrders.sortedWith(compareByDescending<Order> {it.price}.thenBy{it.timeStamp})
+//                for(anOrder in sortedBuyOrders){
+//                    println(anOrder.orderId)
+//                }
                 var remainingQuantity = userOrder.quantity
                 for(anOrder in sortedBuyOrders){
                     if((userOrder.price <= anOrder.price) && (anOrder.orderAvailable())){
@@ -84,7 +94,10 @@ class OrderService{
                         }
                         if(remainingQuantity == 0L){
                             sellOrders.remove(userOrder)
+                            userOrder.updateOrderQuantity(prevQuantity - remainingQuantity, userOrder.price)
                             break
+                        } else{
+                            userOrder.updateOrderQuantity(prevQuantity - remainingQuantity, userOrder.price)
                         }
                         // Deduct inventory from sellers stock
                         this.userService.all_users[userName]?.inventory?.locked = this.userService.all_users[userName]?.inventory?.locked?.minus(
@@ -106,11 +119,21 @@ class OrderService{
                     }
                 }
             }
+            for(i in all_orders[userName]!!){
+                if(userOrder.orderId == i.orderId){
+                    return i
+                }
+            }
+            return null
 
         }
+        return null
     }
 
     fun orderHistory(userName: String): Any {
+        for(i in all_orders[userName]!!){
+            println(i.orderId)
+        }
         val order_history = all_orders[userName]?.toList()
 
 

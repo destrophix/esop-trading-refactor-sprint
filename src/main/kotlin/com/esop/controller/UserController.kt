@@ -11,6 +11,7 @@ import io.micronaut.http.HttpStatus
 import io.micronaut.http.MediaType
 import io.micronaut.http.annotation.Post
 import io.micronaut.json.tree.JsonObject
+import jakarta.inject.Inject
 import org.json.JSONObject
 import java.lang.Error
 
@@ -22,7 +23,8 @@ val all_numbers= mutableSetOf<String>()
 
 @Controller("/user")
 class UserController {
-
+    @Inject
+    lateinit var orderService: OrderService
 
     @Post(uri="/register", consumes = [MediaType.APPLICATION_JSON],produces=[MediaType.APPLICATION_JSON])
     open fun register(@Body response: JsonObject) {
@@ -62,32 +64,8 @@ class UserController {
 
     @Post(uri="/{userName}/order", consumes = [MediaType.APPLICATION_JSON],produces=[MediaType.APPLICATION_JSON])
     fun order(userName: String, @Body body: JsonObject){
-        if(all_users.containsKey(userName)){
-            var quantity: Long = body.get("quantity").longValue
-            var type: String = body.get("type").stringValue
-            var price: Long = body.get("price").longValue
 
-            if(!checkOrderParameters(quantity, price, type)){
-                // add to list of errors
-            }
-            else{
-                var userOrder = Order(quantity, type, price, orderCount)
-                orderCount += 1
-                if(type == "BUY"){
-                    buyOrders.add(userOrder)
-                }
-                else{
-                    sellOrders.add(userOrder)
-                }
-                all_orders[userName]?.add(userOrder)
-
-            }
-
-        }
-        else{
-            // Error messages
-        }
-
+        this.orderService.placeOrder(body, userName)
     }
 
     @Get(uri = "/{userName}/accountInformation", produces = [MediaType.APPLICATION_JSON])

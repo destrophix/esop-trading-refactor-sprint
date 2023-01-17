@@ -3,19 +3,52 @@ package com.esop.service
 import com.esop.schema.Order
 import com.esop.schema.User
 import io.micronaut.json.tree.JsonNode
+import io.micronaut.json.tree.JsonObject
+import jakarta.inject.Singleton
 import java.util.regex.Pattern
 
+@Singleton
+class OrderService{
+    var all_orders = HashMap<String, ArrayList<Order>>()
 
-var all_orders = HashMap<String, ArrayList<Order>>()
+    var orderCount = 1
 
-var orderCount = 1
-
-fun checkOrderParameters(quantity: Long, price: Long, type:String): Boolean{
-    if(quantity > 0 && price > 0 && (type == "BUY" || type =="SELL")){
-        return true
+    fun checkOrderParameters(quantity: Long, price: Long, type:String): Boolean{
+        if(quantity > 0 && price > 0 && (type == "BUY" || type =="SELL")){
+            return true
+        }
+        return false
     }
-    return false
-}
 
-var buyOrders = mutableListOf<Order>()
-var sellOrders = mutableListOf<Order>()
+    var buyOrders = mutableListOf<Order>()
+    var sellOrders = mutableListOf<Order>()
+
+    fun placeOrder(body: JsonObject, userName: String){
+        if(all_users.containsKey(userName)){
+            var quantity: Long = body.get("quantity").longValue
+            var type: String = body.get("type").stringValue
+            var price: Long = body.get("price").longValue
+
+            if(!checkOrderParameters(quantity, price, type)){
+                // add to list of errors
+            }
+            else{
+                var userOrder = Order(quantity, type, price, orderCount)
+                orderCount += 1
+                if(type == "BUY"){
+                    buyOrders.add(userOrder)
+                }
+                else{
+                    sellOrders.add(userOrder)
+                }
+                all_orders[userName]?.add(userOrder)
+
+            }
+
+        }
+        else{
+            // Error messages
+        }
+    }
+
+}

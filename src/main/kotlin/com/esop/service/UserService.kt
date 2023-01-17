@@ -6,6 +6,7 @@ import com.esop.constant.errors
 import com.esop.constant.success_response
 import jakarta.inject.Singleton
 
+
 @Singleton
 class UserService {
     val all_emails = mutableSetOf<String>()

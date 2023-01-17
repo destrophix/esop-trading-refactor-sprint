@@ -146,21 +146,20 @@ class OrderService{
                         if(remainingQuantity == 0L){
                             break
                         }
-
                     }
                 }
             }
             println(userOrder)
             println(userOrder.orderId)
             return mapOf("orderId" to userOrder.orderId)
-
         }
     }
-
     fun orderHistory(userName: String): Any {
-
+        if(!this.userService.all_users.contains(userName))
+        {
+            return mapOf("message" to "User does not exist")
+        }
         val order_history = all_orders[userName]?.toList()
-
 
         if (order_history.isNullOrEmpty()) {
             return mapOf("message" to "User does not have any orders")

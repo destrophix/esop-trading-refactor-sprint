@@ -116,12 +116,13 @@ class UserService {
 }
     fun accountInformation(userName: String): Any {
         val user = all_users[userName.toString()]
-
+        var v1= mapOf("firstName" to user?.firstName.toString() ,"lastName" to user?.lastName.toString(), "phoneNumber" to user?.phoneNumber.toString(), "email" to user?.email.toString(), "wallet" to user?.wallet, "inventory" to user?.inventory)
         if(user!=null){
-            val newUser = "{\"firstName\": ${user?.firstName.toString()}, \"lastName\": ${user?.lastName}, \"phoneNumber\": ${user?.phoneNumber}, \"email\": ${user?.email}, \"username\": ${user?.username}"
-            println(newUser)
-            return newUser
+            //val newUser = "{\"firstName\": ${user?.firstName.toString()}, \"lastName\": ${user?.lastName}, \"phoneNumber\": ${user?.phoneNumber}, \"email\": ${user?.email}, \"username\": ${user?.username}"
+            //println(newUser)
+            return v1
         }
+
         return mapOf("errors" to errors["USER_DOES_NOT_EXISTS"].toString())
 
     }
@@ -137,7 +138,6 @@ class UserService {
             usr1.addInventory(quant)
             return mapOf("message" to "${quant} ESOPS added to inventory")
         }
-
         return mapOf("errors" to errors["USER_DOES_NOT_EXISTS"].toString())
     }
 
@@ -152,6 +152,7 @@ class UserService {
         }
         return mapOf("messsage" to "user does not exist")
     }
+
 
 
 

@@ -37,17 +37,25 @@ class UserController {
         var quantity: Long = body.get("quantity").longValue
         var type: String = body.get("type").stringValue
         var price: Long = body.get("price").longValue
-        var errors = this.userService.orderCheckBeforePlace(userName, quantity, type, price)
-        if(errors.isEmpty()){
-            var userOrder = this.orderService.placeOrder(userName, quantity, type, price)
-            return userOrder
-        }
-        else{
-            // Add to errors
-            return errors
-        }
-        return null
+        var userErrors = this.userService.orderCheckBeforePlace(userName, quantity, type, price)
+        if(userErrors["errors"]?.isEmpty()!!){
+            println("PLACING ORDER")
+            var userOrderOrErrors = this.orderService.placeOrder(userName, quantity, type, price)
+            println(userOrderOrErrors)
+            if (userOrderOrErrors["orderId"] != null) {
+                return mapOf(
+                    "orderId" to userOrderOrErrors["orderId"],
+                    "quantity" to quantity,
+                    "type" to type,
+                    "price" to price
+                )
+            }else{
+                return userOrderOrErrors
+            }
 
+        }
+
+        return userErrors
     }
 
     @Get(uri = "/{userName}/accountInformation", produces = [MediaType.APPLICATION_JSON])

@@ -16,24 +16,30 @@ class OrderService{
 
     var orderCount = 1
 
-    fun checkOrderParameters(quantity: Long, price: Long, type:String): Boolean{
-        if(quantity > 0 && price > 0 && (type == "BUY" || type =="SELL")){
-            return true
+    fun checkOrderParameters(quantity: Long, price: Long, type:String): MutableList<String>{
+        var errors = mutableListOf<String>()
+        if(quantity <= 0){
+            errors.add("Quantity must be positive.")
         }
-        return false
+        if(price <= 0){
+            errors.add("Price must be positive.")
+        }
+        if(type != "SELL" && type != "BUY"){
+            errors.add("Invalid type.")
+        }
+        return errors
     }
 
     var buyOrders = mutableListOf<Order>()
     var sellOrders = mutableListOf<Order>()
 
 
-    fun placeOrder(userName: String, quantity: Long, type: String, price: Long): Order? {
-        for(i in this.userService.all_users){
-            println(i)
-        }
+    fun placeOrder(userName: String, quantity: Long, type: String, price: Long): Map<String, Any> {
 
-        if(!checkOrderParameters(quantity, price, type)){
+        var errors = checkOrderParameters(quantity, price, type)
+        if(errors.isNotEmpty()){
             // add to list of errors
+            return mapOf("errors" to errors)
         }
         else{
             var userOrder = Order(quantity, type, price, orderCount, userName)
@@ -136,11 +142,11 @@ class OrderService{
                     }
                 }
             }
-
-            return userOrder
+            println(userOrder)
+            println(userOrder.orderId)
+            return mapOf("orderId" to userOrder.orderId)
 
         }
-        return null
     }
 
     fun orderHistory(userName: String): Any {

@@ -32,11 +32,11 @@ class UserService {
         }
         return false
     }
-    fun orderCheckBeforePlace(userName: String, quantity: Long, type: String, price: Long): MutableList<String>{
+    fun orderCheckBeforePlace(userName: String, quantity: Long, type: String, price: Long): Map<String, MutableList<String>>{
         var errors = mutableListOf<String>()
         if(!all_users.containsKey(userName)){
             errors.add("User doesn't exist")
-            return errors
+            return mapOf("errors" to errors)
         }
         if(type == "BUY"){
             if(!check_wallet(price*quantity, userName)){
@@ -56,7 +56,7 @@ class UserService {
                 all_users[userName]?.sellAndUpdateInventory(quantity)
             }
         }
-        return errors
+        return mapOf("errors" to errors)
     }
     fun user_exists(userName: String): Boolean{
         return all_users.containsKey(userName)

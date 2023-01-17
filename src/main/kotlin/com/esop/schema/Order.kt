@@ -1,30 +1,33 @@
 package com.esop.schema
 
 class OrderFiller{
-    var quantity: Long = 0
-    var amount: Long = 0
-    constructor(quantity: Long, amount: Long){
+    var quantity: Int = 0
+    var amount: Int = 0
+    constructor(quantity: Int, amount: Int){
         this.quantity = quantity
         this.amount = amount
     }
 }
 
 class Order{
-    var quantity: Long = 0
+    var quantity: Int = 0
     var type: String = "NULL" // BUY or SELL
-    var price: Long = 0
+    var price: Int = 0
     var orderId: Int = 0
     var timeStamp = System.currentTimeMillis()
 
     var orderStatus: String = "PENDING" // COMPLETED, PARTIAL, PENDING
-    var currentQuantity: Long = 0
+    var currentQuantity: Int = 0
     var filled: MutableList<OrderFiller> = mutableListOf()
+
     var userName: String = ""
     constructor(quantity: Long, type: String, price: Long, orderId: Int, userName: String){
         this.quantity = quantity
+
         this.type = type
-        this.price = price
+        this.price = price.toInt()
         this.orderId = orderId
+
         this.userName = userName
     }
     fun orderAvailable():Boolean{
@@ -45,12 +48,15 @@ class Order{
                 remainingQuantity = 0L
             }
             if(currentQuantity == 0L){
+
                 orderStatus = "COMPLETED"
             }
-            else{
+            else
                 orderStatus = "PARTIAL"
             }
+
             val newOrder = OrderFiller(prevQuantity - currentQuantity, amount)
+
             filled.add(newOrder)
         }
         return remainingQuantity

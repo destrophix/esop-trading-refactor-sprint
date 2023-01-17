@@ -25,8 +25,9 @@ class UserController {
     lateinit var userService: UserService
 
     @Post(uri="/register", consumes = [MediaType.APPLICATION_JSON],produces=[MediaType.APPLICATION_JSON])
-    open fun register(@Body response: JsonObject): String {
-          return this.userService.registerUser(response)
+    open fun register(@Body response: JsonObject): HttpResponse<*> {
+        val newUser = this.userService.registerUser(response)
+        return HttpResponse.ok(newUser)
     }
 
     @Post(uri="/{userName}/order", consumes = [MediaType.APPLICATION_JSON],produces=[MediaType.APPLICATION_JSON])
@@ -46,22 +47,27 @@ class UserController {
     }
 
     @Get(uri = "/{userName}/accountInformation", produces = [MediaType.APPLICATION_JSON])
-    fun getAccountInformation(userName: String): String {
-        return "Some response"
+    fun getAccountInformation(userName: String): HttpResponse<*> {
+        val userData = this.userService.accountInformation(userName)
+        return HttpResponse.ok(userData)
     }
 
     @Post(uri = "{userName}/inventory", consumes = [MediaType.APPLICATION_JSON], produces = [MediaType.APPLICATION_JSON])
-    fun addInventory(userName: String): String {
-        return "Some response"
+    fun addInventory(userName: String, @Body body: JsonObject): HttpResponse<*>{
+        val newInventory = this.userService.adding_inventory(body,userName)
+        return HttpResponse.ok(newInventory)
     }
 
     @Post(uri = "{userName}/wallet", consumes = [MediaType.APPLICATION_JSON], produces = [MediaType.APPLICATION_JSON])
-    fun addWallet(userName: String): String {
-        return "Some response"
+    fun addWallet(userName: String, @Body body: JsonObject) :HttpResponse<*> {
+        val addedMoney=this.userService.adding_Money(body,userName)
+        return HttpResponse.ok(addedMoney)
+
     }
 
     @Get(uri = "/{userName}/order", produces = [MediaType.APPLICATION_JSON])
-    fun getOrder(userName: String): String {
-        return "Some response"
+    fun orderHistory(userName: String): HttpResponse<*> {
+        val order_history = this.orderService.orderHistory(userName)
+        return HttpResponse.ok(order_history)
     }
 }

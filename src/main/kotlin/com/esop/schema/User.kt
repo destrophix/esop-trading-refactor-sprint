@@ -11,6 +11,8 @@ class User {
     var email: String = ""
     var username: String = ""
 
+
+
     val wallet: ItemData = ItemData()
     val inventory: ItemData = ItemData()
 
@@ -49,4 +51,5 @@ class User {
         // Or when a Users buy order is satisfied for less amount
         wallet.free += amount
     }
+
 }

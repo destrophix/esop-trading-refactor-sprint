@@ -9,6 +9,9 @@ import java.util.regex.Pattern
 import com.esop.constant.errors
 import com.esop.constant.success_response
 import jakarta.inject.Singleton
+import javax.validation.constraints.Null
+import kotlin.reflect.jvm.internal.impl.load.kotlin.JvmType
+import kotlin.reflect.jvm.internal.impl.resolve.constants.NullValue
 
 @Singleton
 class UserService {
@@ -76,21 +79,23 @@ class UserService {
         return PHONENUMBER_REGEX.toRegex().matches(pNumber);
     }
 
-    fun registerUser(userData: JsonObject): String {
-        var v1 = userData.get("firstName").toString()
-        var v2 = userData.get("lastName").toString()
-        var v3 = userData.get("phoneNumber").toString()
-        var v4 = userData.get("email").toString()
-        var v5 = userData.get("username").toString()
+    fun registerUser(userData: JsonObject): Map<String,Any> {
+    var v1 = userData.get("firstName").stringValue
+    var v2 = userData.get("lastName").stringValue
+    var v3 = userData.get("phoneNumber").stringValue
+    var v4 = userData.get("email").stringValue
+    var v5 = userData.get("username").stringValue
 
 
-        if (check_username(all_usernames, v5)) {
-            return errors["USERNAME_EXISTS"].toString()
-        } else if (check_email(all_emails, v4)) {
-            return errors["EMAIL_EXISTS"].toString()
-        } else if (check_phonenumber(all_numbers, v3)) {
-            return errors["PHONENUMBER_EXISTS"].toString()
-        }
+    if(check_username(all_usernames, v5)){
+        return mapOf("error" to errors["USERNAME_EXISTS"].toString())
+    }
+    else if(check_email(all_emails, v4)){
+        return mapOf("error" to errors["EMAIL_EXISTS"].toString())
+    }
+    else if(check_phonenumber(all_numbers, v3)){
+        return mapOf("error" to errors["PHONENUMBER_EXISTS"].toString())
+    }
 //    else if(!isEmailValid(v4)){
 //        return errors["INVALID_EMAIL"].toString()
 //    }
@@ -98,14 +103,57 @@ class UserService {
 //        return errors["INVALID_PHONENUMBER"].toString()
 //    }
         else {
-            val user = User(v1, v2, v3, v4, v5);
+        val user = User(v1, v2, v3, v4, v5);
 
-            all_users[v5] = user
-            all_emails.add(v4)
-            all_numbers.add(v3)
-            all_usernames.add(v5)
+        all_users[v5] = user
+        all_emails.add(v4)
+        all_numbers.add(v3)
+        all_usernames.add(v5)
+
+        val newUser = "{\"firstName\": ${user.firstName.toString()}, \"lastName\": ${user.lastName}, \"phoneNumber\": ${user.phoneNumber}, \"email\": ${user.email}, \"username\": ${user.username}"
+        return mapOf("user" to newUser, "message" to success_response["USER_CREATED"].toString())
         }
-        return success_response["USER_CREATED"].toString()
+}
+    fun accountInformation(userName: String): Any {
+        val user = all_users[userName.toString()]
+
+        if(user!=null){
+            val newUser = "{\"firstName\": ${user?.firstName.toString()}, \"lastName\": ${user?.lastName}, \"phoneNumber\": ${user?.phoneNumber}, \"email\": ${user?.email}, \"username\": ${user?.username}"
+            println(newUser)
+            return newUser
+        }
+        return mapOf("errors" to errors["USER_DOES_NOT_EXISTS"].toString())
+
     }
+
+
+    fun adding_inventory(body: JsonObject, userName: String): Any
+    {
+        var quant=body.get("quantity").longValue
+
+        var usr1= all_users[userName]
+
+        if (usr1 != null) {
+            usr1.addInventory(quant)
+            return mapOf("message" to "${quant} ESOPS added to inventory")
+        }
+
+        return mapOf("errors" to errors["USER_DOES_NOT_EXISTS"].toString())
+    }
+
+    fun adding_Money(body: JsonObject, userName: String): Any
+    {
+        var amt=body.get("amount").longValue
+        var usr1= all_users[userName]
+
+        if (usr1 != null) {
+            usr1.addWallet(amt)
+            return mapOf("message" to "${amt} amount added to account");
+        }
+        return mapOf("messsage" to "user does not exist")
+    }
+
+
+
 
 }

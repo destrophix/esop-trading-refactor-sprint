@@ -89,20 +89,20 @@ class UserService {
     }
 
     fun registerUser(userData: JsonObject): Map<String,Any> {
-    var v1 = userData.get("firstName").stringValue
-    var v2 = userData.get("lastName").stringValue
-    var v3 = userData.get("phoneNumber").stringValue
-    var v4 = userData.get("email").stringValue
-    var v5 = userData.get("username").stringValue
+    var firstName = userData.get("firstName").stringValue
+    var lastName = userData.get("lastName").stringValue
+    var phoneNumber = userData.get("phoneNumber").stringValue
+    var email = userData.get("email").stringValue
+    var username = userData.get("username").stringValue
 
 
-    if(check_username(all_usernames, v5)){
+    if(check_username(all_usernames, username)){
         return mapOf("error" to errors["USERNAME_EXISTS"].toString())
     }
-    else if(check_email(all_emails, v4)){
+    else if(check_email(all_emails, email)){
         return mapOf("error" to errors["EMAIL_EXISTS"].toString())
     }
-    else if(check_phonenumber(all_numbers, v3)){
+    else if(check_phonenumber(all_numbers, phoneNumber)){
         return mapOf("error" to errors["PHONENUMBER_EXISTS"].toString())
     }
 //    else if(!isEmailValid(v4)){
@@ -112,12 +112,12 @@ class UserService {
 //        return errors["INVALID_PHONENUMBER"].toString()
 //    }
         else {
-        val user = User(v1, v2, v3, v4, v5);
+        val user = User(firstName, lastName, phoneNumber, email, username);
 
-        all_users[v5] = user
-        all_emails.add(v4)
-        all_numbers.add(v3)
-        all_usernames.add(v5)
+        all_users[username] = user
+        all_emails.add(email)
+        all_numbers.add(phoneNumber)
+        all_usernames.add(username)
 
 
         val newUser = mapOf("firstName" to user.firstName.toString(), "lastName" to user.lastName.toString(), "phoneNumber" to user.phoneNumber.toString(), "email" to user.email.toString(), "userName" to user.username.toString() )
@@ -127,15 +127,14 @@ class UserService {
 }
     fun accountInformation(userName: String): Any {
         val user = all_users[userName.toString()]
-        var v1= mapOf("firstName" to user?.firstName.toString() ,"lastName" to user?.lastName.toString(), "phoneNumber" to user?.phoneNumber.toString(), "email" to user?.email.toString(), "wallet" to user?.wallet, "inventory" to user?.inventory)
+        var userData= mapOf("firstName" to user?.firstName.toString() ,"lastName" to user?.lastName.toString(), "phoneNumber" to user?.phoneNumber.toString(), "email" to user?.email.toString(), "wallet" to user?.wallet, "inventory" to user?.inventory)
         if(user!=null){
             //val newUser = "{\"firstName\": ${user?.firstName.toString()}, \"lastName\": ${user?.lastName}, \"phoneNumber\": ${user?.phoneNumber}, \"email\": ${user?.email}, \"username\": ${user?.username}"
             //println(newUser)
-            return v1
+            return userData
         }
 
         return mapOf("errors" to errors["USER_DOES_NOT_EXISTS"].toString())
-
     }
 
 
@@ -161,11 +160,6 @@ class UserService {
             usr1.addWallet(amt)
             return mapOf("message" to "${amt} amount added to account");
         }
-        return mapOf("messsage" to "user does not exist")
+        return mapOf("errors" to errors["USER_DOES_NOT_EXISTS"]).toString()
     }
-
-
-
-
-
 }

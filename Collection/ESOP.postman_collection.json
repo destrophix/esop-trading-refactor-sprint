@@ -1,8 +1,9 @@
 {
 	"info": {
-		"_postman_id": "fe10293d-f4ce-4a3e-be83-19eee4aed036",
+		"_postman_id": "98b2a507-e928-4c92-ac70-98742dbb8675",
 		"name": "ESOP",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "25352199"
 	},
 	"item": [
 		{
@@ -23,7 +24,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8080/user/john_doe/order",
+							"raw": "http://localhost:8080/user/:userName/order",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -31,8 +32,14 @@
 							"port": "8080",
 							"path": [
 								"user",
-								"john_doe",
+								":userName",
 								"order"
+							],
+							"variable": [
+								{
+									"key": "userName",
+									"value": "john_doe"
+								}
 							]
 						}
 					},
@@ -53,7 +60,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8080/user/justjohn/order",
+							"raw": "http://localhost:8080/user/:userName/order",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -61,8 +68,14 @@
 							"port": "8080",
 							"path": [
 								"user",
-								"justjohn",
+								":userName",
 								"order"
+							],
+							"variable": [
+								{
+									"key": "userName",
+									"value": "justjohn"
+								}
 							]
 						}
 					},
@@ -88,7 +101,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8080/user/john_doe/order",
+							"raw": "http://localhost:8080/user/:userName/order",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -96,8 +109,14 @@
 							"port": "8080",
 							"path": [
 								"user",
-								"john_doe",
+								":userName",
 								"order"
+							],
+							"variable": [
+								{
+									"key": "userName",
+									"value": "john_doe"
+								}
 							]
 						}
 					},
@@ -118,7 +137,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8080/user/justjohn/order",
+							"raw": "http://localhost:8080/user/:justjohn/order",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -126,15 +145,21 @@
 							"port": "8080",
 							"path": [
 								"user",
-								"justjohn",
+								":justjohn",
 								"order"
+							],
+							"variable": [
+								{
+									"key": "justjohn",
+									"value": null
+								}
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "Place sell order by vaishnav",
+					"name": "Place sell order by vaishnavi",
 					"request": {
 						"method": "POST",
 						"header": [],
@@ -148,7 +173,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8080/user/vaishnav/order",
+							"raw": "http://localhost:8080/user/:userName/order",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -156,187 +181,14 @@
 							"port": "8080",
 							"path": [
 								"user",
-								"vaishnav",
+								":userName",
 								"order"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Add money and inventory",
-			"item": [
-				{
-					"name": "Add money john_doe",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n\t\"amount\": 1000\n}\n",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "localhost:8080/user/john_doe/wallet",
-							"host": [
-								"localhost"
 							],
-							"port": "8080",
-							"path": [
-								"user",
-								"john_doe",
-								"wallet"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Add money justjohn",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n\t\"amount\": 1000\n}\n",
-							"options": {
-								"raw": {
-									"language": "json"
+							"variable": [
+								{
+									"key": "userName",
+									"value": "vaishnavi"
 								}
-							}
-						},
-						"url": {
-							"raw": "localhost:8080/user/justjohn/wallet",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"user",
-								"justjohn",
-								"wallet"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Add money vaishnav",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n\t\"amount\": 1000\n}\n",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "localhost:8080/user/vaishnav/wallet",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"user",
-								"vaishnav",
-								"wallet"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Add inventory john_doe",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n\t\"quantity\": 10\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "localhost:8080/user/john_doe/inventory",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"user",
-								"john_doe",
-								"inventory"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Add inventory justjohn",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n\t\"quantity\": 10\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "localhost:8080/user/justjohn/inventory",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"user",
-								"justjohn",
-								"inventory"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Add inventory vaishnav",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n\t\"quantity\": 10,\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "localhost:8080/user/vaishnav/inventory",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"user",
-								"vaishnav",
-								"inventory"
 							]
 						}
 					},
@@ -348,7 +200,7 @@
 			"name": "User registration",
 			"item": [
 				{
-					"name": "Register user good 1 (john_doe)",
+					"name": "Register user 1 (john_doe)",
 					"request": {
 						"method": "POST",
 						"header": [],
@@ -377,7 +229,7 @@
 					"response": []
 				},
 				{
-					"name": "Register user good 2 (justjohn)",
+					"name": "Register user 2 (justjohn)",
 					"request": {
 						"method": "POST",
 						"header": [],
@@ -406,13 +258,13 @@
 					"response": []
 				},
 				{
-					"name": "Registr user good 3 (vaishnav)",
+					"name": "Register user 3 (vaishnavi)",
 					"request": {
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"firstName\": \"Vaishnavi\",\n\t\"lastName\": \"Mahajan\",\n\t\"phoneNumber\": \"9119471234\",\n      \"email\": \"mvaishnavie1@gmail.com\",\n      \"username\": \"vaishnav\"\n}",
+							"raw": "{\n\t\"firstName\": \"Vaishnavi\",\n\t\"lastName\": \"Mahajan\",\n\t\"phoneNumber\": \"9119475035\",\n    \"email\": \"mvaishnavi411@gmail.com\",\n    \"username\": \"vaishnavi\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -432,60 +284,6 @@
 						}
 					},
 					"response": []
-				},
-				{
-					"name": "Register user bad",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n\t\"firstName\": \"Johny\",\n    \"lastName\": \"Does\",\n\t\"phoneNumber\": \"9524125143\",\n\t\"email\": \"john.doe@example.com\",\n\t\"username\": \"john_doe\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:8080/user/register",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"user",
-								"register"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Order history",
-			"item": [
-				{
-					"name": "Order history",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "localhost:8080/user/john_doe/order",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"user",
-								"john_doe",
-								"order"
-							]
-						}
-					},
-					"response": []
 				}
 			]
 		},
@@ -495,15 +293,188 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "localhost:8080/user/john_doe/accountInformation",
+					"raw": "localhost:8080/user/:userName/accountInformation",
 					"host": [
 						"localhost"
 					],
 					"port": "8080",
 					"path": [
 						"user",
-						"john_doe",
+						":userName",
 						"accountInformation"
+					],
+					"variable": [
+						{
+							"key": "userName",
+							"value": "john_doe"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "User Order history",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/user/:userName/order",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"user",
+						":userName",
+						"order"
+					],
+					"variable": [
+						{
+							"key": "userName",
+							"value": "john_doe"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add to wallet",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"amount\": 10\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/user/:userName/wallet",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"user",
+						":userName",
+						"wallet"
+					],
+					"variable": [
+						{
+							"key": "userName",
+							"value": "john_doe"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add to inventory",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"quantity\": 10\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/user/:userName/inventory",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"user",
+						":userName",
+						"inventory"
+					],
+					"variable": [
+						{
+							"key": "userName",
+							"value": "john_doe"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Place buy order",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"quantity\": 10,\n\t\"type\": \"BUY\",\n\t\"price\": 50\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/user/:userName/order",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"user",
+						":userName",
+						"order"
+					],
+					"variable": [
+						{
+							"key": "userName",
+							"value": "john_doe"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Place sell order",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"quantity\": 10,\n\t\"type\": \"SELL\",\n\t\"price\": 50\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/user/:userName/order",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"user",
+						":userName",
+						"order"
+					],
+					"variable": [
+						{
+							"key": "userName",
+							"value": "john_doe"
+						}
 					]
 				}
 			},

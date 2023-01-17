@@ -119,7 +119,9 @@ class UserService {
         all_numbers.add(v3)
         all_usernames.add(v5)
 
-        val newUser = "{\"firstName\": ${user.firstName.toString()}, \"lastName\": ${user.lastName}, \"phoneNumber\": ${user.phoneNumber}, \"email\": ${user.email}, \"username\": ${user.username}"
+
+        val newUser = mapOf("firstName" to user.firstName.toString(), "lastName" to user.lastName.toString(), "phoneNumber" to user.phoneNumber.toString(), "email" to user.email.toString(), "userName" to user.username.toString() )
+
         return mapOf("user" to newUser, "message" to success_response["USER_CREATED"].toString())
         }
 }

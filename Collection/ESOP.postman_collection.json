@@ -206,7 +206,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n\t\"phoneNumber\": \"9524125143\",\n\t\"email\": \"john.doe@example.com\",\n\t\"username\": \"john_doe\"\n}",
+							"raw": "{\n\t\"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n\t\"phoneNumber\": \"9524125137\",\n\t\"email\": \"john.doe@example.com\",\n\t\"username\": \"john_doe\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -402,7 +402,7 @@
 					"variable": [
 						{
 							"key": "userName",
-							"value": "john_doe"
+							"value": "john_doE"
 						}
 					]
 				}

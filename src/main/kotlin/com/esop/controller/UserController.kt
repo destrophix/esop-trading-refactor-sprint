@@ -23,9 +23,9 @@ class UserController {
     @Post(uri="/register", consumes = [MediaType.APPLICATION_JSON],produces=[MediaType.APPLICATION_JSON])
     open fun register(@Body response: JsonObject): HttpResponse<*> {
         val newUser = this.userService.registerUser(response)
-//        if(newUser.containsKey("error")){
-//            return HttpResponse.badRequest(newUser)
-//        }
+        if(newUser["error"] != null) {
+            return HttpResponse.badRequest(newUser)
+        }
         return HttpResponse.ok(newUser)
     }
 
@@ -59,19 +59,31 @@ class UserController {
     @Get(uri = "/{userName}/accountInformation", produces = [MediaType.APPLICATION_JSON])
     fun getAccountInformation(userName: String): HttpResponse<*> {
         val userData = this.userService.accountInformation(userName)
-//        if(userData.)
+
+        if(userData["error"] != null) {
+            return HttpResponse.badRequest(userData)
+        }
+
         return HttpResponse.ok(userData)
     }
 
     @Post(uri = "{userName}/inventory", consumes = [MediaType.APPLICATION_JSON], produces = [MediaType.APPLICATION_JSON])
     fun addInventory(userName: String, @Body body: JsonObject): HttpResponse<*>{
         val newInventory = this.userService.adding_inventory(body,userName)
+
+        if(newInventory["error"] != null) {
+            return HttpResponse.badRequest(newInventory)
+        }
         return HttpResponse.ok(newInventory)
     }
 
     @Post(uri = "{userName}/wallet", consumes = [MediaType.APPLICATION_JSON], produces = [MediaType.APPLICATION_JSON])
     fun addWallet(userName: String, @Body body: JsonObject) :HttpResponse<*> {
         val addedMoney=this.userService.adding_Money(body,userName)
+        println(addedMoney["error"])
+        if(addedMoney["error"] != null) {
+            return HttpResponse.badRequest(addedMoney)
+        }
         return HttpResponse.ok(addedMoney)
 
     }

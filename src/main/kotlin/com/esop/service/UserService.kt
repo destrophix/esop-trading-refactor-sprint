@@ -89,15 +89,26 @@ class UserService {
     var email = userData.get("email").stringValue
     var username = userData.get("username").stringValue
 
+        var Errors = mutableListOf<String>()
+
 
     if(check_username(all_usernames, username)){
-        return mapOf("error" to errors["USERNAME_EXISTS"].toString())
+//        return mapOf("error" to errors["USERNAME_EXISTS"].toString())
+        Errors.add(errors["USERNAME_EXISTS"].toString())
+
+        return mapOf("error" to Errors)
     }
     else if(check_email(all_emails, email)){
-        return mapOf("error" to errors["EMAIL_EXISTS"].toString())
+//        return mapOf("error" to errors["EMAIL_EXISTS"].toString())
+        Errors.add(errors["EMAIL_EXISTS"].toString())
+
+        return mapOf("error" to Errors)
     }
     else if(check_phonenumber(all_numbers, phoneNumber)){
-        return mapOf("error" to errors["PHONENUMBER_EXISTS"].toString())
+//        return mapOf("error" to errors["PHONENUMBER_EXISTS"].toString())
+        Errors.add(errors["PHONENUMBER_EXISTS"].toString())
+
+        return mapOf("error" to Errors)
     }
 //    else if(!isEmailValid(v4)){
 //        return errors["INVALID_EMAIL"].toString()
@@ -115,11 +126,11 @@ class UserService {
 
 
         val newUser = mapOf("firstName" to user.firstName.toString(), "lastName" to user.lastName.toString(), "phoneNumber" to user.phoneNumber.toString(), "email" to user.email.toString(), "userName" to user.username.toString() )
+        return newUser
 
-        return mapOf("user" to newUser, "message" to success_response["USER_CREATED"].toString())
         }
 }
-    fun accountInformation(userName: String): Any {
+    fun accountInformation(userName: String): Map<String, Any?> {
         val user = all_users[userName.toString()]
 
         var accountErrors = mutableListOf<String>()
@@ -131,13 +142,13 @@ class UserService {
             return userData
         }
 
-        accountErrors.add("USER_DOES_NOT_EXISTS")
+        accountErrors.add(errors["USER_DOES_NOT_EXISTS"].toString())
 
-        return mapOf("errors" to accountErrors)
+        return mapOf("error" to accountErrors)
     }
 
 
-    fun adding_inventory(body: JsonObject, userName: String): Any
+    fun adding_inventory(body: JsonObject, userName: String): Map<String, Any>
     {
         var quant=body.get("quantity").longValue
 
@@ -149,11 +160,11 @@ class UserService {
             usr1.addInventory(quant)
             return mapOf("message" to "${quant} ESOPS added to inventory")
         }
-        accountErrors.add("USER_DOES_NOT_EXIST")
-        return mapOf("errors" to accountErrors)
+        accountErrors.add(errors["USER_DOES_NOT_EXISTS"].toString())
+        return mapOf("error" to accountErrors)
     }
 
-    fun adding_Money(body: JsonObject, userName: String): Any
+    fun adding_Money(body: JsonObject, userName: String): Map<String, Any>
     {
         var amt=body.get("amount").longValue
         var accountErrors =mutableListOf<String>()
@@ -163,8 +174,9 @@ class UserService {
             usr1.addWallet(amt)
             return mapOf("message" to "${amt} amount added to account");
         }
-        accountErrors.add("USER_DOES_NOT_EXIST")
-        return mapOf("errors" to accountErrors)
+        accountErrors.add(errors["USER_DOES_NOT_EXISTS"].toString())
+
+        return mapOf("error" to accountErrors)
 
         //return mapOf("errors" to errors["USER_DOES_NOT_EXISTS"]).toString()
     }

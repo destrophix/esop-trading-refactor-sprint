@@ -1,9 +1,7 @@
 package com.esop.service
 
 
-import com.esop.constant.errors
 import com.esop.schema.Order
-import io.micronaut.json.tree.JsonObject
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
 
@@ -17,29 +15,79 @@ class OrderService{
     var orderCount = 1
 
     fun checkOrderParameters(quantity: Long, price: Long, type:String): MutableList<String>{
-        var errors = mutableListOf<String>()
+        var userErrors = mutableListOf<String>()
         if(quantity <= 0){
-            errors.add("Quantity must be positive.")
+            userErrors.add("Quantity must be positive.")
         }
         if(price <= 0){
-            errors.add("Price must be positive.")
+            userErrors.add("Price must be positive.")
         }
         if(type != "SELL" && type != "BUY"){
-            errors.add("Invalid type.")
+            userErrors.add("Invalid type.")
         }
-        return errors
+        return userErrors
     }
 
     var buyOrders = mutableListOf<Order>()
     var sellOrders = mutableListOf<Order>()
 
+    fun updateOrderDetailsForBuy(userName: String, prevQuantity: Long, remainingQuantity: Long, anOrder: Order, userOrder: Order){
+        // Deduct money of quantity taken from buyer
+        this.userService.all_users[userName]?.wallet?.locked = this.userService.all_users[userName]?.wallet?.locked?.minus(
+            anOrder.price * (prevQuantity - remainingQuantity)
+        )!!
+        // Add money of quantity taken from seller
+        this.userService.all_users[anOrder.userName]?.wallet?.free  = this.userService.all_users[anOrder.userName]?.wallet?.free?.plus(
+            anOrder.price * (prevQuantity - remainingQuantity)
+        )!!
+        // Deduct inventory of stock from sellers
+        this.userService.all_users[anOrder.userName]?.inventory?.locked = this.userService.all_users[anOrder.userName]?.inventory?.locked?.minus(
+            (prevQuantity - remainingQuantity)
+        )!!
+        // Add purchased inventory to buyer
+        this.userService.all_users[userName]?.inventory?.free = this.userService.all_users[userName]?.inventory?.free?.plus(
+            (prevQuantity - remainingQuantity)
+        )!!
+        // Add buyers luck back to free from locked
+        this.userService.all_users[userName]?.wallet?.free = this.userService.all_users[userName]?.wallet?.free?.plus(
+            (userOrder.price - anOrder.price) * (prevQuantity - remainingQuantity)
+        )!!
+        this.userService.all_users[userName]?.wallet?.locked = this.userService.all_users[userName]?.wallet?.locked?.minus(
+            (userOrder.price - anOrder.price) * (prevQuantity - remainingQuantity)
+        )!!
+    }
 
+    fun updateOrderDetailsForSell(userName: String, prevQuantity: Long, remainingQuantity: Long, anOrder: Order, userOrder: Order){
+        // Deduct inventory from sellers stock
+        this.userService.all_users[userName]?.inventory?.locked = this.userService.all_users[userName]?.inventory?.locked?.minus(
+            (prevQuantity - remainingQuantity)
+        )!!
+        // Add inventory to buyers stock
+        this.userService.all_users[anOrder.userName]?.inventory?.free  = this.userService.all_users[anOrder.userName]?.inventory?.free?.plus(
+            (prevQuantity - remainingQuantity)
+        )!!
+        // Deduct money from buyers wallet
+        this.userService.all_users[anOrder.userName]?.wallet?.locked  = this.userService.all_users[anOrder.userName]?.wallet?.locked?.minus(
+            userOrder.price * (prevQuantity - remainingQuantity)
+        )!!
+        // Add money to sellers wallet
+        this.userService.all_users[userName]?.wallet?.free = this.userService.all_users[userName]?.wallet?.free?.minus(
+            userOrder.price * (prevQuantity - remainingQuantity)
+        )!!
+        // Add buyers luck back to free from locked
+        this.userService.all_users[anOrder.userName]?.wallet?.free = this.userService.all_users[anOrder.userName]?.wallet?.free?.plus(
+            (anOrder.price - userOrder.price) * (prevQuantity - remainingQuantity)
+        )!!
+        this.userService.all_users[anOrder.userName]?.wallet?.locked = this.userService.all_users[anOrder.userName]?.wallet?.locked?.minus(
+            (anOrder.price - userOrder.price) * (prevQuantity - remainingQuantity)
+        )!!
+    }
     fun placeOrder(userName: String, quantity: Long, type: String, price: Long): Map<String, Any> {
 
-        var errors = checkOrderParameters(quantity, price, type)
-        if(errors.isNotEmpty()){
+        var userErrors = checkOrderParameters(quantity, price, type)
+        if(userErrors.isNotEmpty()){
             // add to list of errors
-            return mapOf("errors" to errors)
+            return mapOf("errors" to userErrors)
         }
         else{
             var userOrder = Order(quantity, type, price, orderCount, userName)
@@ -60,35 +108,14 @@ class OrderService{
                            sellOrders.remove(anOrder)
                        }
                        if(remainingQuantity == 0L){
+                           // Order is complete
                            buyOrders.remove(userOrder)
                            userOrder.updateOrderQuantity(prevQuantity - remainingQuantity, anOrder.price)
                        }
                        else{
                            userOrder.updateOrderQuantity(prevQuantity - remainingQuantity, anOrder.price)
                        }
-                       // Deduct money of quantity taken from buyer
-                       this.userService.all_users[userName]?.wallet?.locked = this.userService.all_users[userName]?.wallet?.locked?.minus(
-                           anOrder.price * (prevQuantity - remainingQuantity)
-                       )!!
-                       // Add money of quantity taken from seller
-                       this.userService.all_users[anOrder.userName]?.wallet?.free  = this.userService.all_users[anOrder.userName]?.wallet?.free?.plus(
-                           anOrder.price * (prevQuantity - remainingQuantity)
-                       )!!
-                       // Deduct inventory of stock from sellers
-                       this.userService.all_users[anOrder.userName]?.inventory?.locked = this.userService.all_users[anOrder.userName]?.inventory?.locked?.minus(
-                           (prevQuantity - remainingQuantity)
-                       )!!
-                       // Add purchased inventory to buyer
-                       this.userService.all_users[userName]?.inventory?.free = this.userService.all_users[userName]?.inventory?.free?.plus(
-                           (prevQuantity - remainingQuantity)
-                       )!!
-                       // Add buyers luck back to free from locked
-                       this.userService.all_users[userName]?.wallet?.free = this.userService.all_users[userName]?.wallet?.free?.plus(
-                           (userOrder.price - anOrder.price) * (prevQuantity - remainingQuantity)
-                       )!!
-                       this.userService.all_users[userName]?.wallet?.locked = this.userService.all_users[userName]?.wallet?.locked?.minus(
-                           (userOrder.price - anOrder.price) * (prevQuantity - remainingQuantity)
-                       )!!
+                       updateOrderDetailsForBuy(userName, prevQuantity, remainingQuantity, anOrder, userOrder)
                        if(remainingQuantity == 0L){
                            break
                        }
@@ -107,34 +134,13 @@ class OrderService{
                             buyOrders.remove(anOrder)
                         }
                         if(remainingQuantity == 0L){
+                            // Order is complete
                             sellOrders.remove(userOrder)
                             userOrder.updateOrderQuantity(prevQuantity - remainingQuantity, userOrder.price)
                         } else{
                             userOrder.updateOrderQuantity(prevQuantity - remainingQuantity, userOrder.price)
                         }
-                        // Deduct inventory from sellers stock
-                        this.userService.all_users[userName]?.inventory?.locked = this.userService.all_users[userName]?.inventory?.locked?.minus(
-                            (prevQuantity - remainingQuantity)
-                        )!!
-                        // Add inventory to buyers stock
-                        this.userService.all_users[anOrder.userName]?.inventory?.free  = this.userService.all_users[anOrder.userName]?.inventory?.free?.plus(
-                            (prevQuantity - remainingQuantity)
-                        )!!
-                        // Deduct money from buyers wallet
-                        this.userService.all_users[anOrder.userName]?.wallet?.locked  = this.userService.all_users[anOrder.userName]?.wallet?.locked?.minus(
-                            userOrder.price * (prevQuantity - remainingQuantity)
-                        )!!
-                        // Add money to sellers wallet
-                        this.userService.all_users[userName]?.wallet?.free = this.userService.all_users[userName]?.wallet?.free?.minus(
-                            userOrder.price * (prevQuantity - remainingQuantity)
-                        )!!
-                        // Add buyers luck back to free from locked
-                        this.userService.all_users[anOrder.userName]?.wallet?.free = this.userService.all_users[anOrder.userName]?.wallet?.free?.plus(
-                            (anOrder.price - userOrder.price) * (prevQuantity - remainingQuantity)
-                        )!!
-                        this.userService.all_users[anOrder.userName]?.wallet?.locked = this.userService.all_users[anOrder.userName]?.wallet?.locked?.minus(
-                            (anOrder.price - userOrder.price) * (prevQuantity - remainingQuantity)
-                        )!!
+                        updateOrderDetailsForSell(userName, prevQuantity, remainingQuantity, anOrder, userOrder)
                         if(remainingQuantity == 0L){
                             break
                         }

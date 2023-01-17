@@ -1,6 +1,5 @@
 package com.esop.constant
 
-import io.micronaut.json.tree.JsonObject
 
 val errors = mapOf(
     "PHONENUMBER_EXISTS" to "User with given phone number already exists.",

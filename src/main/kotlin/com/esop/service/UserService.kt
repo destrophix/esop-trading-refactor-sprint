@@ -1,17 +1,10 @@
 package com.esop.service
 
-import com.esop.schema.Order
 import com.esop.schema.User
-import io.micronaut.json.tree.JsonNode
 import io.micronaut.json.tree.JsonObject
-import io.micronaut.validation.validator.constraints.EmailValidator
-import java.util.regex.Pattern
 import com.esop.constant.errors
 import com.esop.constant.success_response
 import jakarta.inject.Singleton
-import javax.validation.constraints.Null
-import kotlin.reflect.jvm.internal.impl.load.kotlin.JvmType
-import kotlin.reflect.jvm.internal.impl.resolve.constants.NullValue
 
 @Singleton
 class UserService {
@@ -33,22 +26,22 @@ class UserService {
         return false
     }
     fun orderCheckBeforePlace(userName: String, quantity: Long, type: String, price: Long): Map<String, MutableList<String>>{
-        var errors = mutableListOf<String>()
+        var userErrors = mutableListOf<String>()
         if(!all_users.containsKey(userName)){
-            errors.add("User doesn't exist")
-            return mapOf("errors" to errors)
+            userErrors.add("User doesn't exist")
+            return mapOf("errors" to userErrors)
         }
         if(type == "BUY"){
             if(!check_wallet(price*quantity, userName)){
-                errors.add("Insufficient funds")
+                userErrors.add("Insufficient funds")
             }
         }
         else if(type == "SELL"){
             if(!check_inventory(quantity, userName)){
-                errors.add("Insufficient inventory")
+                userErrors.add("Insufficient inventory")
             }
         }
-        if(errors.isEmpty()){
+        if(userErrors.isEmpty()){
             if(type == "BUY"){
                 all_users[userName]?.buyAndUpdateWallet(price*quantity)
             }
@@ -56,7 +49,7 @@ class UserService {
                 all_users[userName]?.sellAndUpdateInventory(quantity)
             }
         }
-        return mapOf("errors" to errors)
+        return mapOf("errors" to userErrors)
     }
     fun user_exists(userName: String): Boolean{
         return all_users.containsKey(userName)

@@ -1,10 +1,7 @@
 package com.esop.controller
 
-import com.esop.schema.Order
-import com.esop.schema.User
 import com.esop.service.*
 import io.micronaut.http.HttpResponse
-import com.esop.service.*
 import io.micronaut.http.annotation.Body
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
@@ -12,8 +9,6 @@ import io.micronaut.http.MediaType
 import io.micronaut.http.annotation.Post
 import io.micronaut.json.tree.JsonObject
 import jakarta.inject.Inject
-import org.json.JSONObject
-import java.lang.Error
 
 
 @Controller("/user")

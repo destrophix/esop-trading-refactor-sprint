@@ -120,6 +120,9 @@ class UserService {
 }
     fun accountInformation(userName: String): Any {
         val user = all_users[userName.toString()]
+
+        var accountErrors = mutableListOf<String>()
+
         var userData= mapOf("firstName" to user?.firstName.toString() ,"lastName" to user?.lastName.toString(), "phoneNumber" to user?.phoneNumber.toString(), "email" to user?.email.toString(), "wallet" to user?.wallet, "inventory" to user?.inventory)
         if(user!=null){
             //val newUser = "{\"firstName\": ${user?.firstName.toString()}, \"lastName\": ${user?.lastName}, \"phoneNumber\": ${user?.phoneNumber}, \"email\": ${user?.email}, \"username\": ${user?.username}"
@@ -127,7 +130,9 @@ class UserService {
             return userData
         }
 
-        return mapOf("errors" to errors["USER_DOES_NOT_EXISTS"].toString())
+        accountErrors.add("USER_DOES_NOT_EXISTS")
+
+        return mapOf("errors" to accountErrors)
     }
 
 
@@ -135,24 +140,31 @@ class UserService {
     {
         var quant=body.get("quantity").longValue
 
+        var accountErrors =mutableListOf<String>()
+
         var usr1= all_users[userName]
 
         if (usr1 != null) {
             usr1.addInventory(quant)
             return mapOf("message" to "${quant} ESOPS added to inventory")
         }
-        return mapOf("errors" to errors["USER_DOES_NOT_EXISTS"].toString())
+        accountErrors.add("USER_DOES_NOT_EXIST")
+        return mapOf("errors" to accountErrors)
     }
 
     fun adding_Money(body: JsonObject, userName: String): Any
     {
         var amt=body.get("amount").longValue
+        var accountErrors =mutableListOf<String>()
         var usr1= all_users[userName]
 
         if (usr1 != null) {
             usr1.addWallet(amt)
             return mapOf("message" to "${amt} amount added to account");
         }
-        return mapOf("errors" to errors["USER_DOES_NOT_EXISTS"]).toString()
+        accountErrors.add("USER_DOES_NOT_EXIST")
+        return mapOf("errors" to accountErrors)
+
+        //return mapOf("errors" to errors["USER_DOES_NOT_EXISTS"]).toString()
     }
 }

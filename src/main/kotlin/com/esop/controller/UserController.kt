@@ -1,5 +1,6 @@
 package com.esop.controller
 
+import com.esop.schema.Order
 import com.esop.schema.User
 import com.esop.service.check_email
 import com.esop.service.check_phonenumber
@@ -62,7 +63,14 @@ class UserController {
     }
 
     @Post(uri="/{userName}/order", consumes = [MediaType.APPLICATION_JSON],produces=[MediaType.APPLICATION_JSON])
-    fun order(@Body body: JsonObject) {
-
+    fun order(userName: String, @Body body: JsonObject){
+        var quantity: Long = body.get("quantity").longValue
+        var type: String = body.get("type").stringValue
+        var price: Long = body.get("price").longValue
+        println(type)
+        println(price)
+        println(quantity)
+        println(userName)
+        println(body)
     }
 }

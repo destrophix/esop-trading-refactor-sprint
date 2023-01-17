@@ -25,8 +25,9 @@ class UserController {
     lateinit var userService: UserService
 
     @Post(uri="/register", consumes = [MediaType.APPLICATION_JSON],produces=[MediaType.APPLICATION_JSON])
-    open fun register(@Body response: JsonObject): String {
-          return this.userService.registerUser(response)
+    open fun register(@Body response: JsonObject): HttpResponse<*> {
+        val newUser = this.userService.registerUser(response)
+        return HttpResponse.ok(newUser)
     }
 
     @Post(uri="/{userName}/order", consumes = [MediaType.APPLICATION_JSON],produces=[MediaType.APPLICATION_JSON])
@@ -37,8 +38,9 @@ class UserController {
     }
 
     @Get(uri = "/{userName}/accountInformation", produces = [MediaType.APPLICATION_JSON])
-    fun getAccountInformation(userName: String): String {
-        return "Some response"
+    fun getAccountInformation(userName: String): HttpResponse<*> {
+        val userData = this.userService.accountInformation(userName)
+        return HttpResponse.ok(userData)
     }
 
     @Post(uri = "{userName}/inventory", consumes = [MediaType.APPLICATION_JSON], produces = [MediaType.APPLICATION_JSON])

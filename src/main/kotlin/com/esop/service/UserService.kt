@@ -21,14 +21,34 @@ class UserService {
     var all_users = HashMap<String, User>()
 
     fun check_inventory(quantity: Long, userName: String): Boolean{
-        if(all_users.containsKey(userName) && all_users[userName]?.inventory?.free!! > quantity){
+        if(user_exists(userName) && all_users[userName]?.inventory?.free!! > quantity){
             return true
         }
         return false
     }
-//    fun check_wallet(amount: Long, userName: String): Boolean{
-//
-//    }
+    fun check_wallet(amount: Long, userName: String): Boolean{
+        if(user_exists(userName) && all_users[userName]?.wallet?.free!! > amount){
+            return true
+        }
+        return false
+    }
+    fun orderCheckBeforePlace(userName: String, quantity: Long, type: String, price: Long): MutableList<String>{
+        var errors = mutableListOf<String>()
+        if(type == "BUY"){
+            if(!check_wallet(price, userName)){
+                errors.add("Insufficient funds")
+            }
+        }
+        else if(type == "SELL"){
+            if(!check_inventory(quantity, userName)){
+                errors.add("Insufficient inventory")
+            }
+        }
+        else{
+            errors.add("Invalid Username")
+        }
+        return errors
+    }
     fun user_exists(userName: String): Boolean{
         return all_users.containsKey(userName)
     }

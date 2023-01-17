@@ -19,25 +19,46 @@ class Order{
     var orderStatus: String = "PENDING" // COMPLETED, PARTIAL, PENDING
     var currentQuantity: Int = 0
     var filled: MutableList<OrderFiller> = mutableListOf()
-    constructor(quantity: Long, type: String, price: Long, orderId: Int){
-        this.quantity = quantity.toInt()
+
+    var userName: String = ""
+    constructor(quantity: Long, type: String, price: Long, orderId: Int, userName: String){
+        this.quantity = quantity
+
         this.type = type
         this.price = price.toInt()
         this.orderId = orderId
+
+        this.userName = userName
     }
-    fun updateOrderQuantity(quantity: Int, amount: Int){
+    fun orderAvailable():Boolean{
+        return orderStatus != "Completed"
+    }
+    fun updateOrderQuantity(quantity: Long, amount: Long): Long{
         // This function will execute when the user's order was partially or fully
         // filled/sold
-        if((currentQuantity - quantity) >= 0){
-            currentQuantity -= quantity
-            if(currentQuantity == 0){
+        var remainingQuantity = quantity
+        val prevQuantity = currentQuantity
+        if(currentQuantity>0){
+            if(quantity > currentQuantity){
+                remainingQuantity -= currentQuantity
+                currentQuantity = 0
+            }
+            else{
+                currentQuantity -= quantity
+                remainingQuantity = 0L
+            }
+            if(currentQuantity == 0L){
+
                 orderStatus = "COMPLETED"
             }
             else
                 orderStatus = "PARTIAL"
             }
-            val newOrder = OrderFiller(quantity,amount)
+
+            val newOrder = OrderFiller(prevQuantity - currentQuantity, amount)
+
             filled.add(newOrder)
         }
+        return remainingQuantity
     }
 }

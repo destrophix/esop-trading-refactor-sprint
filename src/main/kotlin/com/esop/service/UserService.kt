@@ -34,6 +34,10 @@ class UserService {
     }
     fun orderCheckBeforePlace(userName: String, quantity: Long, type: String, price: Long): MutableList<String>{
         var errors = mutableListOf<String>()
+        if(!all_users.containsKey(userName)){
+            errors.add("User doesn't exist")
+            return errors
+        }
         if(type == "BUY"){
             if(!check_wallet(price, userName)){
                 errors.add("Insufficient funds")
@@ -43,9 +47,6 @@ class UserService {
             if(!check_inventory(quantity, userName)){
                 errors.add("Insufficient inventory")
             }
-        }
-        else{
-            errors.add("Invalid Username")
         }
         return errors
     }

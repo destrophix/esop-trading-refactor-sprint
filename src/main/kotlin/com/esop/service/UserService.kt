@@ -32,18 +32,12 @@ class UserService {
     fun orderCheckBeforePlace(userName: String, quantity: Long, type: String, price: Long): MutableList<String>{
         var errors = mutableListOf<String>()
         if(type == "BUY"){
-            if(check_wallet(price, userName)){
-                all_users[userName]?.buyAndUpdateWallet(price)
-            }
-            else{
+            if(!check_wallet(price, userName)){
                 errors.add("Insufficient funds")
             }
         }
         else if(type == "SELL"){
-            if(check_inventory(quantity, userName)){
-                all_users[userName]?.sellAndUpdateInventory(quantity)
-            }
-            else{
+            if(!check_inventory(quantity, userName)){
                 errors.add("Insufficient inventory")
             }
         }

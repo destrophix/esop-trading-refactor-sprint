@@ -23,6 +23,9 @@ class UserController {
     @Post(uri="/register", consumes = [MediaType.APPLICATION_JSON],produces=[MediaType.APPLICATION_JSON])
     open fun register(@Body response: JsonObject): HttpResponse<*> {
         val newUser = this.userService.registerUser(response)
+//        if(newUser.containsKey("error")){
+//            return HttpResponse.badRequest(newUser)
+//        }
         return HttpResponse.ok(newUser)
     }
 
@@ -33,29 +36,30 @@ class UserController {
         var type: String = body.get("type").stringValue
         var price: Long = body.get("price").longValue
         var userErrors = this.userService.orderCheckBeforePlace(userName, quantity, type, price)
-        if(userErrors["errors"]?.isEmpty()!!){
+        if(userErrors["error"]?.isEmpty()!!){
             println("PLACING ORDER")
             var userOrderOrErrors = this.orderService.placeOrder(userName, quantity, type, price)
             println(userOrderOrErrors)
             if (userOrderOrErrors["orderId"] != null) {
-                return mapOf(
+                return HttpResponse.ok(mapOf(
                     "orderId" to userOrderOrErrors["orderId"],
                     "quantity" to quantity,
                     "type" to type,
                     "price" to price
-                )
+                ))
             }else{
-                return userOrderOrErrors
+                return HttpResponse.badRequest(userOrderOrErrors)
             }
 
         }
 
-        return userErrors
+        return HttpResponse.badRequest(userErrors)
     }
 
     @Get(uri = "/{userName}/accountInformation", produces = [MediaType.APPLICATION_JSON])
     fun getAccountInformation(userName: String): HttpResponse<*> {
         val userData = this.userService.accountInformation(userName)
+//        if(userData.)
         return HttpResponse.ok(userData)
     }
 
@@ -75,7 +79,6 @@ class UserController {
     @Get(uri = "/{userName}/order", produces = [MediaType.APPLICATION_JSON])
     fun orderHistory(userName: String): HttpResponse<*> {
         val order_history = this.orderService.orderHistory(userName)
-        println(order_history)
         return HttpResponse.ok(order_history)
     }
 }

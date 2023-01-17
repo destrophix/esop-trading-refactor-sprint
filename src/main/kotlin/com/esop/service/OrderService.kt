@@ -87,7 +87,7 @@ class OrderService{
         var userErrors = checkOrderParameters(quantity, price, type)
         if(userErrors.isNotEmpty()){
             // add to list of errors
-            return mapOf("errors" to userErrors)
+            return mapOf("error" to userErrors)
         }
         else{
             var userOrder = Order(quantity, type, price, orderCount, userName)

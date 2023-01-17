@@ -42,13 +42,13 @@ class UserController {
     }
 
     @Post(uri = "{userName}/inventory", consumes = [MediaType.APPLICATION_JSON], produces = [MediaType.APPLICATION_JSON])
-    fun addInventory(userName: String): String {
-        return "Some response"
+    fun addInventory(userName: String, @Body body: JsonObject){
+        return this.userService.adding_inventory(body,userName)
     }
 
     @Post(uri = "{userName}/wallet", consumes = [MediaType.APPLICATION_JSON], produces = [MediaType.APPLICATION_JSON])
-    fun addWallet(userName: String): String {
-        return "Some response"
+    fun addWallet(userName: String, @Body body: JsonObject) {
+        return this.userService.adding_Money(body,userName)
     }
 
     @Get(uri = "/{userName}/order", produces = [MediaType.APPLICATION_JSON])

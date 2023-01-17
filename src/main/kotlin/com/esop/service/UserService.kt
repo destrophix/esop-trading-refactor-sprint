@@ -88,4 +88,26 @@ class UserService {
         return success_response["USER_CREATED"].toString()
     }
 
+
+    fun adding_inventory(body: JsonObject, userName: String)
+    {
+        var quant=body.get("quantity").longValue
+
+        var usr1= all_users[userName]
+
+        if (usr1 != null) {
+            usr1.addInventory(quant)
+        }
+    }
+
+    fun adding_Money(body: JsonObject, userName: String)
+    {
+        var amt=body.get("amount").longValue
+        var usr1= all_users[userName]
+
+        if (usr1 != null) {
+            usr1.addWallet(amt)
+        }
+    }
+
 }

@@ -2,9 +2,7 @@ package com.esop.controller
 
 import com.esop.schema.Order
 import com.esop.schema.User
-import com.esop.service.check_email
-import com.esop.service.check_phonenumber
-import com.esop.service.check_username
+import com.esop.service.*
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.annotation.Body
 import io.micronaut.http.annotation.Controller
@@ -64,13 +62,28 @@ class UserController {
 
     @Post(uri="/{userName}/order", consumes = [MediaType.APPLICATION_JSON],produces=[MediaType.APPLICATION_JSON])
     fun order(userName: String, @Body body: JsonObject){
-        var quantity: Long = body.get("quantity").longValue
-        var type: String = body.get("type").stringValue
-        var price: Long = body.get("price").longValue
-        println(type)
-        println(price)
-        println(quantity)
-        println(userName)
-        println(body)
+        if(all_users.containsKey(userName)){
+            var quantity: Long = body.get("quantity").longValue
+            var type: String = body.get("type").stringValue
+            var price: Long = body.get("price").longValue
+
+            if(!checkOrderParameters(quantity, price, type)){
+                // add to list of errors
+            }
+            else{
+                var userOrder = Order(quantity, type, price, orderCount)
+                orderCount += 1
+                println(type)
+                println(price)
+                println(quantity)
+                println(userName)
+                println(body)
+            }
+
+        }
+        else{
+            // Error messages
+        }
+
     }
 }

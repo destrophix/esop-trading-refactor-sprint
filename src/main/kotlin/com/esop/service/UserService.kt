@@ -11,7 +11,6 @@ val all_emails= mutableSetOf<String>()
 val all_numbers= mutableSetOf<String>()
 val all_usernames= mutableSetOf<String>()
 
-var all_orders = HashMap<String, List<Order>>()
 var all_users = HashMap<String, User>()
 
 fun check_username(username_set: MutableSet<String>, search_value: String) : Boolean

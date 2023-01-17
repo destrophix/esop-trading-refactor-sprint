@@ -7,14 +7,14 @@ class ItemData{
 class User {
     var firstName: String = ""
     var lastName: String = ""
-    var phoneNumber: Int = -1
+    var phoneNumber: String = ""
     var email: String = ""
     var username: String = ""
 
     val wallet: ItemData = ItemData()
     val inventory: ItemData = ItemData()
 
-    constructor(fName: String, lName: String, pNumber: Int, em: String, uname: String){
+    constructor(fName: String, lName: String, pNumber: String, em: String, uname: String){
         firstName = fName
         lastName = lName
         phoneNumber = pNumber

@@ -1,9 +1,15 @@
 package com.esop.service
 
+import io.micronaut.json.tree.JsonNode
 import java.util.regex.Pattern
 
+val all_firstname= mutableSetOf<String>()
+val all_lastname= mutableSetOf<String>()
+val all_emails= mutableSetOf<String>()
+val all_numbers= mutableSetOf<String>()
+val all_usernames= mutableSetOf<String>()
 
-fun check_username(username_set: MutableSet<String>,search_value:String) : Boolean
+fun check_username(username_set: MutableSet<String>, search_value: String) : Boolean
 {
     return username_set.contains(search_value);
 }
@@ -13,7 +19,7 @@ fun check_phonenumber(usernumber_set: MutableSet<String>,search_value:String) : 
     return usernumber_set.contains(search_value);
 }
 
-fun check_email(useremail_set: MutableSet<String>,search_value:String) : Boolean
+fun check_email(useremail_set: MutableSet<String>, search_value: String) : Boolean
 {
     return useremail_set.contains(search_value);
 }
@@ -29,5 +35,6 @@ fun isEmailValid(email: String): Boolean {
 }
 
 class UserService {
+
 
 }

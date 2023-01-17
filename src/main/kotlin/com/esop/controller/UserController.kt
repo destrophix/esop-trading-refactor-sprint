@@ -44,8 +44,9 @@ class UserController {
     }
 
     @Post(uri = "{userName}/inventory", consumes = [MediaType.APPLICATION_JSON], produces = [MediaType.APPLICATION_JSON])
-    fun addInventory(userName: String, @Body body: JsonObject){
-        this.userService.adding_inventory(body,userName)
+    fun addInventory(userName: String, @Body body: JsonObject): HttpResponse<*>{
+        val newInventory = this.userService.adding_inventory(body,userName)
+        return HttpResponse.ok(newInventory)
     }
 
     @Post(uri = "{userName}/wallet", consumes = [MediaType.APPLICATION_JSON], produces = [MediaType.APPLICATION_JSON])
@@ -56,7 +57,8 @@ class UserController {
     }
 
     @Get(uri = "/{userName}/order", produces = [MediaType.APPLICATION_JSON])
-    fun getOrder(userName: String): String {
-        return "Some response"
+    fun orderHistory(userName: String): HttpResponse<*> {
+        val order_history = this.orderService.orderHistory(userName)
+        return HttpResponse.ok(order_history)
     }
 }

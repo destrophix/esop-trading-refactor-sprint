@@ -107,16 +107,18 @@ class UserService {
     }
 
 
-    fun adding_inventory(body: JsonObject, userName: String){
+    fun adding_inventory(body: JsonObject, userName: String): Any
+    {
         var quant=body.get("quantity").longValue
 
         var usr1= all_users[userName]
 
         if (usr1 != null) {
             usr1.addInventory(quant)
+            return mapOf("message" to "${quant} ESOPS added to inventory")
         }
 
-
+        return mapOf("errors" to errors["USER_DOES_NOT_EXISTS"].toString())
     }
 
     fun adding_Money(body: JsonObject, userName: String): Any
@@ -130,6 +132,8 @@ class UserService {
         }
         return mapOf("messsage" to "user does not exist")
     }
+
+
 
 
 }

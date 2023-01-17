@@ -1,6 +1,7 @@
 package com.esop.service
 
 
+import com.esop.constant.errors
 import com.esop.schema.Order
 import io.micronaut.json.tree.JsonObject
 import jakarta.inject.Singleton
@@ -21,7 +22,7 @@ class OrderService{
     var buyOrders = mutableListOf<Order>()
     var sellOrders = mutableListOf<Order>()
 
-    fun placeOrder(body: JsonObject, userName: String){
+    fun placeOrder(body: JsonObject, userName: String): Any{
 
         var quantity: Long = body.get("quantity").longValue
         var type: String = body.get("type").stringValue
@@ -40,9 +41,21 @@ class OrderService{
                 sellOrders.add(userOrder)
             }
             all_orders[userName]?.add(userOrder)
-
+            return userOrder
         }
+        return ""
     }
+
+    fun orderHistory(userName: String): Any {
+        val order_history = all_orders[userName]?.toList()
+
+        if (order_history.isNullOrEmpty()) {
+            return mapOf("message" to "User does not have any orders")
+        }
+
+        return order_history
+    }
+
 
 }
 

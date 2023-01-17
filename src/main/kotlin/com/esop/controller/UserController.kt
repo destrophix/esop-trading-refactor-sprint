@@ -1,13 +1,12 @@
 package com.esop.controller
 
+import com.esop.schema.Order
 import com.esop.schema.User
 import com.esop.service.check_email
 import com.esop.service.check_phonenumber
 import com.esop.service.check_username
-import io.micronaut.http.HttpResponse
 import io.micronaut.http.annotation.Body
 import io.micronaut.http.annotation.Controller
-import io.micronaut.http.annotation.Get
 import io.micronaut.http.HttpStatus
 import io.micronaut.http.MediaType
 import io.micronaut.http.annotation.Post
@@ -19,6 +18,7 @@ import java.lang.Error
 val all_usernames= mutableSetOf<String>()
 val all_emails= mutableSetOf<String>()
 val all_numbers= mutableSetOf<String>()
+var orderID_counter=0;
 
 
 @Controller("/user")
@@ -62,7 +62,16 @@ class UserController {
     }
 
     @Post(uri="/{userName}/order", consumes = [MediaType.APPLICATION_JSON],produces=[MediaType.APPLICATION_JSON])
-    fun order(@Body body: JsonObject) {
+    fun order(@Body orderdata: JsonObject) {
 
+        //getting all parameters of a placed order
+        var quant = orderdata.get("quantity").toString().toInt();
+        var type= orderdata.get("type").toString();
+        var price = orderdata.get("price").toString().toInt();
+
+        // initialising a object of class Order
+        val order= Order(quant,type,price, orderID_counter);
+
+        orderID_counter+=1;   // order ID counter increment
     }
 }

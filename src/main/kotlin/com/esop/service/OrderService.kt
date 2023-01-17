@@ -6,7 +6,7 @@ import io.micronaut.json.tree.JsonNode
 import java.util.regex.Pattern
 
 
-var all_orders = HashMap<String, List<Order>>()
+var all_orders = HashMap<String, ArrayList<Order>>()
 
 var orderCount = 1
 
@@ -16,3 +16,6 @@ fun checkOrderParameters(quantity: Long, price: Long, type:String): Boolean{
     }
     return false
 }
+
+var buyOrders = mutableListOf<Order>()
+var sellOrders = mutableListOf<Order>()

@@ -73,11 +73,14 @@ class UserController {
             else{
                 var userOrder = Order(quantity, type, price, orderCount)
                 orderCount += 1
-                println(type)
-                println(price)
-                println(quantity)
-                println(userName)
-                println(body)
+                if(type == "BUY"){
+                    buyOrders.add(userOrder)
+                }
+                else{
+                    sellOrders.add(userOrder)
+                }
+                all_orders[userName]?.add(userOrder)
+
             }
 
         }

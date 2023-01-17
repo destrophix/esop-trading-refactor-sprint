@@ -149,8 +149,6 @@ class OrderService{
                     }
                 }
             }
-            println(userOrder)
-            println(userOrder.orderId)
             return mapOf("orderId" to userOrder.orderId)
         }
     }

@@ -37,9 +37,7 @@ class UserController {
         var price: Long = body.get("price").longValue
         var userErrors = this.userService.orderCheckBeforePlace(userName, quantity, type, price)
         if(userErrors["error"]?.isEmpty()!!){
-            println("PLACING ORDER")
             var userOrderOrErrors = this.orderService.placeOrder(userName, quantity, type, price)
-            println(userOrderOrErrors)
             if (userOrderOrErrors["orderId"] != null) {
                 return HttpResponse.ok(mapOf(
                     "orderId" to userOrderOrErrors["orderId"],
@@ -80,7 +78,6 @@ class UserController {
     @Post(uri = "{userName}/wallet", consumes = [MediaType.APPLICATION_JSON], produces = [MediaType.APPLICATION_JSON])
     fun addWallet(userName: String, @Body body: JsonObject) :HttpResponse<*> {
         val addedMoney=this.userService.adding_Money(body,userName)
-        println(addedMoney["error"])
         if(addedMoney["error"] != null) {
             return HttpResponse.badRequest(addedMoney)
         }

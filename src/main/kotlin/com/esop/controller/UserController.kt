@@ -14,11 +14,10 @@ import io.micronaut.http.annotation.Post
 import io.micronaut.json.tree.JsonObject
 import org.json.JSONObject
 import java.lang.Error
+import com.esop.service.registerUser
 
 
-val all_usernames= mutableSetOf<String>()
-val all_emails= mutableSetOf<String>()
-val all_numbers= mutableSetOf<String>()
+
 
 
 @Controller("/user")
@@ -26,39 +25,8 @@ class UserController {
 
 
     @Post(uri="/register", consumes = [MediaType.APPLICATION_JSON],produces=[MediaType.APPLICATION_JSON])
-    open fun register(@Body response: JsonObject) {
-
-
-        var v1=response.get("firstname").toString()
-        var v2=response.get("lastName").toString()
-        var v3=response.get("phoneNumber").toString()
-        var v4=response.get("email").toString()
-        var v5=response.get("username").toString()
-
-
-        val x=check_username(all_usernames,v5)
-        val y=check_email(all_emails,v4);
-        val z=check_phonenumber(all_usernames,v3);
-
-        if (x==true and y==true and z)
-        {
-            // constructor call to set properties of object
-            val user= User(v1,v2,v3,v4,v5);
-
-            // adding in different sets for checking unique feature
-            all_emails.add(v4)
-            all_numbers.add(v3)
-            all_usernames.add(v5)
-        }
-        else
-        {
-            // error raise
-
-        }
-
-
-
-
+    open fun register(@Body response: JsonObject): String {
+          return registerUser(response)
     }
 
     @Post(uri="/{userName}/order", consumes = [MediaType.APPLICATION_JSON],produces=[MediaType.APPLICATION_JSON])

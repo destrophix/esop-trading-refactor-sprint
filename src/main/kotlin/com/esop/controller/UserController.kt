@@ -32,8 +32,17 @@ class UserController {
     @Post(uri="/{userName}/order", consumes = [MediaType.APPLICATION_JSON],produces=[MediaType.APPLICATION_JSON])
 
     fun order(userName: String, @Body body: JsonObject){
+        var quantity: Long = body.get("quantity").longValue
+        var type: String = body.get("type").stringValue
+        var price: Long = body.get("price").longValue
+        var errors = this.userService.orderCheckBeforePlace(userName, quantity, type, price)
+        if(errors.isEmpty()){
+            this.orderService.placeOrder(userName, quantity, type, price)
+        }
+        else{
+            // Add to errors
+        }
 
-        this.orderService.placeOrder(body, userName)
     }
 
     @Get(uri = "/{userName}/accountInformation", produces = [MediaType.APPLICATION_JSON])

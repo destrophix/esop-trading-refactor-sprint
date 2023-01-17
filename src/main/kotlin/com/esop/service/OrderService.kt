@@ -24,11 +24,7 @@ class OrderService{
     var buyOrders = mutableListOf<Order>()
     var sellOrders = mutableListOf<Order>()
 
-    fun placeOrder(body: JsonObject, userName: String){
-
-        var quantity: Long = body.get("quantity").longValue
-        var type: String = body.get("type").stringValue
-        var price: Long = body.get("price").longValue
+    fun placeOrder(userName: String, quantity: Long, type: String, price: Long){
 
         if(!checkOrderParameters(quantity, price, type)){
             // add to list of errors
@@ -36,13 +32,21 @@ class OrderService{
         else{
             var userOrder = Order(quantity, type, price, orderCount)
             orderCount += 1
+            all_orders[userName]?.add(userOrder)
             if(type == "BUY"){
                 buyOrders.add(userOrder)
+                var sortedSellOrders = sellOrders.sortedWith(compareBy({it.price}, {it.timeStamp}))
+                for(anOrder in sortedSellOrders){
+                   if((userOrder.price >= anOrder.price) && (anOrder.orderAvailable())){
+                       anOrder.updateOrderQuantity(userOrder.quantity, userOrder.price)
+                   }
+                }
             }
             else{
                 sellOrders.add(userOrder)
+                buyOrders.sortedWith(compareBy({it.price}, {it.timeStamp}))
             }
-            all_orders[userName]?.add(userOrder)
+
 
         }
     }

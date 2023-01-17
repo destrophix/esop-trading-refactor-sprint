@@ -26,6 +26,9 @@ class Order{
         this.orderId = orderId
 
     }
+    fun orderAvailable():Boolean{
+        return orderStatus != "Completed"
+    }
     fun updateOrderQuantity(quantity: Long, amount: Long){
         // This function will execute when the user's order was partially or fully
         // filled/sold

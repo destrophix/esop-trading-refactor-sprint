@@ -39,7 +39,7 @@ class UserService {
             return errors
         }
         if(type == "BUY"){
-            if(!check_wallet(price, userName)){
+            if(!check_wallet(price*quantity, userName)){
                 errors.add("Insufficient funds")
             }
         }
@@ -50,7 +50,7 @@ class UserService {
         }
         if(errors.isEmpty()){
             if(type == "BUY"){
-                all_users[userName]?.buyAndUpdateWallet(price)
+                all_users[userName]?.buyAndUpdateWallet(price*quantity)
             }
             if(type == "SELL"){
                 all_users[userName]?.sellAndUpdateInventory(quantity)

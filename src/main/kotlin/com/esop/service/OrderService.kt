@@ -28,7 +28,9 @@ class OrderService{
 
 
     fun placeOrder(userName: String, quantity: Long, type: String, price: Long): Order? {
-
+        for(i in this.userService.all_users){
+            println(i)
+        }
 
         if(!checkOrderParameters(quantity, price, type)){
             // add to list of errors
@@ -54,7 +56,6 @@ class OrderService{
                        if(remainingQuantity == 0L){
                            buyOrders.remove(userOrder)
                            userOrder.updateOrderQuantity(prevQuantity - remainingQuantity, anOrder.price)
-                           break
                        }
                        else{
                            userOrder.updateOrderQuantity(prevQuantity - remainingQuantity, anOrder.price)
@@ -75,15 +76,22 @@ class OrderService{
                        this.userService.all_users[userName]?.inventory?.free = this.userService.all_users[userName]?.inventory?.free?.plus(
                            (prevQuantity - remainingQuantity)
                        )!!
+                       // Add buyers luck back to free from locked
+                       this.userService.all_users[userName]?.wallet?.free = this.userService.all_users[userName]?.wallet?.free?.plus(
+                           (userOrder.price - anOrder.price) * (prevQuantity - remainingQuantity)
+                       )!!
+                       this.userService.all_users[userName]?.wallet?.locked = this.userService.all_users[userName]?.wallet?.locked?.minus(
+                           (userOrder.price - anOrder.price) * (prevQuantity - remainingQuantity)
+                       )!!
+                       if(remainingQuantity == 0L){
+                           break
+                       }
                    }
                 }
             }
             else{
                 sellOrders.add(userOrder)
                 var sortedBuyOrders = buyOrders.sortedWith(compareByDescending<Order> {it.price}.thenBy{it.timeStamp})
-//                for(anOrder in sortedBuyOrders){
-//                    println(anOrder.orderId)
-//                }
                 var remainingQuantity = userOrder.quantity
                 for(anOrder in sortedBuyOrders){
                     if((userOrder.price <= anOrder.price) && (anOrder.orderAvailable())){
@@ -95,7 +103,6 @@ class OrderService{
                         if(remainingQuantity == 0L){
                             sellOrders.remove(userOrder)
                             userOrder.updateOrderQuantity(prevQuantity - remainingQuantity, userOrder.price)
-                            break
                         } else{
                             userOrder.updateOrderQuantity(prevQuantity - remainingQuantity, userOrder.price)
                         }
@@ -115,6 +122,16 @@ class OrderService{
                         this.userService.all_users[userName]?.wallet?.free = this.userService.all_users[userName]?.wallet?.free?.minus(
                             userOrder.price * (prevQuantity - remainingQuantity)
                         )!!
+                        // Add buyers luck back to free from locked
+                        this.userService.all_users[anOrder.userName]?.wallet?.free = this.userService.all_users[anOrder.userName]?.wallet?.free?.plus(
+                            (anOrder.price - userOrder.price) * (prevQuantity - remainingQuantity)
+                        )!!
+                        this.userService.all_users[anOrder.userName]?.wallet?.locked = this.userService.all_users[anOrder.userName]?.wallet?.locked?.minus(
+                            (anOrder.price - userOrder.price) * (prevQuantity - remainingQuantity)
+                        )!!
+                        if(remainingQuantity == 0L){
+                            break
+                        }
 
                     }
                 }

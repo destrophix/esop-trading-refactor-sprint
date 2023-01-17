@@ -2,9 +2,7 @@ package com.esop.controller
 
 import com.esop.schema.Order
 import com.esop.schema.User
-import com.esop.service.check_email
-import com.esop.service.check_phonenumber
-import com.esop.service.check_username
+import com.esop.service.*
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.annotation.Body
 import io.micronaut.http.annotation.Controller
@@ -13,21 +11,21 @@ import io.micronaut.http.HttpStatus
 import io.micronaut.http.MediaType
 import io.micronaut.http.annotation.Post
 import io.micronaut.json.tree.JsonObject
+import jakarta.inject.Inject
 import org.json.JSONObject
 import java.lang.Error
-import com.esop.service.registerUser
-
-
-
 
 
 @Controller("/user")
 class UserController {
 
+    @Inject
+    lateinit var userService: UserService
+
 
     @Post(uri="/register", consumes = [MediaType.APPLICATION_JSON],produces=[MediaType.APPLICATION_JSON])
     open fun register(@Body response: JsonObject): String {
-          return registerUser(response)
+          return this.userService.registerUser(response)
     }
 
     @Post(uri="/{userName}/order", consumes = [MediaType.APPLICATION_JSON],produces=[MediaType.APPLICATION_JSON])

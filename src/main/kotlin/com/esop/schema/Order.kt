@@ -24,7 +24,6 @@ class Order{
         this.type = type
         this.price = price.toInt()
         this.orderId = orderId
-
     }
     fun updateOrderQuantity(quantity: Int, amount: Int){
         // This function will execute when the user's order was partially or fully
@@ -34,10 +33,10 @@ class Order{
             if(currentQuantity == 0){
                 orderStatus = "COMPLETED"
             }
-            else{
+            else
                 orderStatus = "PARTIAL"
             }
-            val newOrder = OrderFiller(quantity, amount)
+            val newOrder = OrderFiller(quantity,amount)
             filled.add(newOrder)
         }
     }

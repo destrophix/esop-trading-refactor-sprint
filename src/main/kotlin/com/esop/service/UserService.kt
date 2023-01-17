@@ -107,8 +107,7 @@ class UserService {
     }
 
 
-    fun adding_inventory(body: JsonObject, userName: String)
-    {
+    fun adding_inventory(body: JsonObject, userName: String){
         var quant=body.get("quantity").longValue
 
         var usr1= all_users[userName]
@@ -116,16 +115,21 @@ class UserService {
         if (usr1 != null) {
             usr1.addInventory(quant)
         }
+
+
     }
 
-    fun adding_Money(body: JsonObject, userName: String)
+    fun adding_Money(body: JsonObject, userName: String): Any
     {
         var amt=body.get("amount").longValue
         var usr1= all_users[userName]
 
         if (usr1 != null) {
             usr1.addWallet(amt)
+            return mapOf("message" to "${amt} amount added to account");
         }
+        return mapOf("messsage" to "user does not exist")
     }
+
 
 }

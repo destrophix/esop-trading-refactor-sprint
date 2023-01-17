@@ -45,12 +45,14 @@ class UserController {
 
     @Post(uri = "{userName}/inventory", consumes = [MediaType.APPLICATION_JSON], produces = [MediaType.APPLICATION_JSON])
     fun addInventory(userName: String, @Body body: JsonObject){
-        return this.userService.adding_inventory(body,userName)
+        this.userService.adding_inventory(body,userName)
     }
 
     @Post(uri = "{userName}/wallet", consumes = [MediaType.APPLICATION_JSON], produces = [MediaType.APPLICATION_JSON])
-    fun addWallet(userName: String, @Body body: JsonObject) {
-        return this.userService.adding_Money(body,userName)
+    fun addWallet(userName: String, @Body body: JsonObject) :HttpResponse<*> {
+        val addedMoney=this.userService.adding_Money(body,userName)
+        return HttpResponse.ok(addedMoney)
+
     }
 
     @Get(uri = "/{userName}/order", produces = [MediaType.APPLICATION_JSON])

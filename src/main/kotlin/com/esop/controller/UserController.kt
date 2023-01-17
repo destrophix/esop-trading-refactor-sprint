@@ -19,8 +19,10 @@ import java.lang.Error
 class UserController {
 
     @Inject
-    lateinit var userService: UserService
+    lateinit var orderService: OrderService
 
+    @Inject
+    lateinit var userService: UserService
 
     @Post(uri="/register", consumes = [MediaType.APPLICATION_JSON],produces=[MediaType.APPLICATION_JSON])
     open fun register(@Body response: JsonObject): String {
@@ -28,8 +30,10 @@ class UserController {
     }
 
     @Post(uri="/{userName}/order", consumes = [MediaType.APPLICATION_JSON],produces=[MediaType.APPLICATION_JSON])
-    fun order(@Body response: JsonObject):String {
-        return place_order(response)
+
+    fun order(userName: String, @Body body: JsonObject){
+
+        this.orderService.placeOrder(body, userName)
     }
 
     @Get(uri = "/{userName}/accountInformation", produces = [MediaType.APPLICATION_JSON])

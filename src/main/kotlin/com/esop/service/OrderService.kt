@@ -1,22 +1,51 @@
 package com.esop.service
 
-import com.esop.constant.success_response
+
 import com.esop.schema.Order
+import com.esop.schema.User
+import io.micronaut.json.tree.JsonNode
 import io.micronaut.json.tree.JsonObject
+import jakarta.inject.Singleton
+import java.util.regex.Pattern
 
-var all_orders = HashMap<String, List<Order>>()
-var orderID_counter=0;
-fun place_order(orderdata: JsonObject):String
-{
-    //getting all parameters of a placed order
-    var quant = orderdata.get("quantity").toString().toInt();
-    var type= orderdata.get("type").toString();
-    var price = orderdata.get("price").toString().toInt();
+@Singleton
+class OrderService{
+    var all_orders = HashMap<String, ArrayList<Order>>()
 
-    // initialising a object of class Order
-    val order= Order(quant,type,price, orderID_counter);
-    orderID_counter+=1;   // order ID counter increment
+    var orderCount = 1
 
-    return success_response["Order placed successfully"].toString()
+    fun checkOrderParameters(quantity: Long, price: Long, type:String): Boolean{
+        if(quantity > 0 && price > 0 && (type == "BUY" || type =="SELL")){
+            return true
+        }
+        return false
+    }
+
+    var buyOrders = mutableListOf<Order>()
+    var sellOrders = mutableListOf<Order>()
+
+    fun placeOrder(body: JsonObject, userName: String){
+
+        var quantity: Long = body.get("quantity").longValue
+        var type: String = body.get("type").stringValue
+        var price: Long = body.get("price").longValue
+
+        if(!checkOrderParameters(quantity, price, type)){
+            // add to list of errors
+        }
+        else{
+            var userOrder = Order(quantity, type, price, orderCount)
+            orderCount += 1
+            if(type == "BUY"){
+                buyOrders.add(userOrder)
+            }
+            else{
+                sellOrders.add(userOrder)
+            }
+            all_orders[userName]?.add(userOrder)
+
+        }
+    }
 
 }
+

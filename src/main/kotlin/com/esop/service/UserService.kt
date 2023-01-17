@@ -17,7 +17,18 @@ class UserService {
     val all_usernames = mutableSetOf<String>()
     var all_users = HashMap<String, User>()
 
-
+    fun check_inventory(quantity: Long, userName: String): Boolean{
+        if(all_users.containsKey(userName) && all_users[userName]?.inventory?.free!! > quantity){
+            return true
+        }
+        return false
+    }
+//    fun check_wallet(amount: Long, userName: String): Boolean{
+//
+//    }
+    fun user_exists(userName: String): Boolean{
+        return all_users.containsKey(userName)
+    }
     fun check_username(username_set: MutableSet<String>, search_value: String): Boolean {
         return username_set.contains(search_value);
     }

@@ -48,6 +48,9 @@ class UserService {
                 errors.add("Insufficient inventory")
             }
         }
+        if(errors.isEmpty()){
+            all_users[userName]?.buyAndUpdateWallet(quantity)
+        }
         return errors
     }
     fun user_exists(userName: String): Boolean{

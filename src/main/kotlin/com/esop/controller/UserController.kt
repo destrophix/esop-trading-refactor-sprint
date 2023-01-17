@@ -33,7 +33,7 @@ class UserController {
 
     @Post(uri="/{userName}/order", consumes = [MediaType.APPLICATION_JSON],produces=[MediaType.APPLICATION_JSON])
 
-    fun order(userName: String, @Body body: JsonObject): Order? {
+    fun order(userName: String, @Body body: JsonObject): Any? {
         var quantity: Long = body.get("quantity").longValue
         var type: String = body.get("type").stringValue
         var price: Long = body.get("price").longValue
@@ -44,6 +44,7 @@ class UserController {
         }
         else{
             // Add to errors
+            return errors
         }
         return null
 

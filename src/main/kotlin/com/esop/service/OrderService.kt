@@ -119,12 +119,8 @@ class OrderService{
                     }
                 }
             }
-            for(i in all_orders[userName]!!){
-                if(userOrder.orderId == i.orderId){
-                    return i
-                }
-            }
-            return null
+
+            return userOrder
 
         }
         return null

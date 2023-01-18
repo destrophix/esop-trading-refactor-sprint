@@ -103,6 +103,9 @@ class OrderService{
                 var sortedSellOrders = sellOrders.sortedWith(compareBy({it.price}, {it.timeStamp}))
                 var remainingQuantity = userOrder.quantity
                 for(anOrder in sortedSellOrders){
+                    if(userName == anOrder.userName){
+                        continue
+                    }
                    if((userOrder.price >= anOrder.price) && (anOrder.orderAvailable())){
                        var prevQuantity = remainingQuantity
                        remainingQuantity = anOrder.updateOrderQuantity(remainingQuantity, anOrder.price)
@@ -129,6 +132,9 @@ class OrderService{
                 var sortedBuyOrders = buyOrders.sortedWith(compareByDescending<Order> {it.price}.thenBy{it.timeStamp})
                 var remainingQuantity = userOrder.quantity
                 for(anOrder in sortedBuyOrders){
+                    if(userName == anOrder.userName){
+                        continue
+                    }
                     if((userOrder.price <= anOrder.price) && (anOrder.orderAvailable())){
                         var prevQuantity = remainingQuantity
                         remainingQuantity = anOrder.updateOrderQuantity(remainingQuantity, userOrder.price)

@@ -7,7 +7,11 @@ val errors = mapOf(
     "EMAIL_EXISTS" to "User with given email already exists",
     "INVALID_EMAIL" to "Email id is not valid",
     "INVALID_PHONENUMBER" to "Phone number is not valid",
-    "USER_DOES_NOT_EXISTS" to "User not found"
+    "USER_DOES_NOT_EXISTS" to "User not found",
+    "POSITIVE_QUANTITY" to "Quantity must be positive.",
+    "POSITIVE_PRICE" to "Price must be positive.",
+    "INVALID_TYPE" to "Given type doesn't exist.",
+    "NO_ORDERS" to "User does not have any orders"
 )
 
 val success_response = mapOf(

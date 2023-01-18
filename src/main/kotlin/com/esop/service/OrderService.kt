@@ -19,13 +19,13 @@ class OrderService{
     private fun checkOrderParameters(quantity: Long, price: Long, type:String): MutableList<String>{
         var userErrors = mutableListOf<String>()
         if(quantity <= 0){
-            userErrors.add("Quantity must be positive.")
+            errors["POSITIVE_QUANTITY"]?.let { userErrors.add(it) }
         }
         if(price <= 0){
-            userErrors.add("Price must be positive.")
+            errors["POSITIVE_PRICE"]?.let { userErrors.add(it) }
         }
         if(type != "SELL" && type != "BUY"){
-            userErrors.add("Invalid type.")
+            errors["INVALID_TYPE"]?.let { userErrors.add(it) }
         }
         return userErrors
     }
@@ -103,9 +103,6 @@ class OrderService{
                 var sortedSellOrders = sellOrders.sortedWith(compareBy({it.price}, {it.timeStamp}))
                 var remainingQuantity = userOrder.quantity
                 for(anOrder in sortedSellOrders){
-                    if(userName == anOrder.userName){
-                        continue
-                    }
                    if((userOrder.price >= anOrder.price) && (anOrder.orderAvailable())){
                        var prevQuantity = remainingQuantity
                        remainingQuantity = anOrder.updateOrderQuantity(remainingQuantity, anOrder.price)
@@ -132,9 +129,6 @@ class OrderService{
                 var sortedBuyOrders = buyOrders.sortedWith(compareByDescending<Order> {it.price}.thenBy{it.timeStamp})
                 var remainingQuantity = userOrder.quantity
                 for(anOrder in sortedBuyOrders){
-                    if(userName == anOrder.userName){
-                        continue
-                    }
                     if((userOrder.price <= anOrder.price) && (anOrder.orderAvailable())){
                         var prevQuantity = remainingQuantity
                         remainingQuantity = anOrder.updateOrderQuantity(remainingQuantity, userOrder.price)
@@ -162,13 +156,13 @@ class OrderService{
         var userErrors = ArrayList<String>()
         if(!this.userService.all_users.contains(userName))
         {
-            userErrors.add("User does not exist")
+            errors["USER_DOES_NOT_EXISTS"]?.let { userErrors.add(it) }
             return mapOf("error" to userErrors)
         }
         val order_history = all_orders[userName]?.toList()
 
         if (order_history.isNullOrEmpty()) {
-            userErrors.add("User does not have any orders")
+            errors["NO_ORDERS"]?.let { userErrors.add(it) }
             return mapOf("error" to userErrors)
         }
 

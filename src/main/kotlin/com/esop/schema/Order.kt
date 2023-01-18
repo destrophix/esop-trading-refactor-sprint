@@ -34,24 +34,24 @@ class Order{
     fun orderAvailable():Boolean{
         return orderStatus != "Completed"
     }
-    fun updateOrderQuantity(quantity: Long, amount: Long): Long{
+    fun updateOrderQuantity(givenQuantity: Long, amount: Long): Long{
         // This function will execute when the user's order was partially or fully
         // filled/sold
-        var remainingQuantity: Long = quantity
+        var remainingQuantity: Long = givenQuantity
         val prevQuantity = currentQuantity
         if(currentQuantity>0){
-            if(quantity > currentQuantity){
+            if(givenQuantity > currentQuantity){
                 remainingQuantity -= currentQuantity
                 currentQuantity = 0L
             }
             else{
-                currentQuantity -= quantity
+                currentQuantity -= givenQuantity
                 remainingQuantity = 0L
             }
             if(currentQuantity == 0L){
                 orderStatus = "COMPLETED"
             }
-            else{
+            else if(this.quantity != currentQuantity){
                 orderStatus = "PARTIAL"
             }
             if(prevQuantity - currentQuantity != 0L )  

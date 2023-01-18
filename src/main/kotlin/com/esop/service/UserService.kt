@@ -110,12 +110,17 @@ class UserService {
 
         return mapOf("error" to Errors)
     }
-//    else if(!isEmailValid(v4)){
-//        return errors["INVALID_EMAIL"].toString()
-//    }
-//    else if(!isPhoneNumber(v3)){
-//        return errors["INVALID_PHONENUMBER"].toString()
-//    }
+    else if(!isEmailValid(email)){
+        Errors.add(errors["INVALID_EMAIL"].toString())
+
+        return mapOf("error" to Errors)
+
+    }
+    else if(!isPhoneNumber(phoneNumber)){
+        Errors.add(errors["INVALID_PHONENUMBER"].toString())
+
+        return mapOf("error" to Errors)
+    }
         else {
         val user = User(firstName, lastName, phoneNumber, email, username);
 

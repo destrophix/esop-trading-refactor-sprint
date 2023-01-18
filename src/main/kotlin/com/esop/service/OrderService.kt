@@ -159,14 +159,17 @@ class OrderService{
         }
     }
     fun orderHistory(userName: String): Any {
+        var userErrors = ArrayList<String>()
         if(!this.userService.all_users.contains(userName))
         {
-            return mapOf("message" to "User does not exist")
+            userErrors.add("User does not exist")
+            return mapOf("error" to userErrors)
         }
         val order_history = all_orders[userName]?.toList()
 
         if (order_history.isNullOrEmpty()) {
-            return mapOf("message" to "User does not have any orders")
+            userErrors.add("User does not have any orders")
+            return mapOf("error" to userErrors)
         }
 
         return order_history

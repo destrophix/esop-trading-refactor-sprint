@@ -88,6 +88,9 @@ class UserController {
     @Get(uri = "/{userName}/order", produces = [MediaType.APPLICATION_JSON])
     fun orderHistory(userName: String): HttpResponse<*> {
         val order_history = this.orderService.orderHistory(userName)
+        if(order_history is Map<*, *>){
+            return HttpResponse.badRequest(order_history)
+        }
         return HttpResponse.ok(order_history)
     }
 }

@@ -1,5 +1,6 @@
 package com.esop.service
 
+import com.esop.UserCreationDTO
 import com.esop.schema.User
 import io.micronaut.json.tree.JsonObject
 import com.esop.constant.errors
@@ -68,72 +69,47 @@ class UserService {
     }
 
 
-    val PHONENUMBER_REGEX = "^(\\+91[\\-\\s]?)?[0]?(91)?[789]\\d{9}\$"
-//var PATTERN: Pattern = Pattern.compile(REG)
-//fun CharSequence.isPhoneNumber() : Boolean = PATTERN.matcher(this).find()
-
-    val EMAIL_REGEX = "^[A-Za-z](.*)([@]{1})(.{1,})(\\.)(.{1,})";
-
-    fun isEmailValid(email: String): Boolean {
-        return EMAIL_REGEX.toRegex().matches(email);
-    }
-
-    fun isPhoneNumber(pNumber: String): Boolean {
-        return PHONENUMBER_REGEX.toRegex().matches(pNumber);
-    }
-
-    fun registerUser(userData: JsonObject): Map<String,Any> {
-    var firstName = userData.get("firstName").stringValue
-    var lastName = userData.get("lastName").stringValue
-    var phoneNumber = userData.get("phoneNumber").stringValue
-    var email = userData.get("email").stringValue
-    var username = userData.get("username").stringValue
-
+    fun validateUserDetails(userData: UserCreationDTO): List<String> {
         var Errors = mutableListOf<String>()
 
-
-    if(check_username(all_usernames, username)){
-//        return mapOf("error" to errors["USERNAME_EXISTS"].toString())
-        Errors.add(errors["USERNAME_EXISTS"].toString())
-
-        return mapOf("error" to Errors)
-    }
-    else if(check_email(all_emails, email)){
-//        return mapOf("error" to errors["EMAIL_EXISTS"].toString())
-        Errors.add(errors["EMAIL_EXISTS"].toString())
-
-        return mapOf("error" to Errors)
-    }
-    else if(check_phonenumber(all_numbers, phoneNumber)){
-//        return mapOf("error" to errors["PHONENUMBER_EXISTS"].toString())
-        Errors.add(errors["PHONENUMBER_EXISTS"].toString())
-
-        return mapOf("error" to Errors)
-    }
-    else if(!isEmailValid(email)){
-        Errors.add(errors["INVALID_EMAIL"].toString())
-
-        return mapOf("error" to Errors)
-
-    }
-    else if(!isPhoneNumber(phoneNumber)){
-        Errors.add(errors["INVALID_PHONENUMBER"].toString())
-
-        return mapOf("error" to Errors)
-    }
-        else {
-        val user = User(firstName, lastName, phoneNumber, email, username);
-
-        all_users[username] = user
-        all_emails.add(email)
-        all_numbers.add(phoneNumber)
-        all_usernames.add(username)
-
-
-        val newUser = mapOf("firstName" to user.firstName.toString(), "lastName" to user.lastName.toString(), "phoneNumber" to user.phoneNumber.toString(), "email" to user.email.toString(), "userName" to user.username.toString() )
-        return newUser
-
+        if(check_username(all_usernames, userData.username)){
+            Errors.add(errors["USERNAME_EXISTS"].toString())
         }
+
+        else if(check_email(all_emails, userData.email)){
+            Errors.add(errors["EMAIL_EXISTS"].toString())
+        }
+        else if(check_phonenumber(all_numbers, userData.phoneNumber)){
+            Errors.add(errors["PHONENUMBER_EXISTS"].toString())
+        }
+
+        return Errors
+    }
+
+    fun registerUser(userData: UserCreationDTO): Map<String,Any> {
+    var firstName = userData.firstName
+    var lastName = userData.lastName
+    var phoneNumber = userData.phoneNumber
+    var email = userData.email
+    var username = userData.username
+
+
+    var errorList = validateUserDetails(userData)
+     if (errorList.isNotEmpty()) {
+         return mapOf("errors" to errorList)
+     }
+
+
+    val user = User(firstName, lastName, phoneNumber, email, username);
+
+    all_users[username] = user
+    all_emails.add(email)
+    all_numbers.add(phoneNumber)
+    all_usernames.add(username)
+
+
+    val newUser = mapOf("firstName" to user.firstName.toString(), "lastName" to user.lastName.toString(), "phoneNumber" to user.phoneNumber.toString(), "email" to user.email.toString(), "userName" to user.username.toString() )
+    return newUser
 }
     fun accountInformation(userName: String): Map<String, Any?> {
         val user = all_users[userName.toString()]

@@ -1,5 +1,6 @@
 package com.esop.controller
 
+import com.esop.UserCreationDTO
 import com.esop.service.*
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.annotation.Body
@@ -8,11 +9,18 @@ import io.micronaut.http.annotation.Get
 import io.micronaut.http.MediaType
 import io.micronaut.http.annotation.Post
 import io.micronaut.json.tree.JsonObject
+import io.micronaut.validation.Validated
 import jakarta.inject.Inject
+import java.util.Optional
+import javax.validation.Valid
+import javax.validation.Validator
 
 
 @Controller("/user")
 class UserController {
+
+    @Inject
+    lateinit var validator: Validator
 
     @Inject
     lateinit var orderService: OrderService
@@ -21,8 +29,14 @@ class UserController {
     lateinit var userService: UserService
 
     @Post(uri="/register", consumes = [MediaType.APPLICATION_JSON],produces=[MediaType.APPLICATION_JSON])
-    open fun register(@Body response: JsonObject): HttpResponse<*> {
-        val newUser = this.userService.registerUser(response)
+    open fun register(@Body userData: UserCreationDTO): HttpResponse<*> {
+        val constraintViolations = validator.validate(userData).map { it.message }
+
+        if (constraintViolations.isNotEmpty()) {
+            return HttpResponse.badRequest(mapOf("errors" to constraintViolations))
+        }
+
+        val newUser = this.userService.registerUser(userData)
         if(newUser["error"] != null) {
             return HttpResponse.badRequest(newUser)
         }
@@ -30,7 +44,6 @@ class UserController {
     }
 
     @Post(uri="/{userName}/order", consumes = [MediaType.APPLICATION_JSON],produces=[MediaType.APPLICATION_JSON])
-
     fun order(userName: String, @Body body: JsonObject): Any? {
         var quantity: Long = body.get("quantity").longValue
         var type: String = body.get("type").stringValue

@@ -6,6 +6,7 @@ import com.esop.schema.Order
 import io.micronaut.json.tree.JsonObject
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
+import kotlin.math.round
 
 @Singleton
 class OrderService{
@@ -39,8 +40,9 @@ class OrderService{
             sellerOrder.price * (prevQuantity - remainingQuantity)
         )!!
         // Add money of quantity taken from seller
+        var totOrderPrice = sellerOrder.price * (prevQuantity - remainingQuantity)
         this.userService.all_users[sellerOrder.userName]?.wallet?.free  = this.userService.all_users[sellerOrder.userName]?.wallet?.free?.plus(
-            sellerOrder.price * (prevQuantity - remainingQuantity)
+            totOrderPrice- round(totOrderPrice*0.02).toLong()
         )!!
         // Deduct inventory of stock from sellers
         this.userService.all_users[sellerOrder.userName]?.inventory?.locked = this.userService.all_users[sellerOrder.userName]?.inventory?.locked?.minus(
@@ -73,8 +75,9 @@ class OrderService{
             sellerOrder.price * (prevQuantity - remainingQuantity)
         )!!
         // Add money to sellers wallet
+        var totOrderPrice = sellerOrder.price * (prevQuantity - remainingQuantity)
         this.userService.all_users[userName]?.wallet?.free = this.userService.all_users[userName]?.wallet?.free?.plus(
-            sellerOrder.price * (prevQuantity - remainingQuantity)
+            totOrderPrice- round(totOrderPrice*0.02).toLong()
         )!!
         // Add buyers luck back to free from locked
         this.userService.all_users[buyerOrder.userName]?.wallet?.free = this.userService.all_users[buyerOrder.userName]?.wallet?.free?.plus(

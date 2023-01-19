@@ -4,6 +4,12 @@ class ItemData{
     var free: Long = 0
     var locked: Long = 0
 }
+
+class Inventory{
+    var normalInventory :ItemData = ItemData()
+    var performanceInventory :ItemData = ItemData()
+}
+
 class User {
     var firstName: String = ""
     var lastName: String = ""
@@ -14,7 +20,7 @@ class User {
 
 
     val wallet: ItemData = ItemData()
-    val inventory: ItemData = ItemData()
+    val inventory: Inventory = Inventory()
 
     constructor(fName: String, lName: String, pNumber: String, em: String, uname: String){
         firstName = fName
@@ -28,9 +34,14 @@ class User {
         // A function to add amount to the users free wallet
         wallet.free += amount
     }
-    fun addInventory(quantity: Long){
+    fun addInventory(quantity: Long,type: String){
         // A function to add quantity to the users inventory
-        inventory.free += quantity
+        if(type == "normal") {
+            inventory.normalInventory.free += quantity
+        }else{
+            inventory.performanceInventory.free += quantity
+        }
+
     }
     fun buyAndUpdateWallet(amount: Long){
         // A function which after buy order,
@@ -41,8 +52,8 @@ class User {
     fun sellAndUpdateInventory(quantity: Long){
         // A function which after sell order,
         // updates the free quantity and places it into the locked quantity
-        inventory.free -= quantity
-        inventory.locked += quantity
+//        inventory.free -= quantity
+//        inventory.locked += quantity
     }
 
     fun orderWalletFree(amount: Long){

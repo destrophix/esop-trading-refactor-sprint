@@ -15,7 +15,8 @@ class UserService {
     var all_users = HashMap<String, User>()
 
     fun check_inventory(quantity: Long, userName: String): Boolean{
-        if(user_exists(userName) && all_users[userName]?.inventory?.free!! >= quantity){
+        val userinventory = all_users[userName]?.inventory!!
+        if(user_exists(userName) && (userinventory.normalInventory.free +  userinventory.performanceInventory.free)>= quantity){
             return true
         }
         return false
@@ -153,17 +154,31 @@ class UserService {
 
     fun adding_inventory(body: JsonObject, userName: String): Map<String, Any>
     {
-        var quant=body.get("quantity").longValue
 
+        var quant=body.get("quantity").longValue
+        var type:String = body.get("type").stringValue.lowercase()
         var accountErrors =mutableListOf<String>()
 
         var usr1= all_users[userName]
 
         if (usr1 != null) {
-            usr1.addInventory(quant)
-            return mapOf("message" to "${quant} ESOPS added to inventory")
+            if(quant > 10000 || quant <=0){
+                accountErrors.add(errors["QUANTITY_NOT_ACCEPTED"].toString())
+            }else{
+                if(type != "normal" && type != "performance"){
+                    accountErrors.add(errors["INVALID_TYPE"].toString())
+                }else{
+                    usr1.addInventory(quant,type)
+                    if(type == "performance"){
+                        return mapOf("message" to "${quant} Performance ESOPS added to inventory")
+                    }else{
+                        return mapOf("message" to "${quant} normal added to inventory")
+                    }
+                }
+            }
+        }else{
+            accountErrors.add(errors["USER_DOES_NOT_EXISTS"].toString())
         }
-        accountErrors.add(errors["USER_DOES_NOT_EXISTS"].toString())
         return mapOf("error" to accountErrors)
     }
 

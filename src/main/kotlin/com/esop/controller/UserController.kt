@@ -29,30 +29,40 @@ class UserController {
         return HttpResponse.ok(newUser)
     }
 
-//    @Post(uri="/{userName}/order", consumes = [MediaType.APPLICATION_JSON],produces=[MediaType.APPLICATION_JSON])
-//
-//    fun order(userName: String, @Body body: JsonObject): Any? {
-//        var quantity: Long = body.get("quantity").longValue
-//        var type: String = body.get("type").stringValue
-//        var price: Long = body.get("price").longValue
-//        var userErrors = this.userService.orderCheckBeforePlace(userName, quantity, type, price)
-//        if(userErrors["error"]?.isEmpty()!!){
-//            var userOrderOrErrors = this.orderService.placeOrder(userName, quantity, type, price)
-//            if (userOrderOrErrors["orderId"] != null) {
-//                return HttpResponse.ok(mapOf(
-//                    "orderId" to userOrderOrErrors["orderId"],
-//                    "quantity" to quantity,
-//                    "type" to type,
-//                    "price" to price
-//                ))
-//            }else{
-//                return HttpResponse.badRequest(userOrderOrErrors)
-//            }
-//
-//        }
-//
-//        return HttpResponse.badRequest(userErrors)
-//    }
+    @Post(uri="/{userName}/order", consumes = [MediaType.APPLICATION_JSON],produces=[MediaType.APPLICATION_JSON])
+
+    fun order(userName: String, @Body body: JsonObject): Any? {
+        var quantity: Long = body.get("quantity").longValue
+        var type: String = body.get("type").stringValue.lowercase()
+        var price: Long = body.get("price").longValue
+        var inventoryType: String = ""
+
+        if(type == "sell"){
+            inventoryType = body.get("inventoryType").stringValue.lowercase()
+            print(inventoryType)
+            if(inventoryType != "performance" && inventoryType != "normal"){
+                return HttpResponse.ok("Invalid inventory type")
+            }
+        }
+
+        var userErrors = this.userService.orderCheckBeforePlace(userName, quantity, type, price, inventoryType)
+        if(userErrors["error"]?.isEmpty()!!){
+            var userOrderOrErrors = this.orderService.placeOrder(userName, quantity, type, price, inventoryType)
+            if (userOrderOrErrors["orderId"] != null) {
+                return HttpResponse.ok(mapOf(
+                    "orderId" to userOrderOrErrors["orderId"],
+                    "quantity" to quantity,
+                    "type" to type,
+                    "price" to price
+                ))
+            }else{
+                return HttpResponse.badRequest(userOrderOrErrors)
+            }
+
+        }
+
+        return HttpResponse.badRequest(userErrors)
+    }
 
     @Get(uri = "/{userName}/accountInformation", produces = [MediaType.APPLICATION_JSON])
     fun getAccountInformation(userName: String): HttpResponse<*> {
@@ -75,7 +85,7 @@ class UserController {
         return HttpResponse.ok(newInventory)
     }
 
-    @Post(uri = "{userName}/wallet", consumes = [MediaType.APPLICATION_JSON], produces = [MediaType.APPLICATION_JSON])
+    @Post(uri = "/{userName}/wallet", consumes = [MediaType.APPLICATION_JSON], produces = [MediaType.APPLICATION_JSON])
     fun addWallet(userName: String, @Body body: JsonObject) :HttpResponse<*> {
         val addedMoney=this.userService.adding_Money(body,userName)
         if(addedMoney["error"] != null) {

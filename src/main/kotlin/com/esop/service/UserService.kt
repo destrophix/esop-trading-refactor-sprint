@@ -1,35 +1,35 @@
 package com.esop.service
 
-import com.esop.UserCreationDTO
+import com.esop.dto.UserCreationDTO
 import com.esop.schema.User
-import io.micronaut.json.tree.JsonObject
 import com.esop.constant.errors
-import com.esop.constant.success_response
+import com.esop.dto.AddInventoryDTO
+import com.esop.dto.AddWalletDTO
 import jakarta.inject.Singleton
 
 
 @Singleton
 class UserService {
-    val all_emails = mutableSetOf<String>()
-    val all_numbers = mutableSetOf<String>()
-    val all_usernames = mutableSetOf<String>()
-    var all_users = HashMap<String, User>()
+    val allEmails = mutableSetOf<String>()
+    val allNumbers = mutableSetOf<String>()
+    val allUsernames = mutableSetOf<String>()
+    var allUsers = HashMap<String, User>()
 
     fun check_inventory(quantity: Long, userName: String): Boolean{
-        if(user_exists(userName) && all_users[userName]?.inventory?.free!! >= quantity){
+        if(user_exists(userName) && allUsers[userName]?.inventory?.free!! >= quantity){
             return true
         }
         return false
     }
     fun check_wallet(amount: Long, userName: String): Boolean{
-        if(user_exists(userName) && all_users[userName]?.wallet?.free!! >= amount){
+        if(user_exists(userName) && allUsers[userName]?.wallet?.free!! >= amount){
             return true
         }
         return false
     }
     fun orderCheckBeforePlace(userName: String, quantity: Long, type: String, price: Long): Map<String, MutableList<String>>{
         var userErrors = mutableListOf<String>()
-        if(!all_users.containsKey(userName)){
+        if(!allUsers.containsKey(userName)){
             userErrors.add("User doesn't exist")
             return mapOf("error" to userErrors)
         }
@@ -45,16 +45,16 @@ class UserService {
         }
         if(userErrors.isEmpty()){
             if(type == "BUY"){
-                all_users[userName]?.buyAndUpdateWallet(price*quantity)
+                allUsers[userName]?.buyAndUpdateWallet(price*quantity)
             }
             if(type == "SELL"){
-                all_users[userName]?.sellAndUpdateInventory(quantity)
+                allUsers[userName]?.sellAndUpdateInventory(quantity)
             }
         }
         return mapOf("error" to userErrors)
     }
     fun user_exists(userName: String): Boolean{
-        return all_users.containsKey(userName)
+        return allUsers.containsKey(userName)
     }
     fun check_username(username_set: MutableSet<String>, search_value: String): Boolean {
         return username_set.contains(search_value);
@@ -72,14 +72,14 @@ class UserService {
     fun validateUserDetails(userData: UserCreationDTO): List<String> {
         var Errors = mutableListOf<String>()
 
-        if(check_username(all_usernames, userData.username)){
+        if(check_username(allUsernames, userData.username)){
             Errors.add(errors["USERNAME_EXISTS"].toString())
         }
 
-        else if(check_email(all_emails, userData.email)){
+        else if(check_email(allEmails, userData.email)){
             Errors.add(errors["EMAIL_EXISTS"].toString())
         }
-        else if(check_phonenumber(all_numbers, userData.phoneNumber)){
+        else if(check_phonenumber(allNumbers, userData.phoneNumber!!)){
             Errors.add(errors["PHONENUMBER_EXISTS"].toString())
         }
 
@@ -87,9 +87,9 @@ class UserService {
     }
 
     fun registerUser(userData: UserCreationDTO): Map<String,Any> {
-    var firstName = userData.firstName
-    var lastName = userData.lastName
-    var phoneNumber = userData.phoneNumber
+    var firstName = userData.firstName!!
+    var lastName = userData.lastName!!
+    var phoneNumber = userData.phoneNumber!!
     var email = userData.email
     var username = userData.username
 
@@ -102,17 +102,17 @@ class UserService {
 
     val user = User(firstName, lastName, phoneNumber, email, username);
 
-    all_users[username] = user
-    all_emails.add(email)
-    all_numbers.add(phoneNumber)
-    all_usernames.add(username)
+    allUsers[username] = user
+    allEmails.add(email)
+    allNumbers.add(phoneNumber)
+    allUsernames.add(username)
 
 
     val newUser = mapOf("firstName" to user.firstName.toString(), "lastName" to user.lastName.toString(), "phoneNumber" to user.phoneNumber.toString(), "email" to user.email.toString(), "userName" to user.username.toString() )
     return newUser
 }
     fun accountInformation(userName: String): Map<String, Any?> {
-        val user = all_users[userName.toString()]
+        val user = allUsers[userName.toString()]
 
         var accountErrors = mutableListOf<String>()
 
@@ -127,31 +127,28 @@ class UserService {
     }
 
 
-    fun adding_inventory(body: JsonObject, userName: String): Map<String, Any>
+    fun addingInventory(body: AddInventoryDTO, userName: String): Map<String, Any>
     {
-        var quant=body.get("quantity").longValue
-
         var accountErrors =mutableListOf<String>()
 
-        var usr1= all_users[userName]
+        var usr1= allUsers[userName]
 
         if (usr1 != null) {
-            usr1.addInventory(quant)
-            return mapOf("message" to "${quant} ESOPS added to inventory")
+            usr1.addInventory(body.quantity!!)
+            return mapOf("message" to "${body.quantity} ESOPS added to inventory")
         }
         accountErrors.add(errors["USER_DOES_NOT_EXISTS"].toString())
         return mapOf("error" to accountErrors)
     }
 
-    fun adding_Money(body: JsonObject, userName: String): Map<String, Any>
+    fun addingMoney(body: AddWalletDTO, userName: String): Map<String, Any>
     {
-        var amt=body.get("amount").longValue
         var accountErrors =mutableListOf<String>()
-        var usr1= all_users[userName]
+        var usr1= allUsers[userName]
 
         if (usr1 != null) {
-            usr1.addWallet(amt)
-            return mapOf("message" to "${amt} amount added to account");
+            usr1.addWallet(body.price!!)
+            return mapOf("message" to "${body.price} amount added to account");
         }
         accountErrors.add(errors["USER_DOES_NOT_EXISTS"].toString())
 

@@ -1,6 +1,9 @@
 package com.esop.controller
 
-import com.esop.UserCreationDTO
+import com.esop.dto.AddInventoryDTO
+import com.esop.dto.AddWalletDTO
+import com.esop.dto.CreateOrderDTO
+import com.esop.dto.UserCreationDTO
 import com.esop.service.*
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.annotation.Body
@@ -8,14 +11,13 @@ import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
 import io.micronaut.http.MediaType
 import io.micronaut.http.annotation.Post
-import io.micronaut.json.tree.JsonObject
 import io.micronaut.validation.Validated
 import jakarta.inject.Inject
-import java.util.Optional
 import javax.validation.Valid
 import javax.validation.Validator
 
 
+@Validated
 @Controller("/user")
 class UserController {
 
@@ -28,14 +30,12 @@ class UserController {
     @Inject
     lateinit var userService: UserService
 
+    fun <T> checkValidationError(input: T): List<String> {
+        return validator.validate(input).map { it.message }
+    }
+
     @Post(uri="/register", consumes = [MediaType.APPLICATION_JSON],produces=[MediaType.APPLICATION_JSON])
-    open fun register(@Body userData: UserCreationDTO): HttpResponse<*> {
-        val constraintViolations = validator.validate(userData).map { it.message }
-
-        if (constraintViolations.isNotEmpty()) {
-            return HttpResponse.badRequest(mapOf("errors" to constraintViolations))
-        }
-
+     fun register(@Body @Valid userData: UserCreationDTO): HttpResponse<*> {
         val newUser = this.userService.registerUser(userData)
         if(newUser["error"] != null) {
             return HttpResponse.badRequest(newUser)
@@ -44,19 +44,16 @@ class UserController {
     }
 
     @Post(uri="/{userName}/order", consumes = [MediaType.APPLICATION_JSON],produces=[MediaType.APPLICATION_JSON])
-    fun order(userName: String, @Body body: JsonObject): Any? {
-        var quantity: Long = body.get("quantity").longValue
-        var type: String = body.get("type").stringValue
-        var price: Long = body.get("price").longValue
-        var userErrors = this.userService.orderCheckBeforePlace(userName, quantity, type, price)
+    fun order(userName: String, @Body @Valid body: CreateOrderDTO): Any? {
+        var userErrors = this.userService.orderCheckBeforePlace(userName, body.quantity!!, body.type!!, body.price!!)
         if(userErrors["error"]?.isEmpty()!!){
-            var userOrderOrErrors = this.orderService.placeOrder(userName, quantity, type, price)
+            var userOrderOrErrors = this.orderService.placeOrder(userName, body.quantity!!, body.type!!, body.price!!)
             if (userOrderOrErrors["orderId"] != null) {
                 return HttpResponse.ok(mapOf(
                     "orderId" to userOrderOrErrors["orderId"],
-                    "quantity" to quantity,
-                    "type" to type,
-                    "price" to price
+                    "quantity" to body.quantity,
+                    "type" to body.type,
+                    "price" to body.price
                 ))
             }else{
                 return HttpResponse.badRequest(userOrderOrErrors)
@@ -79,8 +76,15 @@ class UserController {
     }
 
     @Post(uri = "{userName}/inventory", consumes = [MediaType.APPLICATION_JSON], produces = [MediaType.APPLICATION_JSON])
-    fun addInventory(userName: String, @Body body: JsonObject): HttpResponse<*>{
-        val newInventory = this.userService.adding_inventory(body,userName)
+    fun addInventory(userName: String, @Body @Valid body: AddInventoryDTO): HttpResponse<*>{
+        val validationErrors = checkValidationError(body)
+
+        if (validationErrors.isNotEmpty()) {
+            return HttpResponse.badRequest(mapOf("errors" to validationErrors))
+        }
+
+
+        val newInventory = this.userService.addingInventory(body,userName)
 
         if(newInventory["error"] != null) {
             return HttpResponse.badRequest(newInventory)
@@ -89,8 +93,15 @@ class UserController {
     }
 
     @Post(uri = "{userName}/wallet", consumes = [MediaType.APPLICATION_JSON], produces = [MediaType.APPLICATION_JSON])
-    fun addWallet(userName: String, @Body body: JsonObject) :HttpResponse<*> {
-        val addedMoney=this.userService.adding_Money(body,userName)
+    fun addWallet(userName: String, @Body @Valid body: AddWalletDTO) :HttpResponse<*> {
+        val validationErrors = checkValidationError(body)
+
+        if (validationErrors.isNotEmpty()) {
+            return HttpResponse.badRequest(mapOf("errors" to validationErrors))
+        }
+
+
+        val addedMoney=this.userService.addingMoney(body,userName)
         if(addedMoney["error"] != null) {
             return HttpResponse.badRequest(addedMoney)
         }

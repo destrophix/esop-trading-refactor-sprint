@@ -19,17 +19,19 @@ class Order{
     var orderStatus: String = "PENDING" // COMPLETED, PARTIAL, PENDING
     var currentQuantity: Long = 0
     var filled: MutableList<OrderFiller> = mutableListOf()
-
+    var inventoryType : String = "normal"
+    var inventoryPriority : Int = 2
     var userName: String = ""
-    constructor(quantity: Long, type: String, price: Long, orderId: Int, userName: String){
+    constructor(quantity: Long, type: String, price: Long, orderId: Int, userName: String,inventoryType : String,inventoryPriority : Int){
         this.currentQuantity = quantity
         this.quantity = quantity
 
         this.type = type
         this.price = price
         this.orderId = orderId
-
+        this.inventoryType = inventoryType
         this.userName = userName
+        this.inventoryPriority = inventoryPriority
     }
     fun orderAvailable():Boolean{
         return orderStatus != "Completed"

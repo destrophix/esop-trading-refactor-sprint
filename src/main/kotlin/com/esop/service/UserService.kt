@@ -3,6 +3,8 @@ package com.esop.service
 import com.esop.dto.UserCreationDTO
 import com.esop.schema.User
 import com.esop.constant.errors
+import com.esop.constant.success_response
+import com.esop.schema.Inventory
 import com.esop.dto.AddInventoryDTO
 import com.esop.dto.AddWalletDTO
 import jakarta.inject.Singleton
@@ -15,9 +17,16 @@ class UserService {
     val allUsernames = mutableSetOf<String>()
     var allUsers = HashMap<String, User>()
 
-    fun check_inventory(quantity: Long, userName: String): Boolean{
-        if(user_exists(userName) && allUsers[userName]?.inventory?.free!! >= quantity){
-            return true
+    fun check_inventory(quantity: Long, userName: String, type: String): Boolean{
+        val userinventory = all_users[userName]?.inventory!!
+        if(type == "normal"){
+            if(user_exists(userName) && userinventory.normalInventory.free>= quantity){
+                return true
+            }
+        }else{
+            if(user_exists(userName) && userinventory.performanceInventory.free>= quantity){
+                return true
+            }
         }
         return false
     }
@@ -27,28 +36,34 @@ class UserService {
         }
         return false
     }
-    fun orderCheckBeforePlace(userName: String, quantity: Long, type: String, price: Long): Map<String, MutableList<String>>{
+    fun orderCheckBeforePlace(userName: String, quantity: Long, type: String, price: Long, inventoryType : String): Map<String, MutableList<String>>{
         var userErrors = mutableListOf<String>()
         if(!allUsers.containsKey(userName)){
             userErrors.add("User doesn't exist")
             return mapOf("error" to userErrors)
         }
-        if(type == "BUY"){
+        if(type == "buy"){
             if(!check_wallet(price*quantity, userName)){
                 userErrors.add("Insufficient funds")
             }
         }
-        else if(type == "SELL"){
-            if(!check_inventory(quantity, userName)){
-                userErrors.add("Insufficient inventory")
+        else if(type == "sell"){
+            if(inventoryType == "performance"){
+                if(!check_inventory(quantity, userName,"performance")){
+                    userErrors.add("Insufficient performance inventory")
+                }
+            }else{
+                if(!check_inventory(quantity, userName,"normal")){
+                    userErrors.add("Insufficient normal inventory")
+                }
             }
         }
         if(userErrors.isEmpty()){
-            if(type == "BUY"){
+            if(type == "buy"){
                 allUsers[userName]?.buyAndUpdateWallet(price*quantity)
             }
-            if(type == "SELL"){
-                allUsers[userName]?.sellAndUpdateInventory(quantity)
+            if(type == "sell"){
+                allUsers[userName]?.sellAndUpdateInventory(quantity,inventoryType)
             }
         }
         return mapOf("error" to userErrors)
@@ -129,15 +144,34 @@ class UserService {
 
     fun addingInventory(body: AddInventoryDTO, userName: String): Map<String, Any>
     {
+
+        var quant=body.get("quantity").longValue
+        var type:String = "normal"
+        type = body.get("inventoryType").stringValue.lowercase()
+
         var accountErrors =mutableListOf<String>()
 
         var usr1= allUsers[userName]
 
         if (usr1 != null) {
-            usr1.addInventory(body.quantity!!)
-            return mapOf("message" to "${body.quantity} ESOPS added to inventory")
+
+            if(quant > 10000 || quant <=0){
+                accountErrors.add(errors["QUANTITY_NOT_ACCEPTED"].toString())
+            }else{
+                if(type != "normal" && type != "performance"){
+                    accountErrors.add(errors["INVALID_TYPE"].toString())
+                }else{
+                    usr1.addInventory(quant,type)
+                    return if(type == "performance"){
+                        mapOf("message" to "${quant} Performance ESOPS added to inventory")
+                    }else{
+                        mapOf("message" to "${quant} normal added to inventory")
+                    }
+                }
+            }
+        }else{
+            accountErrors.add(errors["USER_DOES_NOT_EXISTS"].toString())
         }
-        accountErrors.add(errors["USER_DOES_NOT_EXISTS"].toString())
         return mapOf("error" to accountErrors)
     }
 

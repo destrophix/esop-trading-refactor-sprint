@@ -29,5 +29,8 @@ class CreateOrderDTO @JsonCreator constructor(
     @field:NotNull(message="property price is required")
     @field:Min(0, message = "price cannot be less than zero")
     @field:Max(MAX_PRICE, message = "price has to be less than or equal to $MAX_PRICE")
-    var price: Long? = null
+    var price: Long? = null,
+
+    //@field:Pattern(regexp = "^(NORMAL|PERFORMANCE)$", message = "Invalid Type: should be one of NORMAL or PERFORMANCE")
+    var inventoryType: String? = "NORMAL"
 )

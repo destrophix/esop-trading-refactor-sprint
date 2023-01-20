@@ -47,19 +47,19 @@ class OrderService{
         )!!
         // Deduct inventory of stock from sellers inventory based on its type
         if(sellerOrder.inventoryType == "performance"){
-            this.userService.all_users[sellerOrder.userName]?.inventory?.performanceInventory!!.locked = this.userService.all_users[sellerOrder.userName]?.inventory?.performanceInventory!!.locked?.minus(
+            this.userService.allUsers[sellerOrder.userName]?.inventory?.performanceInventory!!.locked = this.userService.allUsers[sellerOrder.userName]?.inventory?.performanceInventory!!.locked?.minus(
                 (prevQuantity - remainingQuantity)
             )!!
         }
 
         if(sellerOrder.inventoryType == "normal"){
-            this.userService.all_users[sellerOrder.userName]?.inventory?.normalInventory!!.locked = this.userService.all_users[sellerOrder.userName]?.inventory?.normalInventory!!.locked?.minus(
+            this.userService.allUsers[sellerOrder.userName]?.inventory?.normalInventory!!.locked = this.userService.allUsers[sellerOrder.userName]?.inventory?.normalInventory!!.locked?.minus(
                 (prevQuantity - remainingQuantity)
             )!!
         }
 
         // Add purchased inventory to buyer
-        this.userService.all_users[userName]?.inventory?.normalInventory!!.free = this.userService.all_users[userName]?.inventory?.normalInventory!!.free.plus(
+        this.userService.allUsers[userName]?.inventory?.normalInventory!!.free = this.userService.allUsers[userName]?.inventory?.normalInventory!!.free.plus(
             (prevQuantity - remainingQuantity)
         )!!
         // Add buyers luck back to free from locked
@@ -75,19 +75,19 @@ class OrderService{
 
         // Deduct inventory of stock from sellers inventory based on its type
         if(sellerOrder.inventoryType == "performance"){
-            this.userService.all_users[userName]?.inventory?.performanceInventory!!.locked = this.userService.all_users[sellerOrder.userName]?.inventory?.performanceInventory!!.locked?.minus(
+            this.userService.allUsers[userName]?.inventory?.performanceInventory!!.locked = this.userService.allUsers[sellerOrder.userName]?.inventory?.performanceInventory!!.locked?.minus(
                 (prevQuantity - remainingQuantity)
             )!!
         }
 
         if(sellerOrder.inventoryType == "normal"){
-            this.userService.all_users[userName]?.inventory?.normalInventory!!.locked = this.userService.all_users[sellerOrder.userName]?.inventory?.normalInventory!!.locked?.minus(
+            this.userService.allUsers[userName]?.inventory?.normalInventory!!.locked = this.userService.allUsers[sellerOrder.userName]?.inventory?.normalInventory!!.locked?.minus(
                 (prevQuantity - remainingQuantity)
             )!!
         }
 
         // Add inventory to buyers stock
-        this.userService.all_users[buyerOrder.userName]?.inventory?.normalInventory!!.free  = this.userService.all_users[buyerOrder.userName]?.inventory?.normalInventory!!.free?.plus(
+        this.userService.allUsers[buyerOrder.userName]?.inventory?.normalInventory!!.free  = this.userService.allUsers[buyerOrder.userName]?.inventory?.normalInventory!!.free?.plus(
             (prevQuantity - remainingQuantity)
         )!!
         // Deduct money from buyers wallet
@@ -112,106 +112,96 @@ class OrderService{
     fun placeOrder(userName: String, quantity: Long, type: String, price: Long, inventoryType : String): Map<String, Any> {
 
         var userErrors = checkOrderParameters(quantity, price, type)
-        if(userErrors.isNotEmpty()){
+        if (userErrors.isNotEmpty()) {
             // add to list of errors
             return mapOf("error" to userErrors)
-        }
-        else{
+        } else {
             var inventoryPriority = 2
-            if(inventoryType == "performance"){
+            if (inventoryType == "performance") {
                 inventoryPriority -= 1
             }
-            var userOrder = Order(quantity, type, price, orderCount, userName,inventoryType,inventoryPriority)
+            var userOrder = Order(quantity, type, price, orderCount, userName, inventoryType, inventoryPriority)
             orderCount += 1
-            if(!all_orders.containsKey(userName)){
+            if (!all_orders.containsKey(userName)) {
                 all_orders[userName] = ArrayList()
             }
             all_orders[userName]?.add(userOrder)
-            if(type == "buy"){
+            if (type == "buy") {
                 //altering buy order queue
                 buyOrders.add(userOrder)
-                var sortedSellOrders = sellOrders.sortedWith(compareBy({it.inventoryPriority},{it.price}, {it.timeStamp}))
+                var sortedSellOrders =
+                    sellOrders.sortedWith(compareBy({ it.inventoryPriority }, { it.price }, { it.timeStamp }))
                 var remainingQuantity = userOrder.quantity
 
 
-                for(anOrder in sortedSellOrders){
-                   if((userOrder.price >= anOrder.price) && (anOrder.orderAvailable())){
-                       var prevQuantity = remainingQuantity
-                       remainingQuantity = anOrder.updateOrderQuantity(remainingQuantity, anOrder.price)
-                       if(!anOrder.orderAvailable()){
-                           sellOrders.remove(anOrder)
-                       }
-                       if(remainingQuantity == 0L){
-                           // Order is complete
-                           buyOrders.remove(userOrder)
-                           userOrder.updateOrderQuantity(prevQuantity - remainingQuantity, anOrder.price)
-                       }
-                       else{
-                           userOrder.updateOrderQuantity(prevQuantity - remainingQuantity, anOrder.price)
-                       }
-                       updateOrderDetailsForBuy(userName, prevQuantity, remainingQuantity, anOrder, userOrder)
-                       if(remainingQuantity == 0L){
-                           break
-                       }
-                   }
-                   if(remainingQuantity == 0L){
-                       // Order is complete
-                       buyOrders.remove(userOrder)
-                       userOrder.updateOrderQuantity(prevQuantity - remainingQuantity, anOrder.price)
-                   }
-                   else{
-                       userOrder.updateOrderQuantity(prevQuantity - remainingQuantity, anOrder.price)
-                   }
-                   updateOrderDetailsForBuy(userName, prevQuantity, remainingQuantity, anOrder, userOrder)
-                   if(remainingQuantity == 0L){
-                       break
-                   }
-               }
-            }
-        }
-        else{
-            sellOrders.add(userOrder)
-            var sortedBuyOrders = buyOrders.sortedWith(compareByDescending<Order> {it.price}.thenBy{it.timeStamp})
-            var remainingQuantity = userOrder.quantity
-            for(anOrder in sortedBuyOrders){
-                if((userOrder.price <= anOrder.price) && (anOrder.orderAvailable())){
-                    var prevQuantity = remainingQuantity
-                    remainingQuantity = anOrder.updateOrderQuantity(remainingQuantity, userOrder.price)
-                    if(!anOrder.orderAvailable()){
-                        buyOrders.remove(anOrder)
+                for (anOrder in sortedSellOrders) {
+                    if ((userOrder.price >= anOrder.price) && (anOrder.orderAvailable())) {
+                        var prevQuantity = remainingQuantity
+                        remainingQuantity = anOrder.updateOrderQuantity(remainingQuantity, anOrder.price)
+                        if (!anOrder.orderAvailable()) {
+                            sellOrders.remove(anOrder)
+                        }
+                        if (remainingQuantity == 0L) {
+                            // Order is complete
+                            buyOrders.remove(userOrder)
+                            userOrder.updateOrderQuantity(prevQuantity - remainingQuantity, anOrder.price)
+                        } else {
+                            userOrder.updateOrderQuantity(prevQuantity - remainingQuantity, anOrder.price)
+                        }
+                        updateOrderDetailsForBuy(userName, prevQuantity, remainingQuantity, anOrder, userOrder)
+                        if (remainingQuantity == 0L) {
+                            break
+                        }
                     }
-                    if(remainingQuantity == 0L){
-                        // Order is complete
-                        sellOrders.remove(userOrder)
-                        userOrder.updateOrderQuantity(prevQuantity - remainingQuantity, userOrder.price)
-                    } else{
-                        userOrder.updateOrderQuantity(prevQuantity - remainingQuantity, userOrder.price)
-                    }
-                    updateOrderDetailsForSell(userName, prevQuantity, remainingQuantity, anOrder, userOrder)
-                    if(remainingQuantity == 0L){
-                        break
+
+                }
+            } else {
+                sellOrders.add(userOrder)
+                var sortedBuyOrders =
+                    buyOrders.sortedWith(compareByDescending<Order> { it.price }.thenBy { it.timeStamp })
+                var remainingQuantity = userOrder.quantity
+                for (anOrder in sortedBuyOrders) {
+                    if ((userOrder.price <= anOrder.price) && (anOrder.orderAvailable())) {
+                        var prevQuantity = remainingQuantity
+                        remainingQuantity = anOrder.updateOrderQuantity(remainingQuantity, userOrder.price)
+                        if (!anOrder.orderAvailable()) {
+                            buyOrders.remove(anOrder)
+                        }
+                        if (remainingQuantity == 0L) {
+                            // Order is complete
+                            sellOrders.remove(userOrder)
+                            userOrder.updateOrderQuantity(prevQuantity - remainingQuantity, userOrder.price)
+                        } else {
+                            userOrder.updateOrderQuantity(prevQuantity - remainingQuantity, userOrder.price)
+                        }
+                        updateOrderDetailsForSell(userName, prevQuantity, remainingQuantity, anOrder, userOrder)
+                        if (remainingQuantity == 0L) {
+                            break
+                        }
                     }
                 }
             }
+            return mapOf("orderId" to userOrder.orderId)
         }
-        return mapOf("orderId" to userOrder.orderId)
     }
-    fun orderHistory(userName: String): Any {
-        var userErrors = ArrayList<String>()
-        if(!this.userService.allUsers.contains(userName))
-        {
-            errors["USER_DOES_NOT_EXISTS"]?.let { userErrors.add(it) }
-            return mapOf("error" to userErrors)
-        }
-        val order_history = all_orders[userName]?.toList()
 
-        if (order_history.isNullOrEmpty()) {
-            errors["NO_ORDERS"]?.let { userErrors.add(it) }
-            return mapOf("error" to userErrors)
+
+        fun orderHistory(userName: String): Any {
+            var userErrors = ArrayList<String>()
+            if (!this.userService.allUsers.contains(userName)) {
+                errors["USER_DOES_NOT_EXISTS"]?.let { userErrors.add(it) }
+                return mapOf("error" to userErrors)
+            }
+            val order_history = all_orders[userName]?.toList()
+
+            if (order_history.isNullOrEmpty()) {
+                errors["NO_ORDERS"]?.let { userErrors.add(it) }
+                return mapOf("error" to userErrors)
+            }
+
+            return order_history
         }
 
-        return order_history
-    }
 
 
 }

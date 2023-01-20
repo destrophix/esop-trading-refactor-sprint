@@ -18,7 +18,7 @@ class UserService {
     var allUsers = HashMap<String, User>()
 
     fun check_inventory(quantity: Long, userName: String, type: String): Boolean{
-        val userinventory = all_users[userName]?.inventory!!
+        val userinventory = allUsers[userName]?.inventory!!
         if(type == "normal"){
             if(user_exists(userName) && userinventory.normalInventory.free>= quantity){
                 return true
@@ -145,9 +145,9 @@ class UserService {
     fun addingInventory(body: AddInventoryDTO, userName: String): Map<String, Any>
     {
 
-        var quant=body.get("quantity").longValue
+        var quant= body.quantity?.toLong()
         var type:String = "normal"
-        type = body.get("inventoryType").stringValue.lowercase()
+        type = body.inventoryType?.lowercase().toString()
 
         var accountErrors =mutableListOf<String>()
 
@@ -155,17 +155,19 @@ class UserService {
 
         if (usr1 != null) {
 
-            if(quant > 10000 || quant <=0){
-                accountErrors.add(errors["QUANTITY_NOT_ACCEPTED"].toString())
-            }else{
-                if(type != "normal" && type != "performance"){
-                    accountErrors.add(errors["INVALID_TYPE"].toString())
+            if (quant != null) {
+                if(quant > 10000 || quant <=0){
+                    accountErrors.add(errors["QUANTITY_NOT_ACCEPTED"].toString())
                 }else{
-                    usr1.addInventory(quant,type)
-                    return if(type == "performance"){
-                        mapOf("message" to "${quant} Performance ESOPS added to inventory")
+                    if(type != "normal" && type != "performance"){
+                        accountErrors.add(errors["INVALID_TYPE"].toString())
                     }else{
-                        mapOf("message" to "${quant} normal added to inventory")
+                        usr1.addInventory(quant,type)
+                        return if(type == "performance"){
+                            mapOf("message" to "${quant} Performance ESOPS added to inventory")
+                        }else{
+                            mapOf("message" to "${quant} normal added to inventory")
+                        }
                     }
                 }
             }

@@ -46,13 +46,13 @@ class UserController {
     @Post(uri="/{userName}/order", consumes = [MediaType.APPLICATION_JSON],produces=[MediaType.APPLICATION_JSON])
 
     fun order(userName: String, @Body @Valid body: CreateOrderDTO): Any? {
-        var quantity: Long = body.get("quantity").longValue
-        var type: String = body.get("type").stringValue.lowercase()
-        var price: Long = body.get("price").longValue
+        var quantity: Long = body.quantity!!.toLong()
+        var type: String = body.type.toString().lowercase()
+        var price: Long = body.price!!.toLong()
         var inventoryType: String = ""
 
         if(type == "sell"){
-            inventoryType = body.get("inventoryType").stringValue.lowercase()
+            inventoryType = body.inventoryType.toString().lowercase()
             print(inventoryType)
             if(inventoryType != "performance" && inventoryType != "normal"){
                 return HttpResponse.ok("Invalid inventory type")

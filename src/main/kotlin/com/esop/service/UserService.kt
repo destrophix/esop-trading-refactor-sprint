@@ -100,30 +100,27 @@ class UserService {
     }
 
     fun registerUser(userData: UserCreationDTO): Map<String,Any> {
-    val firstName = userData.firstName!!
-    val lastName = userData.lastName!!
-    val phoneNumber = userData.phoneNumber!!
-    val email = userData.email
-    val username = userData.username
+
+        val user = User(
+            userData.firstName!!, userData.lastName!!, userData.phoneNumber!!, userData.email!!, userData.username!!
+        );
+
+        allUsers[userData.username!!] = user
+        allEmails.add(userData.email!!)
+        allNumbers.add(userData.phoneNumber!!)
+        allUsernames.add(userData.username!!)
 
 
-    val errorList = validateUserDetails(userData)
-     if (errorList.isNotEmpty()) {
-         return mapOf("errors" to errorList)
-     }
+        return mapOf(
+            "firstName" to user.firstName.toString(),
+            "lastName" to user.lastName.toString(),
+            "phoneNumber" to user.phoneNumber.toString(),
+            "email" to user.email.toString(),
+            "userName" to user.username.toString()
+        )
 
+    }
 
-    val user = User(firstName, lastName, phoneNumber, email, username)
-
-        allUsers[username] = user
-    allEmails.add(email)
-    allNumbers.add(phoneNumber)
-    allUsernames.add(username)
-
-
-    val newUser = mapOf("firstName" to user.firstName.toString(), "lastName" to user.lastName.toString(), "phoneNumber" to user.phoneNumber.toString(), "email" to user.email.toString(), "userName" to user.username.toString() )
-    return newUser
-}
     fun accountInformation(userName: String): Map<String, Any?> {
         val user = allUsers[userName.toString()]
 

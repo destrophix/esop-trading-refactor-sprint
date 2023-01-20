@@ -11,7 +11,8 @@ val errors = mapOf(
     "POSITIVE_QUANTITY" to "Quantity must be positive.",
     "POSITIVE_PRICE" to "Price must be positive.",
     "INVALID_TYPE" to "Given type doesn't exist.",
-    "NO_ORDERS" to "User does not have any orders"
+    "NO_ORDERS" to "User does not have any orders",
+    "INVALID_USERNAME" to "Invalid User Name: username can consist only of alphabets, numbers or hyphen(s) and should start with an alphabet."
 )
 
 val success_response = mapOf(

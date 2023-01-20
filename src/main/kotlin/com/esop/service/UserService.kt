@@ -4,6 +4,7 @@ import com.esop.schema.User
 import io.micronaut.json.tree.JsonObject
 import com.esop.constant.errors
 import com.esop.constant.success_response
+import com.esop.schema.Inventory
 import jakarta.inject.Singleton
 
 
@@ -14,10 +15,16 @@ class UserService {
     val all_usernames = mutableSetOf<String>()
     var all_users = HashMap<String, User>()
 
-    fun check_inventory(quantity: Long, userName: String): Boolean{
+    fun check_inventory(quantity: Long, userName: String, type: String): Boolean{
         val userinventory = all_users[userName]?.inventory!!
-        if(user_exists(userName) && (userinventory.normalInventory.free +  userinventory.performanceInventory.free)>= quantity){
-            return true
+        if(type == "normal"){
+            if(user_exists(userName) && userinventory.normalInventory.free>= quantity){
+                return true
+            }
+        }else{
+            if(user_exists(userName) && userinventory.performanceInventory.free>= quantity){
+                return true
+            }
         }
         return false
     }
@@ -27,28 +34,34 @@ class UserService {
         }
         return false
     }
-    fun orderCheckBeforePlace(userName: String, quantity: Long, type: String, price: Long): Map<String, MutableList<String>>{
+    fun orderCheckBeforePlace(userName: String, quantity: Long, type: String, price: Long, inventoryType : String): Map<String, MutableList<String>>{
         var userErrors = mutableListOf<String>()
         if(!all_users.containsKey(userName)){
             userErrors.add("User doesn't exist")
             return mapOf("error" to userErrors)
         }
-        if(type == "BUY"){
+        if(type == "buy"){
             if(!check_wallet(price*quantity, userName)){
                 userErrors.add("Insufficient funds")
             }
         }
-        else if(type == "SELL"){
-            if(!check_inventory(quantity, userName)){
-                userErrors.add("Insufficient inventory")
+        else if(type == "sell"){
+            if(inventoryType == "performance"){
+                if(!check_inventory(quantity, userName,"performance")){
+                    userErrors.add("Insufficient performance inventory")
+                }
+            }else{
+                if(!check_inventory(quantity, userName,"normal")){
+                    userErrors.add("Insufficient normal inventory")
+                }
             }
         }
         if(userErrors.isEmpty()){
-            if(type == "BUY"){
+            if(type == "buy"){
                 all_users[userName]?.buyAndUpdateWallet(price*quantity)
             }
-            if(type == "SELL"){
-                all_users[userName]?.sellAndUpdateInventory(quantity)
+            if(type == "sell"){
+                all_users[userName]?.sellAndUpdateInventory(quantity,inventoryType)
             }
         }
         return mapOf("error" to userErrors)
@@ -156,7 +169,8 @@ class UserService {
     {
 
         var quant=body.get("quantity").longValue
-        var type:String = body.get("type").stringValue.lowercase()
+        var type:String = "normal"
+        type = body.get("inventoryType").stringValue.lowercase()
         var accountErrors =mutableListOf<String>()
 
         var usr1= all_users[userName]
@@ -169,10 +183,10 @@ class UserService {
                     accountErrors.add(errors["INVALID_TYPE"].toString())
                 }else{
                     usr1.addInventory(quant,type)
-                    if(type == "performance"){
-                        return mapOf("message" to "${quant} Performance ESOPS added to inventory")
+                    return if(type == "performance"){
+                        mapOf("message" to "${quant} Performance ESOPS added to inventory")
                     }else{
-                        return mapOf("message" to "${quant} normal added to inventory")
+                        mapOf("message" to "${quant} normal added to inventory")
                     }
                 }
             }

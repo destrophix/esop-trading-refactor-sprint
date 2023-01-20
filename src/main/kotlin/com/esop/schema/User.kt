@@ -49,11 +49,17 @@ class User {
         wallet.free -= amount
         wallet.locked += amount
     }
-    fun sellAndUpdateInventory(quantity: Long){
+    fun sellAndUpdateInventory(quantity: Long,inventoryType : String){
         // A function which after sell order,
         // updates the free quantity and places it into the locked quantity
-//        inventory.free -= quantity
-//        inventory.locked += quantity
+        if(inventoryType == "performance"){
+            inventory.performanceInventory.free -= quantity
+            inventory.performanceInventory.locked += quantity
+        }else{
+            inventory.normalInventory.free -= quantity
+            inventory.normalInventory.locked += quantity
+        }
+
     }
 
     fun orderWalletFree(amount: Long){

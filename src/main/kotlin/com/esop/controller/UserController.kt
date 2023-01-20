@@ -44,12 +44,11 @@ class UserController {
     }
 
     @Post(uri="/{userName}/order", consumes = [MediaType.APPLICATION_JSON],produces=[MediaType.APPLICATION_JSON])
-
     fun order(userName: String, @Body @Valid body: CreateOrderDTO): Any? {
-        var quantity: Long = body.quantity!!.toLong()
-        var type: String = body.type.toString().lowercase()
-        var price: Long = body.price!!.toLong()
-        var inventoryType: String = ""
+        val quantity: Long = body.quantity!!.toLong()
+        val type: String = body.type.toString().lowercase()
+        val price: Long = body.price!!.toLong()
+        var inventoryType = ""
 
         if(type == "sell"){
             inventoryType = body.inventoryType.toString().lowercase()
@@ -59,9 +58,9 @@ class UserController {
             }
         }
 
-        var userErrors = this.userService.orderCheckBeforePlace(userName, quantity, type, price, inventoryType)
+        val userErrors = this.userService.orderCheckBeforePlace(userName, quantity, type, price, inventoryType)
         if(userErrors["error"]?.isEmpty()!!){
-            var userOrderOrErrors = this.orderService.placeOrder(userName, quantity, type, price, inventoryType)
+            val userOrderOrErrors = this.orderService.placeOrder(userName, quantity, type, price, inventoryType)
             
             if (userOrderOrErrors["orderId"] != null) {
                 return HttpResponse.ok(mapOf(
@@ -75,7 +74,6 @@ class UserController {
             }
 
         }
-
         return HttpResponse.badRequest(userErrors)
     }
 
@@ -128,10 +126,10 @@ class UserController {
 
     @Get(uri = "/{userName}/order", produces = [MediaType.APPLICATION_JSON])
     fun orderHistory(userName: String): HttpResponse<*> {
-        val order_history = this.orderService.orderHistory(userName)
-        if(order_history is Map<*, *>){
-            return HttpResponse.badRequest(order_history)
+        val orderHistoryData = this.orderService.orderHistory(userName)
+        if(orderHistoryData is Map<*, *>){
+            return HttpResponse.badRequest(orderHistoryData)
         }
-        return HttpResponse.ok(order_history)
+        return HttpResponse.ok(orderHistoryData)
     }
 }

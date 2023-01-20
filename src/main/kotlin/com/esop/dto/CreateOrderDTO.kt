@@ -2,7 +2,6 @@ package com.esop.dto
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
-import io.micronaut.context.annotation.Value
 import io.micronaut.core.annotation.Introspected
 import javax.validation.constraints.Max
 import javax.validation.constraints.Min

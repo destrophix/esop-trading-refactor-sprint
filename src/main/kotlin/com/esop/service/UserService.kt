@@ -1,12 +1,10 @@
 package com.esop.service
 
-import com.esop.dto.UserCreationDTO
-import com.esop.schema.User
 import com.esop.constant.errors
-import com.esop.constant.success_response
-import com.esop.schema.Inventory
 import com.esop.dto.AddInventoryDTO
 import com.esop.dto.AddWalletDTO
+import com.esop.dto.UserCreationDTO
+import com.esop.schema.User
 import jakarta.inject.Singleton
 
 
@@ -37,7 +35,7 @@ class UserService {
         return false
     }
     fun orderCheckBeforePlace(userName: String, quantity: Long, type: String, price: Long, inventoryType : String): Map<String, MutableList<String>>{
-        var userErrors = mutableListOf<String>()
+        val userErrors = mutableListOf<String>()
         if(!allUsers.containsKey(userName)){
             userErrors.add("User doesn't exist")
             return mapOf("error" to userErrors)
@@ -72,20 +70,20 @@ class UserService {
         return allUsers.containsKey(userName)
     }
     fun check_username(username_set: MutableSet<String>, search_value: String): Boolean {
-        return username_set.contains(search_value);
+        return username_set.contains(search_value)
     }
 
     fun check_phonenumber(usernumber_set: MutableSet<String>, search_value: String): Boolean {
-        return usernumber_set.contains(search_value);
+        return usernumber_set.contains(search_value)
     }
 
     fun check_email(useremail_set: MutableSet<String>, search_value: String): Boolean {
-        return useremail_set.contains(search_value);
+        return useremail_set.contains(search_value)
     }
 
 
     fun validateUserDetails(userData: UserCreationDTO): List<String> {
-        var Errors = mutableListOf<String>()
+        val Errors = mutableListOf<String>()
 
         if(check_username(allUsernames, userData.username)){
             Errors.add(errors["USERNAME_EXISTS"].toString())
@@ -102,22 +100,22 @@ class UserService {
     }
 
     fun registerUser(userData: UserCreationDTO): Map<String,Any> {
-    var firstName = userData.firstName!!
-    var lastName = userData.lastName!!
-    var phoneNumber = userData.phoneNumber!!
-    var email = userData.email
-    var username = userData.username
+    val firstName = userData.firstName!!
+    val lastName = userData.lastName!!
+    val phoneNumber = userData.phoneNumber!!
+    val email = userData.email
+    val username = userData.username
 
 
-    var errorList = validateUserDetails(userData)
+    val errorList = validateUserDetails(userData)
      if (errorList.isNotEmpty()) {
          return mapOf("errors" to errorList)
      }
 
 
-    val user = User(firstName, lastName, phoneNumber, email, username);
+    val user = User(firstName, lastName, phoneNumber, email, username)
 
-    allUsers[username] = user
+        allUsers[username] = user
     allEmails.add(email)
     allNumbers.add(phoneNumber)
     allUsernames.add(username)
@@ -146,7 +144,7 @@ class UserService {
     {
 
         var quant= body.quantity?.toLong()
-        var type:String = "normal"
+        var type = "normal"
         type = body.inventoryType?.lowercase().toString()
 
         var accountErrors =mutableListOf<String>()
@@ -184,7 +182,7 @@ class UserService {
 
         if (usr1 != null) {
             usr1.addWallet(body.price!!)
-            return mapOf("message" to "${body.price} amount added to account");
+            return mapOf("message" to "${body.price} amount added to account")
         }
         accountErrors.add(errors["USER_DOES_NOT_EXISTS"].toString())
 

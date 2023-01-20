@@ -17,7 +17,7 @@ class OrderService{
     private var orderCount = 1
 
     private fun checkOrderParameters(quantity: Long, price: Long, type:String): MutableList<String>{
-        var userErrors = mutableListOf<String>()
+        val userErrors = mutableListOf<String>()
         if(quantity <= 0){
             errors["POSITIVE_QUANTITY"]?.let { userErrors.add(it) }
         }
@@ -41,7 +41,7 @@ class OrderService{
         )!!
 
         // Add money of quantity taken from seller
-        var totOrderPrice = sellerOrder.price * (prevQuantity - remainingQuantity)
+        val totOrderPrice = sellerOrder.price * (prevQuantity - remainingQuantity)
         this.userService.allUsers[sellerOrder.userName]?.wallet?.free  = this.userService.allUsers[sellerOrder.userName]?.wallet?.free?.plus(
             totOrderPrice- round(totOrderPrice*0.02).toLong()
         )!!
@@ -96,7 +96,7 @@ class OrderService{
         )!!
 
         // Add money to sellers wallet
-        var totOrderPrice = sellerOrder.price * (prevQuantity - remainingQuantity)
+        val totOrderPrice = sellerOrder.price * (prevQuantity - remainingQuantity)
         this.userService.allUsers[userName]?.wallet?.free = this.userService.allUsers[userName]?.wallet?.free?.plus(
             totOrderPrice- round(totOrderPrice*0.02).toLong()
         )!!
@@ -111,7 +111,7 @@ class OrderService{
 
     fun placeOrder(userName: String, quantity: Long, type: String, price: Long, inventoryType : String): Map<String, Any> {
 
-        var userErrors = checkOrderParameters(quantity, price, type)
+        val userErrors = checkOrderParameters(quantity, price, type)
         if (userErrors.isNotEmpty()) {
             // add to list of errors
             return mapOf("error" to userErrors)
@@ -120,7 +120,7 @@ class OrderService{
             if (inventoryType == "performance") {
                 inventoryPriority -= 1
             }
-            var userOrder = Order(quantity, type, price, orderCount, userName, inventoryType, inventoryPriority)
+            val userOrder = Order(quantity, type, price, orderCount, userName, inventoryType, inventoryPriority)
             orderCount += 1
             if (!all_orders.containsKey(userName)) {
                 all_orders[userName] = ArrayList()
@@ -129,14 +129,14 @@ class OrderService{
             if (type == "buy") {
                 //altering buy order queue
                 buyOrders.add(userOrder)
-                var sortedSellOrders =
+                val sortedSellOrders =
                     sellOrders.sortedWith(compareBy({ it.inventoryPriority }, { it.price }, { it.timeStamp }))
                 var remainingQuantity = userOrder.quantity
 
 
                 for (anOrder in sortedSellOrders) {
                     if ((userOrder.price >= anOrder.price) && (anOrder.orderAvailable())) {
-                        var prevQuantity = remainingQuantity
+                        val prevQuantity = remainingQuantity
                         remainingQuantity = anOrder.updateOrderQuantity(remainingQuantity, anOrder.price)
                         if (!anOrder.orderAvailable()) {
                             sellOrders.remove(anOrder)
@@ -157,12 +157,12 @@ class OrderService{
                 }
             } else {
                 sellOrders.add(userOrder)
-                var sortedBuyOrders =
+                val sortedBuyOrders =
                     buyOrders.sortedWith(compareByDescending<Order> { it.price }.thenBy { it.timeStamp })
                 var remainingQuantity = userOrder.quantity
                 for (anOrder in sortedBuyOrders) {
                     if ((userOrder.price <= anOrder.price) && (anOrder.orderAvailable())) {
-                        var prevQuantity = remainingQuantity
+                        val prevQuantity = remainingQuantity
                         remainingQuantity = anOrder.updateOrderQuantity(remainingQuantity, userOrder.price)
                         if (!anOrder.orderAvailable()) {
                             buyOrders.remove(anOrder)
@@ -187,7 +187,7 @@ class OrderService{
 
 
         fun orderHistory(userName: String): Any {
-            var userErrors = ArrayList<String>()
+            val userErrors = ArrayList<String>()
             if (!this.userService.allUsers.contains(userName)) {
                 errors["USER_DOES_NOT_EXISTS"]?.let { userErrors.add(it) }
                 return mapOf("error" to userErrors)

@@ -99,8 +99,8 @@ class UserService {
             "firstName" to user.firstName.toString(),
             "lastName" to user.lastName.toString(),
             "phoneNumber" to user.phoneNumber.toString(),
-            "emailID" to user.email.toString(),
-            "userName" to user.username.toString()
+            "email" to user.email.toString(),
+            "username" to user.username.toString()
         )
     }
 

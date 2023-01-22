@@ -4,6 +4,7 @@ import com.esop.dto.AddInventoryDTO
 import com.esop.dto.AddWalletDTO
 import com.esop.dto.CreateOrderDTO
 import com.esop.dto.UserCreationDTO
+import com.esop.schema.Order
 import com.esop.service.*
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.annotation.Body
@@ -45,36 +46,39 @@ class UserController {
 
     @Post(uri="/{userName}/order", consumes = [MediaType.APPLICATION_JSON],produces=[MediaType.APPLICATION_JSON])
     fun order(userName: String, @Body @Valid body: CreateOrderDTO): Any? {
-        val quantity: Long = body.quantity!!.toLong()
-        val type: String = body.type.toString().lowercase()
-        val price: Long = body.price!!.toLong()
+        var errorList = mutableListOf<String>()
+
+        val orderType: String = body.type.toString()
         var inventoryType = ""
 
-        if(type == "sell"){
-            inventoryType = body.inventoryType.toString().lowercase()
-            print(inventoryType)
-            if(inventoryType != "performance" && inventoryType != "normal"){
-                return HttpResponse.ok("Invalid inventory type")
+        if(orderType == "SELL"){
+            inventoryType = body.inventoryType.toString()
+            if(inventoryType != "PERFORMANCE" && inventoryType != "NORMAL"){
+                errorList.add("Invalid inventory type")
+                return HttpResponse.badRequest(mapOf("errors" to errorList))
             }
         }
 
-        val userErrors = this.userService.orderCheckBeforePlace(userName, quantity, type, price, inventoryType)
-        if(userErrors["error"]?.isEmpty()!!){
-            val userOrderOrErrors = this.orderService.placeOrder(userName, quantity, type, price, inventoryType)
-            
-            if (userOrderOrErrors["orderId"] != null) {
-                return HttpResponse.ok(mapOf(
-                    "orderId" to userOrderOrErrors["orderId"],
-                    "quantity" to body.quantity,
-                    "type" to body.type,
-                    "price" to body.price
-                ))
-            }else{
-                return HttpResponse.badRequest(userOrderOrErrors)
-            }
-
+        val order = Order(body.quantity!!.toLong(),body.type.toString(),body.price!!.toLong(),userName)
+        if(orderType == "SELL"){
+            order.inventoryType = inventoryType
         }
-        return HttpResponse.badRequest(userErrors)
+        errorList = UserService.orderCheckBeforePlace(order)
+        if(errorList.size > 0){
+            return HttpResponse.badRequest(mapOf("errors" to errorList))
+        }
+        val userOrderOrErrors = OrderService.placeOrder(order)
+
+        if (userOrderOrErrors["orderId"] != null) {
+            return HttpResponse.ok(mapOf(
+                "orderId" to userOrderOrErrors["orderId"],
+                "quantity" to body.quantity,
+                "type" to body.type,
+                "price" to body.price
+            ))
+        }else{
+            return HttpResponse.badRequest(userOrderOrErrors)
+        }
     }
 
     @Get(uri = "/{userName}/accountInformation", produces = [MediaType.APPLICATION_JSON])
@@ -124,9 +128,9 @@ class UserController {
 
     }
 
-    @Get(uri = "/{userName}/order", produces = [MediaType.APPLICATION_JSON])
+    @Get(uri = "/{userName}/orderHistory", produces = [MediaType.APPLICATION_JSON])
     fun orderHistory(userName: String): HttpResponse<*> {
-        val orderHistoryData = this.orderService.orderHistory(userName)
+        val orderHistoryData = OrderService.orderHistory(userName)
         if(orderHistoryData is Map<*, *>){
             return HttpResponse.badRequest(orderHistoryData)
         }

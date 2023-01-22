@@ -6,185 +6,171 @@ import com.esop.dto.AddWalletDTO
 import com.esop.dto.UserCreationDTO
 import com.esop.schema.User
 import jakarta.inject.Singleton
-
+import com.esop.schema.Order
 
 @Singleton
 class UserService {
-    val allEmails = mutableSetOf<String>()
-    val allNumbers = mutableSetOf<String>()
-    val allUsernames = mutableSetOf<String>()
-    var allUsers = HashMap<String, User>()
+    companion object {
+        val emailList = mutableSetOf<String>()
+        val phoneNumberList = mutableSetOf<String>()
+        var userList = HashMap<String, User>()
 
-    fun check_inventory(quantity: Long, userName: String, type: String): Boolean{
-        val userinventory = allUsers[userName]?.inventory!!
-        if(type == "normal"){
-            if(user_exists(userName) && userinventory.normalInventory.free>= quantity){
-                return true
+        fun orderCheckBeforePlace(order: Order): MutableList<String> {
+            val errorList = mutableListOf<String>()
+
+            if(!userList.containsKey(order.userName)){
+                errorList.add("User doesn't exist.")
+                return errorList
             }
-        }else{
-            if(user_exists(userName) && userinventory.performanceInventory.free>= quantity){
-                return true
-            }
-        }
-        return false
-    }
-    fun check_wallet(amount: Long, userName: String): Boolean{
-        if(user_exists(userName) && allUsers[userName]?.wallet?.free!! >= amount){
-            return true
-        }
-        return false
-    }
-    fun orderCheckBeforePlace(userName: String, quantity: Long, type: String, price: Long, inventoryType : String): Map<String, MutableList<String>>{
-        val userErrors = mutableListOf<String>()
-        if(!allUsers.containsKey(userName)){
-            userErrors.add("User doesn't exist")
-            return mapOf("error" to userErrors)
-        }
-        if(type == "buy"){
-            if(!check_wallet(price*quantity, userName)){
-                userErrors.add("Insufficient funds")
-            }
-        }
-        else if(type == "sell"){
-            if(inventoryType == "performance"){
-                if(!check_inventory(quantity, userName,"performance")){
-                    userErrors.add("Insufficient performance inventory")
-                }
-            }else{
-                if(!check_inventory(quantity, userName,"normal")){
-                    userErrors.add("Insufficient normal inventory")
+            val user = userList.get(order.userName)
+            if(order.type == "BUY"){
+                val response = user!!.userWallet.moveMoneyFromFreeToLockedState(order.price*order.quantity)
+                if (response != "SUCCESS"){
+                    errorList.add(response)
                 }
             }
-        }
-        if(userErrors.isEmpty()){
-            if(type == "buy"){
-                allUsers[userName]?.buyAndUpdateWallet(price*quantity)
+            else if(order.type == "sell"){
+                if(order.inventoryType == "PERFORMANCE"){
+                    val response = user!!.userPerformanceInventory.moveESOPsFromFreeToLockedState(order.quantity)
+                    if ( response != "SUCCESS" ){
+                        errorList.add(response)
+                    }
+                }else if(order.inventoryType == "NORMAL"){
+                    val response = user!!.userNormalInventory.moveESOPsFromFreeToLockedState(order.quantity)
+                    if ( response != "SUCCESS" ){
+                        errorList.add(response)
+                    }
+                }
             }
-            if(type == "sell"){
-                allUsers[userName]?.sellAndUpdateInventory(quantity,inventoryType)
-            }
+            return errorList
         }
-        return mapOf("error" to userErrors)
-    }
-    fun user_exists(userName: String): Boolean{
-        return allUsers.containsKey(userName)
-    }
-    fun check_username(username_set: MutableSet<String>, search_value: String): Boolean {
-        return username_set.contains(search_value)
     }
 
-    fun check_phonenumber(usernumber_set: MutableSet<String>, search_value: String): Boolean {
+    fun check_username( search_value: String): Boolean
+    {
+        return userList.contains(search_value)
+    }
+
+    fun check_phonenumber(usernumber_set: MutableSet<String>, search_value: String): Boolean
+    {
         return usernumber_set.contains(search_value)
     }
 
-    fun check_email(useremail_set: MutableSet<String>, search_value: String): Boolean {
+    fun check_email(useremail_set: MutableSet<String>, search_value: String): Boolean
+    {
         return useremail_set.contains(search_value)
     }
 
 
-    fun validateUserDetails(userData: UserCreationDTO): List<String> {
-        val Errors = mutableListOf<String>()
+    fun validateUserDetails(userData: UserCreationDTO): List<String>
+    {
+        val errorList = mutableListOf<String>()
 
-        if(check_username(allUsernames, userData.username)){
-            Errors.add(errors["USERNAME_EXISTS"].toString())
+        if(check_username(userData.username!!)){
+            errorList.add(errors["USERNAME_EXISTS"].toString())
+        }
+        else if(check_email(emailList, userData.email!!)){
+            errorList.add(errors["EMAIL_EXISTS"].toString())
+        }
+        else if(check_phonenumber(phoneNumberList, userData.phoneNumber!!)){
+            errorList.add(errors["PHONENUMBER_EXISTS"].toString())
         }
 
-        else if(check_email(allEmails, userData.email)){
-            Errors.add(errors["EMAIL_EXISTS"].toString())
-        }
-        else if(check_phonenumber(allNumbers, userData.phoneNumber!!)){
-            Errors.add(errors["PHONENUMBER_EXISTS"].toString())
-        }
-
-        return Errors
+        return errorList
     }
 
-    fun registerUser(userData: UserCreationDTO): Map<String,Any> {
-
+    fun registerUser(userData: UserCreationDTO): Map<String,Any>
+    {
+        val errors = validateUserDetails(userData)
+        if(errors.size > 0) {
+            return mapOf("error" to errors)
+        }
         val user = User(
-            userData.firstName!!, userData.lastName!!, userData.phoneNumber!!, userData.email!!, userData.username!!
+            userData.firstName!!,
+            userData.lastName!!,
+            userData.phoneNumber!!,
+            userData.email!!,
+            userData.username!!
         );
-
-        allUsers[userData.username!!] = user
-        allEmails.add(userData.email!!)
-        allNumbers.add(userData.phoneNumber!!)
-        allUsernames.add(userData.username!!)
-
-
+        userList.put(userData.username!!,user)
+        emailList.add(userData.email!!)
+        phoneNumberList.add(userData.phoneNumber!!)
         return mapOf(
             "firstName" to user.firstName.toString(),
             "lastName" to user.lastName.toString(),
             "phoneNumber" to user.phoneNumber.toString(),
-            "email" to user.email.toString(),
+            "emailID" to user.email.toString(),
             "userName" to user.username.toString()
         )
-
     }
 
-    fun accountInformation(userName: String): Map<String, Any?> {
-        val user = allUsers[userName.toString()]
-
-        var accountErrors = mutableListOf<String>()
-
-        var userData= mapOf("firstName" to user?.firstName.toString() ,"lastName" to user?.lastName.toString(), "phoneNumber" to user?.phoneNumber.toString(), "email" to user?.email.toString(), "wallet" to user?.wallet, "inventory" to user?.inventory)
-        if(user!=null){
-            return userData
-        }
-
-        accountErrors.add(errors["USER_DOES_NOT_EXISTS"].toString())
-
-        return mapOf("error" to accountErrors)
-    }
-
-
-    fun addingInventory(body: AddInventoryDTO, userName: String): Map<String, Any>
+    fun accountInformation(userName: String): Map<String, Any?>
     {
+        var errorList = mutableListOf<String>()
 
-        var quant= body.quantity?.toLong()
-        var type = "normal"
-        type = body.inventoryType?.lowercase().toString()
-
-        var accountErrors =mutableListOf<String>()
-
-        var usr1= allUsers[userName]
-
-        if (usr1 != null) {
-
-            if (quant != null) {
-                if(quant > 10000 || quant <=0){
-                    accountErrors.add(errors["QUANTITY_NOT_ACCEPTED"].toString())
-                }else{
-                    if(type != "normal" && type != "performance"){
-                        accountErrors.add(errors["INVALID_TYPE"].toString())
-                    }else{
-                        usr1.addInventory(quant,type)
-                        return if(type == "performance"){
-                            mapOf("message" to "${quant} Performance ESOPS added to inventory")
-                        }else{
-                            mapOf("message" to "${quant} normal added to inventory")
-                        }
-                    }
-                }
-            }
-        }else{
-            accountErrors.add(errors["USER_DOES_NOT_EXISTS"].toString())
+        if ( !check_username(userName) ){
+            errorList.add(errors["USER_DOES_NOT_EXISTS"].toString())
         }
-        return mapOf("error" to accountErrors)
+
+        if( errorList.size > 0 ){
+            return mapOf("error" to errorList)
+        }
+        val user = userList.get(userName)!!
+
+        return mapOf(
+            "firstName" to user.firstName,
+            "lastName" to user.lastName,
+            "phoneNumber" to user.phoneNumber,
+            "email" to user.email,
+            "wallet" to mapOf(
+                "free" to user.userWallet.getFreeMoney(),
+                "locked" to user.userWallet.getLockedMoney()
+            ),
+            "inventory" to arrayListOf<Any>(
+                mapOf(
+                    "type" to "PERFORMANCE",
+                    "free" to user.userPerformanceInventory.getFreeInventory(),
+                    "locked" to user.userPerformanceInventory.getLockedInventory()
+                ),
+                mapOf(
+                    "type" to "NORMAL",
+                    "free" to user.userNormalInventory.getFreeInventory(),
+                    "locked" to user.userNormalInventory.getLockedInventory()
+                )
+            )
+        )
     }
 
-    fun addingMoney(body: AddWalletDTO, userName: String): Map<String, Any>
+
+    fun addingInventory(inventoryData: AddInventoryDTO, userName: String): Map<String, Any>
     {
-        var accountErrors =mutableListOf<String>()
-        var usr1= allUsers[userName]
+        var errorList = mutableListOf<String>()
 
-        if (usr1 != null) {
-            usr1.addWallet(body.price!!)
-            return mapOf("message" to "${body.price} amount added to account")
+        if ( inventoryData.type != "NORMAL" && inventoryData.type != "PERFORMANCE" ){
+            errorList.add(errors["INVALID_TYPE"].toString())
         }
-        accountErrors.add(errors["USER_DOES_NOT_EXISTS"].toString())
+        else if ( !check_username(userName) ){
+            errorList.add(errors["USER_DOES_NOT_EXISTS"].toString())
+        }
 
-        return mapOf("error" to accountErrors)
+        if( errorList.size > 0 ) {
+            return mapOf("error" to errorList)
+        }
+        return mapOf("message" to userList.get(userName)!!.addToInventory(inventoryData))
+    }
 
-        //return mapOf("errors" to errors["USER_DOES_NOT_EXISTS"]).toString()
+    fun addingMoney(walletData: AddWalletDTO, userName: String): Map<String, Any>
+    {
+        var errorList = mutableListOf<String>()
+
+        if ( !check_username(userName) ){
+            errorList.add(errors["USER_DOES_NOT_EXISTS"].toString())
+        }
+
+        if( errorList.size > 0 ) {
+            return mapOf("error" to errorList)
+        }
+
+        return mapOf("message" to userList.get(userName)!!.addToWallet(walletData))
     }
 }

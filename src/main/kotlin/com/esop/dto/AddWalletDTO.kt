@@ -11,8 +11,8 @@ import javax.validation.constraints.NotNull
 @Introspected
 class AddWalletDTO @JsonCreator constructor(
     @JsonProperty("amount")
-    @field:NotNull(message = "property amount is required")
-    @field:Min(1, message = "amount cannot be less than zero")
-    @field:Max(MAX_PRICE, message = "amount has to be less than or equal to $MAX_PRICE")
+    @field:NotNull(message = "Amount can not be missing.")
+    @field:Min(1, message = "Amount can not be less than zero")
+    @field:Max(1000000000, message = "Amount has to be less than or equal to 1000000000")
     var price: Long? = null,
 )

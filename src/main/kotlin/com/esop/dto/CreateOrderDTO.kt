@@ -7,6 +7,7 @@ import javax.validation.constraints.Max
 import javax.validation.constraints.Min
 import javax.validation.constraints.NotNull
 import javax.validation.constraints.Pattern
+import javax.validation.constraints.NotBlank
 
 
 const val MAX_QUANTITY = 1_000_000_000L
@@ -15,21 +16,20 @@ const val MAX_PRICE = 1_000_000L
 @Introspected
 class CreateOrderDTO @JsonCreator constructor(
 
-    @field:NotNull(message = "property order type is required")
+    @field:NotBlank(message = "Order Type can not be missing or empty.")
     @field:Pattern(regexp = "^(BUY|SELL)$", message = "Invalid Type: should be one of BUY or SELL")
     var type: String? = null,
 
-    @field:NotNull(message = "property quantity is required")
-    @field:Min(1, message = "quantity has to be greater than zero")
-    @field:Max(MAX_QUANTITY, message = "quantity has be less than or equal to $MAX_QUANTITY")
+    @field:NotBlank(message = "Quantity can not be missing or empty.")
+    @field:Min(1, message = "Quantity has to be greater than zero")
+    @field:Max(MAX_QUANTITY, message = "Quantity has be less than or equal to $MAX_QUANTITY")
     var quantity: Long? = null,
 
     @JsonProperty("price")
-    @field:NotNull(message="property price is required")
-    @field:Min(0, message = "price cannot be less than zero")
-    @field:Max(MAX_PRICE, message = "price has to be less than or equal to $MAX_PRICE")
+    @field:NotNull(message="Price can not be missing or empty.")
+    @field:Min(0, message = "Price cannot be less than zero")
+    @field:Max(MAX_PRICE, message = "Price has to be less than or equal to $MAX_PRICE")
     var price: Long? = null,
 
-    //@field:Pattern(regexp = "^(NORMAL|PERFORMANCE)$", message = "Invalid Type: should be one of NORMAL or PERFORMANCE")
     var inventoryType: String? = "NORMAL"
 )

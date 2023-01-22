@@ -1,10 +1,16 @@
 package com.esop.schema
 
+import com.esop.WalletLimitExceededException
+
 class Wallet{
     private var freeMoney: Long = 0
     private var lockedMoney: Long = 0
 
     fun addMoneyToWallet(amountToBeAdded : Long){
+        if (amountToBeAdded + freeMoney > amountToBeAdded) {
+            throw WalletLimitExceededException()
+        }
+
         this.freeMoney = this.freeMoney + amountToBeAdded
     }
 

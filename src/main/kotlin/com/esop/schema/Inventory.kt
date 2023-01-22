@@ -1,10 +1,18 @@
 package com.esop.schema
+
+import com.esop.InventoryLimitExceededException
+import com.esop.constant.MAX_INVENTORY_CAPACITY
+
 class Inventory(
     private var freeInventory: Long = 0L ,
     private var lockedInventory: Long = 0L,
     private var type: String
 ) {
     fun addESOPsToInventory(esopsToBeAdded: Long) {
+        if (esopsToBeAdded + freeInventory > MAX_INVENTORY_CAPACITY) {
+            throw InventoryLimitExceededException()
+        }
+
         this.freeInventory = this.freeInventory + esopsToBeAdded
     }
 

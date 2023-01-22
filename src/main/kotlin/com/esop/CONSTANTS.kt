@@ -20,3 +20,9 @@ val errors = mapOf(
 val success_response = mapOf(
     "USER_CREATED" to "User has been registered successfully."
 )
+
+
+
+const val MAX_WALLET_CAPACITY = 100_00_00_000L
+
+const val MAX_INVENTORY_CAPACITY = 1_00_00_000L

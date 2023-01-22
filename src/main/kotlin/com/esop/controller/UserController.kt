@@ -1,5 +1,7 @@
 package com.esop.controller
 
+import com.esop.InventoryLimitExceededException
+import com.esop.WalletLimitExceededException
 import com.esop.dto.AddInventoryDTO
 import com.esop.dto.AddWalletDTO
 import com.esop.dto.CreateOrderDTO
@@ -7,10 +9,12 @@ import com.esop.dto.UserCreationDTO
 import com.esop.schema.Order
 import com.esop.service.*
 import io.micronaut.http.HttpResponse
+import io.micronaut.http.HttpStatus
 import io.micronaut.http.annotation.Body
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
 import io.micronaut.http.MediaType
+import io.micronaut.http.annotation.Error
 import io.micronaut.http.annotation.Post
 import io.micronaut.validation.Validated
 import jakarta.inject.Inject
@@ -94,6 +98,7 @@ class UserController {
         return HttpResponse.ok(userData)
     }
 
+    @Error(exception = InventoryLimitExceededException::class, status = HttpStatus.BAD_REQUEST)
     @Post(uri = "{userName}/inventory", consumes = [MediaType.APPLICATION_JSON], produces = [MediaType.APPLICATION_JSON])
     fun addInventory(userName: String, @Body @Valid body: AddInventoryDTO): HttpResponse<*>{
         val validationErrors = checkValidationError(body)
@@ -112,6 +117,7 @@ class UserController {
     }
 
 
+    @Error(exception = WalletLimitExceededException::class, status = HttpStatus.BAD_REQUEST)
     @Post(uri = "{userName}/wallet", consumes = [MediaType.APPLICATION_JSON], produces = [MediaType.APPLICATION_JSON])
     fun addWallet(userName: String, @Body @Valid body: AddWalletDTO) :HttpResponse<*> {
         val validationErrors = checkValidationError(body)

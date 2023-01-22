@@ -18,7 +18,7 @@ import javax.validation.constraints.NotBlank
 class CreateOrderDTO @JsonCreator constructor(
 
     @field:NotBlank(message = "Order Type can not be missing or empty.")
-    @field:Pattern(regexp = "^(BUY|SELL)$", message = "Invalid Type: should be one of BUY or SELL")
+    @field:Pattern(regexp = "^((?i)BUY|(?i)SELL)$", message = "Invalid Type: should be one of BUY or SELL")
     var type: String? = null,
 
     @field:NotNull(message = "Quantity can not be missing.")
@@ -33,6 +33,6 @@ class CreateOrderDTO @JsonCreator constructor(
     var price: Long? = null,
 
     @JsonProperty("inventoryType")
-    @field:Pattern(regexp = "^(NON_PERFORMANCE|PERFORMANCE)$", message = "inventoryType should be one of NON_PERFORMANCE or PERFORMANCE")
+    @field:Pattern(regexp = "^((?i)NON_PERFORMANCE|(?i)PERFORMANCE)$", message = "inventoryType should be one of NON_PERFORMANCE or PERFORMANCE")
     var inventoryType: String? = "NON_PERFORMANCE"
 )

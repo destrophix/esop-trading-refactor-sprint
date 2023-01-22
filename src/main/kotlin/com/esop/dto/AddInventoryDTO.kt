@@ -18,6 +18,6 @@ class AddInventoryDTO @JsonCreator constructor(
     var quantity: Long? = null,
 
     @JsonProperty("inventoryType")
-    @field:Pattern(regexp = "^(NON_PERFORMANCE|PERFORMANCE)$", message = "inventoryType should be one of NON_PERFORMANCE or PERFORMANCE")
+    @field:Pattern(regexp = "^((?i)NON_PERFORMANCE|(?i)PERFORMANCE)$", message = "inventoryType should be one of NON_PERFORMANCE or PERFORMANCE")
     var inventoryType: String? = "NON_PERFORMANCE"
 )

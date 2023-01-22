@@ -2,6 +2,7 @@ package com.esop.service
 
 
 import com.esop.constant.errors
+import com.esop.schema.History
 import com.esop.schema.Order
 import com.esop.schema.OrderFilledLog
 import com.esop.schema.User
@@ -131,7 +132,10 @@ class OrderService{
             }
             order.orderID = generateOrderId()
             order.inventoryPriority = inventoryPriority
-            UserService.userList.get(order.userName)?.orderList?.add(order)
+
+            var orderHistoryStatus = History(order.orderID,order.quantity,order.type,order.price,order.orderFilledLogs)
+
+            UserService.userList.get(order.userName)?.orderList?.add(orderHistoryStatus)
             if (order.type == "BUY") {
                 buyOrders.add(order)
                 val sortedSellOrders = sortAscending()
@@ -195,6 +199,10 @@ class OrderService{
                 return mapOf("error" to userErrors)
             }
             val order_history = UserService.userList.get(userName)!!.orderList
+
+            for (order in order_history){
+
+            }
 
             if (order_history.size > 0) {
                 return order_history

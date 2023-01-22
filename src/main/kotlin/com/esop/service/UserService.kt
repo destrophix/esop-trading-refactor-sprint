@@ -142,22 +142,22 @@ class UserService {
     }
 
 
-    fun addingInventory(inventoryData: AddInventoryDTO, userName: String): Map<String, Any>
-    {
-        var errorList = mutableListOf<String>()
+        fun addingInventory(inventoryData: AddInventoryDTO, userName: String): Map<String, Any>
+        {
+            var errorList = mutableListOf<String>()
 
-        if ( inventoryData.inventoryType != "NON_PERFORMANCE" && inventoryData.inventoryType != "PERFORMANCE" ){
-            errorList.add(errors["INVALID_TYPE"].toString())
-        }
-        else if ( !check_username(userName) ){
-            errorList.add(errors["USER_DOES_NOT_EXISTS"].toString())
-        }
+            if ( inventoryData.inventoryType != "NON_PERFORMANCE" && inventoryData.inventoryType != "PERFORMANCE" ){
+                errorList.add(errors["INVALID_TYPE"].toString())
+            }
+            else if ( !check_username(userName) ){
+                errorList.add(errors["USER_DOES_NOT_EXISTS"].toString())
+            }
 
-        if( errorList.size > 0 ) {
-            return mapOf("error" to errorList)
+            if( errorList.size > 0 ) {
+                return mapOf("error" to errorList)
+            }
+            return mapOf("message" to userList.get(userName)!!.addToInventory(inventoryData))
         }
-        return mapOf("message" to userList.get(userName)!!.addToInventory(inventoryData))
-    }
 
     fun addingMoney(walletData: AddWalletDTO, userName: String): Map<String, Any>
     {

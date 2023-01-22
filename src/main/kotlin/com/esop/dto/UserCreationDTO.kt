@@ -14,7 +14,7 @@ const val PHONE_NUMBER_REGEX = "^(\\+91[\\-\\s]?)?[0]?(91)?[789]\\d{9}\$"
 
 const val USERNAME_REGEX = "^[a-zA-Z]+([a-zA-Z]|_|[0-9])*"
 
-const val ALPHABET_SEQUENCE_REGEX = "^[a-z\\sA-Z]+"
+const val ALPHABET_SEQUENCE_REGEX = "^\\s*[a-zA-Z]+[a-zA-Z\\s]*"
 
 @Introspected
 class UserCreationDTO @JsonCreator constructor(

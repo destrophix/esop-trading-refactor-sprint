@@ -15,6 +15,6 @@ class AddInventoryDTO @JsonCreator constructor(
     @field:Max(10000000, message = "Quantity has to be less than or equal to 10000000")
     var quantity: Long? = null,
 
-    @JsonProperty("type")
-    var type: String? = "NORMAL"
+    @JsonProperty("inventoryType")
+    var inventoryType: String? = "NON_PERFORMANCE"
 )

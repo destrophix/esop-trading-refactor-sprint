@@ -31,5 +31,6 @@ class CreateOrderDTO @JsonCreator constructor(
     @field:Max(MAX_PRICE, message = "Price has to be less than or equal to $MAX_PRICE")
     var price: Long? = null,
 
-    var inventoryType: String? = "NORMAL"
+    @JsonProperty("inventoryType")
+    var inventoryType: String? = "NON_PERFORMANCE"
 )

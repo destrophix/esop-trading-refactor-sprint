@@ -12,7 +12,7 @@ class Order(
     var orderStatus: String = "PENDING" // COMPLETED, PARTIAL, PENDING
     var orderFilledLogs: MutableList<OrderFilledLog> = mutableListOf()
     var orderID: Long = -1
-    var inventoryType = ""
+    var inventoryType = "NON_PERFORMANCE"
     var inventoryPriority = 2
 
     fun orderAvailable():Boolean{

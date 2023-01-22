@@ -29,14 +29,14 @@ class UserService {
                     errorList.add(response)
                 }
             }
-            else if(order.type == "sell"){
+            else if(order.type == "SELL"){
                 if(order.inventoryType == "PERFORMANCE"){
                     val response = user!!.userPerformanceInventory.moveESOPsFromFreeToLockedState(order.quantity)
                     if ( response != "SUCCESS" ){
                         errorList.add(response)
                     }
-                }else if(order.inventoryType == "NORMAL"){
-                    val response = user!!.userNormalInventory.moveESOPsFromFreeToLockedState(order.quantity)
+                }else if(order.inventoryType == "NON_PERFORMANCE"){
+                    val response = user!!.userNonPerfInventory.moveESOPsFromFreeToLockedState(order.quantity)
                     if ( response != "SUCCESS" ){
                         errorList.add(response)
                     }
@@ -69,10 +69,10 @@ class UserService {
         if(check_username(userData.username!!)){
             errorList.add(errors["USERNAME_EXISTS"].toString())
         }
-        else if(check_email(emailList, userData.email!!)){
+        if(check_email(emailList, userData.email!!)){
             errorList.add(errors["EMAIL_EXISTS"].toString())
         }
-        else if(check_phonenumber(phoneNumberList, userData.phoneNumber!!)){
+        if(check_phonenumber(phoneNumberList, userData.phoneNumber!!)){
             errorList.add(errors["PHONENUMBER_EXISTS"].toString())
         }
 
@@ -133,9 +133,9 @@ class UserService {
                     "locked" to user.userPerformanceInventory.getLockedInventory()
                 ),
                 mapOf(
-                    "type" to "NORMAL",
-                    "free" to user.userNormalInventory.getFreeInventory(),
-                    "locked" to user.userNormalInventory.getLockedInventory()
+                    "type" to "NON_PERFORMANCE",
+                    "free" to user.userNonPerfInventory.getFreeInventory(),
+                    "locked" to user.userNonPerfInventory.getLockedInventory()
                 )
             )
         )
@@ -146,7 +146,7 @@ class UserService {
     {
         var errorList = mutableListOf<String>()
 
-        if ( inventoryData.type != "NORMAL" && inventoryData.type != "PERFORMANCE" ){
+        if ( inventoryData.inventoryType != "NON_PERFORMANCE" && inventoryData.inventoryType != "PERFORMANCE" ){
             errorList.add(errors["INVALID_TYPE"].toString())
         }
         else if ( !check_username(userName) ){

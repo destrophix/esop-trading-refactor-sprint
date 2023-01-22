@@ -1,5 +1,10 @@
 package com.esop
 
-class InventoryLimitExceededException: RuntimeException()
+import io.micronaut.http.HttpStatus
+import kotlin.RuntimeException
 
-class WalletLimitExceededException: RuntimeException()
+open class HttpException(val status: HttpStatus, message: String): RuntimeException(message)
+
+class InventoryLimitExceededException: HttpException(HttpStatus.BAD_REQUEST, "Inventory Limit exceeded")
+
+class WalletLimitExceededException: HttpException(HttpStatus.BAD_REQUEST, "Wallet Limit exceeded")

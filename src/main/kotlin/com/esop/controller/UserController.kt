@@ -98,7 +98,6 @@ class UserController {
         return HttpResponse.ok(userData)
     }
 
-    @Error(exception = InventoryLimitExceededException::class, status = HttpStatus.BAD_REQUEST)
     @Post(uri = "{userName}/inventory", consumes = [MediaType.APPLICATION_JSON], produces = [MediaType.APPLICATION_JSON])
     fun addInventory(userName: String, @Body @Valid body: AddInventoryDTO): HttpResponse<*>{
         val validationErrors = checkValidationError(body)
@@ -117,7 +116,6 @@ class UserController {
     }
 
 
-    @Error(exception = WalletLimitExceededException::class, status = HttpStatus.BAD_REQUEST)
     @Post(uri = "{userName}/wallet", consumes = [MediaType.APPLICATION_JSON], produces = [MediaType.APPLICATION_JSON])
     fun addWallet(userName: String, @Body @Valid body: AddWalletDTO) :HttpResponse<*> {
         val validationErrors = checkValidationError(body)

@@ -8,6 +8,9 @@ import com.esop.dto.CreateOrderDTO
 import com.esop.dto.UserCreationDTO
 import com.esop.schema.Order
 import com.esop.service.*
+import com.fasterxml.jackson.core.JsonProcessingException
+import io.micronaut.core.convert.exceptions.ConversionErrorException
+import io.micronaut.http.HttpRequest
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.HttpStatus
 import io.micronaut.http.annotation.Body
@@ -16,6 +19,7 @@ import io.micronaut.http.annotation.Get
 import io.micronaut.http.MediaType
 import io.micronaut.http.annotation.Error
 import io.micronaut.http.annotation.Post
+import io.micronaut.http.server.exceptions.HttpStatusHandler
 import io.micronaut.validation.Validated
 import jakarta.inject.Inject
 import javax.validation.Valid
@@ -38,6 +42,18 @@ class UserController {
     fun <T> checkValidationError(input: T): List<String> {
         return validator.validate(input).map { it.message }
     }
+
+    @Error(exception = JsonProcessingException::class)
+    fun onJSONProcessingExceptionError(): HttpResponse<Map<String, ArrayList<String>>> {
+        return HttpResponse.badRequest(mapOf("errors" to arrayListOf("JSON processing error")))
+    }
+
+    @Error(exception = ConversionErrorException::class)
+    fun onConversionErrorException(request: HttpRequest<*>, ex: ConversionErrorException): HttpResponse<Map<String, ArrayList<*>>>  {
+        println(request.path)
+        return HttpResponse.badRequest(mapOf("errors" to arrayListOf(ex.message)))
+    }
+
 
     @Post(uri="/register", consumes = [MediaType.APPLICATION_JSON],produces=[MediaType.APPLICATION_JSON])
      fun register(@Body @Valid userData: UserCreationDTO): HttpResponse<*> {
@@ -123,7 +139,6 @@ class UserController {
         if (validationErrors.isNotEmpty()) {
             return HttpResponse.badRequest(mapOf("errors" to validationErrors))
         }
-
 
         val addedMoney=this.userService.addingMoney(body,userName)
 

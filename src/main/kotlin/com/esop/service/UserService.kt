@@ -86,8 +86,8 @@ class UserService {
             return mapOf("error" to errors)
         }
         val user = User(
-            userData.firstName!!,
-            userData.lastName!!,
+            userData.firstName!!.trim(),
+            userData.lastName!!.trim(),
             userData.phoneNumber!!,
             userData.email!!,
             userData.username!!
@@ -146,7 +146,7 @@ class UserService {
         {
             var errorList = mutableListOf<String>()
 
-            if ( inventoryData.inventoryType != "NON_PERFORMANCE" && inventoryData.inventoryType != "PERFORMANCE" ){
+            if ( inventoryData.inventoryType.toString().uppercase() != "NON_PERFORMANCE" && inventoryData.inventoryType.toString().uppercase() != "PERFORMANCE" ){
                 errorList.add(errors["INVALID_TYPE"].toString())
             }
             else if ( !check_username(userName) ){

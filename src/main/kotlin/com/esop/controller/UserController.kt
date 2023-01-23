@@ -68,18 +68,18 @@ class UserController {
     fun order(userName: String, @Body @Valid body: CreateOrderDTO): Any? {
         var errorList = mutableListOf<String>()
 
-        val orderType: String = body.type.toString()
+        val orderType: String = body.type.toString().uppercase()
         var inventoryType = "NON_PERFORMANCE"
 
         if(orderType == "SELL"){
-            inventoryType = body.inventoryType.toString()
+            inventoryType = body.inventoryType.toString().uppercase()
             if(inventoryType != "PERFORMANCE" && inventoryType != "NON_PERFORMANCE"){
                 errorList.add("Invalid inventory type")
-                return HttpResponse.badRequest(mapOf("errors" to errorList))
+                return HttpResponse.ok(mapOf("errors" to errorList))
             }
         }
 
-        val order = Order(body.quantity!!.toLong(),body.type.toString(),body.price!!.toLong(),userName)
+        val order = Order(body.quantity!!.toLong(),body.type.toString().uppercase(),body.price!!.toLong(),userName)
         if(orderType == "SELL"){
             order.inventoryType = inventoryType
             if(inventoryType == "PERFORMANCE")

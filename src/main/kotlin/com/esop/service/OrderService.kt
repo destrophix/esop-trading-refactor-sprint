@@ -200,10 +200,6 @@ class OrderService{
             }
             val order_history = UserService.userList.get(userName)!!.orderList
 
-            for (order in order_history){
-
-            }
-
             if (order_history.size > 0) {
                 return order_history
             }

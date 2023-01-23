@@ -5,20 +5,14 @@ import com.esop.constant.MAX_WALLET_CAPACITY
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.micronaut.core.annotation.Introspected
-import javax.validation.constraints.Max
-import javax.validation.constraints.Min
-import javax.validation.constraints.NotNull
-import javax.validation.constraints.Pattern
-import javax.validation.constraints.NotBlank
-
-
+import javax.validation.constraints.*
 
 
 @Introspected
 class CreateOrderDTO @JsonCreator constructor(
 
     @field:NotBlank(message = "Order Type can not be missing or empty.")
-    @field:Pattern(regexp = "^(BUY|SELL)$", message = "Invalid Type: should be one of BUY or SELL")
+    @field:Pattern(regexp = "^((?i)BUY|(?i)SELL)$", message = "Invalid Type: should be one of BUY or SELL")
     var type: String? = null,
 
     @field:NotNull(message = "Quantity can not be missing.")
@@ -29,10 +23,10 @@ class CreateOrderDTO @JsonCreator constructor(
     @JsonProperty("price")
     @field:NotNull(message = "Price can not be missing.")
     @field:Min(1, message = "Price can not be less than zero")
-    @field:Max(MAX_WALLET_CAPACITY, message = "price can't exceed maximum wallet capacity of ${MAX_WALLET_CAPACITY.toDouble().toString()}")
+    @field:Digits(integer = 9, fraction = 0, message = "amount can't exceed maximum wallet capacity of ${MAX_WALLET_CAPACITY.toString()}")
     var price: Long? = null,
 
     @JsonProperty("inventoryType")
-    @field:Pattern(regexp = "^(NON_PERFORMANCE|PERFORMANCE)$", message = "inventoryType should be one of NON_PERFORMANCE or PERFORMANCE")
+    @field:Pattern(regexp = "^((?i)NON_PERFORMANCE|(?i)PERFORMANCE)$", message = "inventoryType should be one of NON_PERFORMANCE or PERFORMANCE")
     var inventoryType: String? = "NON_PERFORMANCE"
 )

@@ -14,6 +14,8 @@ const val PHONE_NUMBER_REGEX = "^(\\+91[\\-\\s]?)?[0]?(91)?[789]\\d{9}\$"
 
 const val USERNAME_REGEX = "^[a-zA-Z]+([a-zA-Z]|_|[0-9])*"
 
+const val EMAIL_REGEX = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@"+ "[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$"
+
 const val ALPHABET_SEQUENCE_REGEX = "^\\s*[a-zA-Z]+[a-zA-Z\\s]*"
 
 @Introspected
@@ -38,7 +40,7 @@ class UserCreationDTO @JsonCreator constructor(
     @JsonProperty("email")
     @field:NotBlank(message = "Email can not be missing or empty.")
     @field:Size(max=30, message = "Email should not exceed 30 characters")
-    @field:Email(message = "Invalid Email-ID.")
+    @field:Email(regexp = "($EMAIL_REGEX| *)", message = "Invalid Email-ID.")
     var email: String? = null,
 
     @JsonProperty("username")

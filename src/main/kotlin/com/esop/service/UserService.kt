@@ -86,8 +86,8 @@ class UserService {
             return mapOf("error" to errors)
         }
         val user = User(
-            userData.firstName!!,
-            userData.lastName!!,
+            userData.firstName!!.trim(),
+            userData.lastName!!.trim(),
             userData.phoneNumber!!,
             userData.email!!,
             userData.username!!

@@ -19,12 +19,12 @@ class User ( var firstName: String,
         return "${walletData.price} amount added to account."
     }
     fun addToInventory(inventoryData: AddInventoryDTO): String {
-        if(inventoryData.inventoryType == "NON_PERFORMANCE") {
+        if(inventoryData.inventoryType.toString().uppercase() == "NON_PERFORMANCE") {
             userNonPerfInventory.addESOPsToInventory(inventoryData.quantity!!)
-            return "${inventoryData.quantity} NON_PERFORMANCE ESOPs added to account."
-        }else if( inventoryData.inventoryType == "PERFORMANCE" ){
+            return "${inventoryData.quantity} Non-Performanc ESOPs added to account."
+        }else if( inventoryData.inventoryType.toString().uppercase() == "PERFORMANCE" ){
             userPerformanceInventory.addESOPsToInventory(inventoryData.quantity!!)
-            return "${inventoryData.quantity} PERFORMANCE ESOPs added to account."
+            return "${inventoryData.quantity} Performance ESOPs added to account."
         }
         return "None"
     }

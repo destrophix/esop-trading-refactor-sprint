@@ -1,12 +1,14 @@
 package com.esop.controller
 
 
+import com.esop.HttpException
 import com.esop.dto.AddInventoryDTO
 import com.esop.dto.AddWalletDTO
 import com.esop.dto.CreateOrderDTO
 import com.esop.dto.UserCreationDTO
 import com.esop.schema.Order
 import com.esop.service.*
+import com.fasterxml.jackson.core.JsonProcessingException
 import io.micronaut.core.convert.exceptions.ConversionErrorException
 import io.micronaut.http.HttpRequest
 import io.micronaut.http.HttpResponse
@@ -40,8 +42,14 @@ class UserController {
     lateinit var userService: UserService
 
 
-    @Error(exception = Exception::class)
-    fun onJSONProcessingExceptionError(ex: Exception): HttpResponse<Map<String, ArrayList<String>>> {
+    @Error(exception = HttpException::class)
+    fun onHttpException(exception: HttpException): HttpResponse<*> {
+        return HttpResponse.status<Map<String, ArrayList<String>>>(exception.status)
+            .body(mapOf("errors" to arrayListOf(exception.message)))
+    }
+
+    @Error(exception = JsonProcessingException::class)
+    fun onJSONProcessingExceptionError(ex: JsonProcessingException): HttpResponse<Map<String, ArrayList<String>>> {
         return HttpResponse.badRequest(mapOf("errors" to arrayListOf("Invalid JSON format")))
     }
 

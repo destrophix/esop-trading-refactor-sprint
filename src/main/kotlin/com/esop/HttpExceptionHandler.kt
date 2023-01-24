@@ -8,13 +8,12 @@ import io.micronaut.http.annotation.Produces
 import io.micronaut.http.server.exceptions.ExceptionHandler
 
 import jakarta.inject.Singleton
-import javax.validation.ConstraintViolationException
 
 
 @Produces
 @Singleton
 @Requirements(
-    Requires(classes = [ConstraintViolationException::class, ExceptionHandler::class])
+    Requires(classes = [HttpException::class, ExceptionHandler::class])
 )
 class HttpExceptionHandler () :
     ExceptionHandler<HttpException, HttpResponse<*>> {

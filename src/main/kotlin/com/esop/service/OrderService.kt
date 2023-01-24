@@ -2,10 +2,7 @@ package com.esop.service
 
 
 import com.esop.constant.errors
-import com.esop.schema.History
-import com.esop.schema.Order
-import com.esop.schema.OrderFilledLog
-import com.esop.schema.User
+import com.esop.schema.*
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
 import kotlin.math.round
@@ -39,6 +36,8 @@ class OrderService{
             var amountToBeAddedToSellersAccount = amountToBeDeductedFromLockedState
             if (sellerOrder.inventoryType == "NON_PERFORMANCE") {
                 amountToBeAddedToSellersAccount -= round(amountToBeDeductedFromLockedState * 0.02).toLong()
+                PlatformFee.fee += round(amountToBeDeductedFromLockedState * 0.02).toLong()
+
             }
             UserService.userList.get(sellerOrder.userName)!!.userWallet.addMoneyToWallet(amountToBeAddedToSellersAccount)
 
@@ -90,6 +89,7 @@ class OrderService{
             var totOrderPrice = sellerOrder.price * (prevQuantity - remainingQuantity)
             if (sellerOrder.inventoryType == "NON_PERFORMANCE") {
                 totOrderPrice -= kotlin.math.round(totOrderPrice * 0.02).toLong()
+                PlatformFee.fee += round(totOrderPrice * 0.02).toLong()
             }
             UserService.userList.get(userName)!!.userWallet.addMoneyToWallet(totOrderPrice)
 
@@ -200,7 +200,7 @@ class OrderService{
             }
             val order_history = UserService.userList.get(userName)!!.orderList
 
-            if (order_history.size > 0) {
+            if (order_history.size >= 0) {
                 return order_history
             }
 

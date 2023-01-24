@@ -9,6 +9,7 @@ import com.esop.dto.UserCreationDTO
 import com.esop.schema.Order
 import com.esop.service.*
 import com.fasterxml.jackson.core.JsonProcessingException
+import io.micronaut.context.annotation.Requires
 import io.micronaut.core.convert.exceptions.ConversionErrorException
 import io.micronaut.http.HttpRequest
 import io.micronaut.http.HttpResponse
@@ -21,7 +22,9 @@ import io.micronaut.http.annotation.Error
 import io.micronaut.http.annotation.Post
 import io.micronaut.http.server.exceptions.HttpStatusHandler
 import io.micronaut.validation.Validated
+import io.micronaut.web.router.exceptions.UnsatisfiedBodyRouteException
 import jakarta.inject.Inject
+import javax.validation.ConstraintViolationException
 import javax.validation.Valid
 import javax.validation.Validator
 
@@ -51,7 +54,18 @@ class UserController {
     @Error(exception = ConversionErrorException::class)
     fun onConversionErrorException(request: HttpRequest<*>, ex: ConversionErrorException): HttpResponse<Map<String, ArrayList<*>>>  {
         println(request.path)
-        return HttpResponse.badRequest(mapOf("errors" to arrayListOf(ex.message)))
+//        return HttpResponse.badRequest(mapOf("errors" to arrayListOf(ex.message)))
+        return HttpResponse.badRequest(mapOf("errors" to arrayListOf("Parsing Error")))
+    }
+
+//    @Error(exception = ConstraintViolationException::class)
+//    fun onConstraintViolationError(): HttpResponse<Map<String, ArrayList<String>>> {
+//        return HttpResponse.badRequest(mapOf("errors" to arrayListOf("Constraints Violation")))
+//    }
+
+    @Error(exception = UnsatisfiedBodyRouteException::class)
+    fun onUnsatisfiedBodyRouteError(): HttpResponse<Map<String, ArrayList<String>>> {
+        return HttpResponse.badRequest(mapOf("errors" to arrayListOf("Body is Required")))
     }
 
 

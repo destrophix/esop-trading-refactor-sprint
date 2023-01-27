@@ -7,10 +7,20 @@ class Wallet{
     private var freeMoney: Long = 0
     private var lockedMoney: Long = 0
 
+    private fun totalMoneyInWallet(): Long {
+        return freeMoney + lockedMoney
+    }
+
+    private fun willWalletOverflowOnAdding(amount: Long): Boolean {
+        return amount + totalMoneyInWallet() > MAX_WALLET_CAPACITY
+    }
+
+    fun assertWalletWillNotOverflowOnAdding(amount: Long) {
+        if (willWalletOverflowOnAdding(amount)) throw WalletLimitExceededException()
+    }
+
     fun addMoneyToWallet(amountToBeAdded : Long){
-        if (amountToBeAdded + freeMoney > MAX_WALLET_CAPACITY) {
-            throw WalletLimitExceededException()
-        }
+        assertWalletWillNotOverflowOnAdding(amountToBeAdded)
 
         this.freeMoney = this.freeMoney + amountToBeAdded
     }

@@ -8,10 +8,21 @@ class Inventory(
     private var lockedInventory: Long = 0L,
     private var type: String
 ) {
+
+    private fun totalESOPQuantity(): Long {
+        return freeInventory + lockedInventory
+    }
+
+    fun willInventoryOverflowOnAdding(quantity: Long): Boolean {
+        return quantity + totalESOPQuantity() > MAX_INVENTORY_CAPACITY
+    }
+
+    fun assertInventoryWillNotOverflowOnAdding(quantity: Long) {
+        if (willInventoryOverflowOnAdding(quantity)) throw InventoryLimitExceededException()
+    }
+
     fun addESOPsToInventory(esopsToBeAdded: Long) {
-        if (esopsToBeAdded + freeInventory > MAX_INVENTORY_CAPACITY) {
-            throw InventoryLimitExceededException()
-        }
+        assertInventoryWillNotOverflowOnAdding(esopsToBeAdded)
 
         this.freeInventory = this.freeInventory + esopsToBeAdded
     }

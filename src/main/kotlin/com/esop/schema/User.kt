@@ -11,8 +11,7 @@ class User ( var firstName: String,
     val userWallet: Wallet = Wallet()
     val userNonPerfInventory: Inventory = Inventory(type = "NON_PERFORMANCE")
     val userPerformanceInventory: Inventory = Inventory(type = "PERFORMANCE")
-//    val orderList: ArrayList<Order> = ArrayList<Order>()
-    val orderList: ArrayList<History> = ArrayList<History>()
+    val orderList: ArrayList<Order> = ArrayList<Order>()
 
     fun addToWallet(walletData: AddWalletDTO): String {
         userWallet.addMoneyToWallet(walletData.price!!)

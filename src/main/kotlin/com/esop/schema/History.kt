@@ -5,5 +5,6 @@ data class History(
     var quantity: Long,
     var type: String,
     var price: Long,
+    var status: String,
     var filled: MutableList<OrderFilledLog>
 )

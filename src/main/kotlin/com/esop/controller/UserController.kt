@@ -1,7 +1,7 @@
 package com.esop.controller
 
-import com.esop.InventoryLimitExceededException
-import com.esop.WalletLimitExceededException
+
+import com.esop.HttpException
 import com.esop.dto.AddInventoryDTO
 import com.esop.dto.AddWalletDTO
 import com.esop.dto.CreateOrderDTO
@@ -19,9 +19,11 @@ import io.micronaut.http.annotation.Get
 import io.micronaut.http.MediaType
 import io.micronaut.http.annotation.Error
 import io.micronaut.http.annotation.Post
-import io.micronaut.http.server.exceptions.HttpStatusHandler
 import io.micronaut.validation.Validated
+import io.micronaut.web.router.exceptions.UnsatisfiedBodyRouteException
+import io.micronaut.web.router.exceptions.UnsatisfiedRouteException
 import jakarta.inject.Inject
+import javax.validation.ConstraintViolationException
 import javax.validation.Valid
 import javax.validation.Validator
 
@@ -39,20 +41,43 @@ class UserController {
     @Inject
     lateinit var userService: UserService
 
-    fun <T> checkValidationError(input: T): List<String> {
-        return validator.validate(input).map { it.message }
+
+    @Error(exception = HttpException::class)
+    fun onHttpException(exception: HttpException): HttpResponse<*> {
+        return HttpResponse.status<Map<String, ArrayList<String>>>(exception.status)
+            .body(mapOf("errors" to arrayListOf(exception.message)))
     }
 
     @Error(exception = JsonProcessingException::class)
-    fun onJSONProcessingExceptionError(): HttpResponse<Map<String, ArrayList<String>>> {
-        return HttpResponse.badRequest(mapOf("errors" to arrayListOf("JSON processing error")))
+    fun onJSONProcessingExceptionError(ex: JsonProcessingException): HttpResponse<Map<String, ArrayList<String>>> {
+        return HttpResponse.badRequest(mapOf("errors" to arrayListOf("Invalid JSON format")))
+    }
+
+    @Error(exception = UnsatisfiedBodyRouteException::class)
+    fun onUnsatisfiedBodyRouteException(request: HttpRequest<*>, ex: UnsatisfiedBodyRouteException): HttpResponse<Map<String, List<*>>> {
+        return HttpResponse.badRequest(mapOf("errors" to arrayListOf("request body missing")))
+    }
+
+    @Error(status = HttpStatus.NOT_FOUND, global = true)
+    fun onRouteNotFound() : HttpResponse<Map<String, List<*>>> {
+        return HttpResponse.badRequest(mapOf("errors" to arrayListOf("route not found")))
     }
 
     @Error(exception = ConversionErrorException::class)
-    fun onConversionErrorException(request: HttpRequest<*>, ex: ConversionErrorException): HttpResponse<Map<String, ArrayList<*>>>  {
-        println(request.path)
+    fun onConversionErrorException(ex: ConversionErrorException): HttpResponse<Map<String, List<*>>> {
         return HttpResponse.badRequest(mapOf("errors" to arrayListOf(ex.message)))
     }
+
+    @Error(exception = ConstraintViolationException::class)
+    fun onConstraintViolationException(ex: ConstraintViolationException): HttpResponse<Map<String, List<*>>> {
+        return HttpResponse.badRequest(mapOf("errors" to ex.constraintViolations.map { it.message }))
+    }
+
+    @Error(exception = RuntimeException::class)
+    fun onRuntimeError(ex: RuntimeException): HttpResponse<Map<String, List<*>>> {
+        return HttpResponse.serverError(mapOf("errors" to arrayListOf(ex.message)))
+    }
+
 
 
     @Post(uri="/register", consumes = [MediaType.APPLICATION_JSON],produces=[MediaType.APPLICATION_JSON])
@@ -116,13 +141,6 @@ class UserController {
 
     @Post(uri = "{userName}/inventory", consumes = [MediaType.APPLICATION_JSON], produces = [MediaType.APPLICATION_JSON])
     fun addInventory(userName: String, @Body @Valid body: AddInventoryDTO): HttpResponse<*>{
-        val validationErrors = checkValidationError(body)
-
-        if (validationErrors.isNotEmpty()) {
-            return HttpResponse.badRequest(mapOf("errors" to validationErrors))
-        }
-
-
         val newInventory = this.userService.addingInventory(body,userName)
 
         if(newInventory["error"] != null) {
@@ -134,12 +152,6 @@ class UserController {
 
     @Post(uri = "{userName}/wallet", consumes = [MediaType.APPLICATION_JSON], produces = [MediaType.APPLICATION_JSON])
     fun addWallet(userName: String, @Body @Valid body: AddWalletDTO) :HttpResponse<*> {
-        val validationErrors = checkValidationError(body)
-
-        if (validationErrors.isNotEmpty()) {
-            return HttpResponse.badRequest(mapOf("errors" to validationErrors))
-        }
-
         val addedMoney=this.userService.addingMoney(body,userName)
 
         if(addedMoney["error"] != null) {

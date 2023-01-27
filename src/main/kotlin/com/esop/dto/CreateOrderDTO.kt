@@ -17,7 +17,7 @@ class CreateOrderDTO @JsonCreator constructor(
 
     @field:NotNull(message = "Quantity can not be missing.")
     @field:Min(1, message = "Quantity has to be greater than zero")
-    @field:Max(MAX_INVENTORY_CAPACITY, message = "quantity can't exceed maximum inventory capacity of ${MAX_INVENTORY_CAPACITY.toDouble().toString()}")
+    @field:Max(MAX_INVENTORY_CAPACITY, message = "quantity can't exceed maximum inventory capacity of ${MAX_INVENTORY_CAPACITY.toString()}")
     var quantity: Long? = null,
 
     @JsonProperty("price")

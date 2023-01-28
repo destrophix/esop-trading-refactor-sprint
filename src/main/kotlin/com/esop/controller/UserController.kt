@@ -9,6 +9,7 @@ import com.esop.dto.UserCreationDTO
 import com.esop.schema.Order
 import com.esop.service.*
 import com.fasterxml.jackson.core.JsonProcessingException
+import io.micronaut.context.annotation.Requires
 import io.micronaut.core.convert.exceptions.ConversionErrorException
 import io.micronaut.http.HttpRequest
 import io.micronaut.http.HttpResponse

@@ -3,6 +3,8 @@ package com.esop.service
 
 import com.esop.constant.errors
 import com.esop.schema.*
+import com.esop.schema.PlatformFee.Companion.addPlatformFee
+import jakarta.inject.Inject
 import jakarta.inject.Singleton
 import kotlin.math.round
 
@@ -34,6 +36,8 @@ class OrderService{
             var amountToBeAddedToSellersAccount = amountToBeDeductedFromLockedState
             if (sellerOrder.inventoryType == "NON_PERFORMANCE") {
                 amountToBeAddedToSellersAccount -= round(amountToBeDeductedFromLockedState * 0.02).toLong()
+                addPlatformFee(round(amountToBeDeductedFromLockedState * 0.02).toLong())
+
             }
             UserService.userList.get(sellerOrder.userName)!!.userWallet.addMoneyToWallet(amountToBeAddedToSellersAccount)
 
@@ -85,6 +89,7 @@ class OrderService{
             var totOrderPrice = sellerOrder.price * (prevQuantity - remainingQuantity)
             if (sellerOrder.inventoryType == "NON_PERFORMANCE") {
                 totOrderPrice -= kotlin.math.round(totOrderPrice * 0.02).toLong()
+                addPlatformFee(round(totOrderPrice * 0.02).toLong())
             }
             UserService.userList.get(userName)!!.userWallet.addMoneyToWallet(totOrderPrice)
 
@@ -265,11 +270,13 @@ class OrderService{
             val orderDetails = UserService.userList.get(userName)!!.orderList
             var orderHistory = ArrayList<History>()
 
+
             if (orderDetails.size > 0) {
                 for (orders in orderDetails){
                     orderHistory.add(History(orders.orderID,orders.quantity,orders.type,orders.price,orders.orderStatus,orders.orderFilledLogs))
                 }
                 return orderHistory
+
             }
 
             errors["NO_ORDERS"]?.let { userErrors.add(it) }

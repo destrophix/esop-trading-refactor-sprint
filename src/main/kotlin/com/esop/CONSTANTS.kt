@@ -23,6 +23,6 @@ val success_response = mapOf(
 
 
 
-const val MAX_WALLET_CAPACITY = 100_00_00_000L
+const val MAX_WALLET_CAPACITY = 10_000_000L
 
-const val MAX_INVENTORY_CAPACITY = 1_00_00_000L
+const val MAX_INVENTORY_CAPACITY = 10_000_000L

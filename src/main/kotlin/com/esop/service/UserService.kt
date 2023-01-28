@@ -17,19 +17,26 @@ class UserService {
 
         fun orderCheckBeforePlace(order: Order): MutableList<String> {
             val errorList = mutableListOf<String>()
+            val user = userList.get(order.userName)!!
+            val wallet = user.userWallet
+            val nonPerformanceInventory = user.userNonPerfInventory
 
             if(!userList.containsKey(order.userName)){
                 errorList.add("User doesn't exist.")
                 return errorList
             }
-            val user = userList.get(order.userName)
+
             if(order.type == "BUY"){
+                nonPerformanceInventory.assertInventoryWillNotOverflowOnAdding(order.quantity)
+
                 val response = user!!.userWallet.moveMoneyFromFreeToLockedState(order.price*order.quantity)
                 if (response != "SUCCESS"){
                     errorList.add(response)
                 }
             }
             else if(order.type == "SELL"){
+                wallet.assertWalletWillNotOverflowOnAdding(order.price * order.quantity)
+
                 if(order.inventoryType == "PERFORMANCE"){
                     val response = user!!.userPerformanceInventory.moveESOPsFromFreeToLockedState(order.quantity)
                     if ( response != "SUCCESS" ){

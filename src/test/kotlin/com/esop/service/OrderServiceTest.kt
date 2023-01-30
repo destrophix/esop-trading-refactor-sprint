@@ -47,17 +47,19 @@ class OrderServiceTest {
 
     @Test
     fun `It should place SELL order`() {
+        //Arrange
         val sellOrder = Order(10, "SELL", 10, "kajal")
 
-
+        //Act
         placeOrder(sellOrder)
 
-
+        //Assert
         assertTrue(sellOrders.contains(sellOrder))
     }
 
     @Test
     fun `It should match BUY order for existing SELL order`() {
+        //Arrange
         userList["kajal"]!!.userNonPerfInventory.addESOPsToInventory(50)
         val sellOrder = Order(10, "SELL", 10, "kajal")
         userList["kajal"]!!.userNonPerfInventory.moveESOPsFromFreeToLockedState(10)
@@ -67,10 +69,10 @@ class OrderServiceTest {
         val buyOrder = Order(10, "BUY", 10, "sankar")
         userList["sankar"]!!.userWallet.moveMoneyFromFreeToLockedState(100)
 
-
+        //Act
         placeOrder(buyOrder)
 
-
+        //Assert
         assertEquals(40, userList["kajal"]!!.userNonPerfInventory.getFreeInventory())
         assertEquals(10, userList["sankar"]!!.userNonPerfInventory.getFreeInventory())
         assertEquals(98, userList["kajal"]!!.userWallet.getFreeMoney())
@@ -79,6 +81,7 @@ class OrderServiceTest {
 
     @Test
     fun `It should place 2 SELL orders followed by a BUY order where the BUY order is partial`() {
+        //Arrange
         userList["kajal"]!!.userNonPerfInventory.addESOPsToInventory(50)
         val sellOrderByKajal = Order(10, "SELL", 10, "kajal")
         userList["kajal"]!!.userNonPerfInventory.moveESOPsFromFreeToLockedState(10)
@@ -93,10 +96,10 @@ class OrderServiceTest {
         val buyOrderBySankar = Order(25, "BUY", 10, "sankar")
         userList["sankar"]!!.userWallet.moveMoneyFromFreeToLockedState(250)
 
-
+        //Act
         placeOrder(buyOrderBySankar)
 
-
+        //Assert
         assertEquals(40, userList["kajal"]!!.userNonPerfInventory.getFreeInventory())
         assertEquals(40, userList["arun"]!!.userNonPerfInventory.getFreeInventory())
         assertEquals(20, userList["sankar"]!!.userNonPerfInventory.getFreeInventory())
@@ -116,6 +119,7 @@ class OrderServiceTest {
 
     @Test
     fun `It should place 2 SELL orders followed by a BUY order where the BUY order is complete`() {
+        //Arrange
         userList["kajal"]!!.userNonPerfInventory.addESOPsToInventory(50)
         val sellOrderByKajal = Order(10, "SELL", 10, "kajal")
         userList["kajal"]!!.userNonPerfInventory.moveESOPsFromFreeToLockedState(10)
@@ -130,10 +134,10 @@ class OrderServiceTest {
         val buyOrderBySankar = Order(20, "BUY", 10, "sankar")
         userList["sankar"]!!.userWallet.moveMoneyFromFreeToLockedState(200)
 
-
+        //Act
         placeOrder(buyOrderBySankar)
 
-
+        //Assert
         assertEquals(40, userList["kajal"]!!.userNonPerfInventory.getFreeInventory())
         assertEquals(40, userList["arun"]!!.userNonPerfInventory.getFreeInventory())
         assertEquals(20, userList["sankar"]!!.userNonPerfInventory.getFreeInventory())

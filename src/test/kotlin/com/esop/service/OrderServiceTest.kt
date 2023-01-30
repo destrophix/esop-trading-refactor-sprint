@@ -35,12 +35,13 @@ class OrderServiceTest {
 
     @Test
     fun `It should place BUY order`() {
+        //Arrange
         val buyOrder = Order(10, "BUY", 10, "sankar")
 
-
+        //Act
         placeOrder(buyOrder)
 
-
+        //Assert
         assertTrue(buyOrders.contains(buyOrder))
     }
 
@@ -103,6 +104,46 @@ class OrderServiceTest {
         assertEquals(98, userList["arun"]!!.userWallet.getFreeMoney())
         assertEquals(50, userList["sankar"]!!.userWallet.getLockedMoney())
         assertEquals("PARTIAL", buyOrders[buyOrders.indexOf(buyOrderBySankar)]!!.orderStatus)
+        assertEquals(
+            "COMPLETED",
+            userList["kajal"]!!.orderList[userList["kajal"]!!.orderList.indexOf(sellOrderByKajal)].orderStatus
+        )
+        assertEquals(
+            "COMPLETED",
+            userList["arun"]!!.orderList[userList["arun"]!!.orderList.indexOf(sellOrderByArun)].orderStatus
+        )
+    }
+
+    @Test
+    fun `It should place 2 SELL orders followed by a BUY order where the BUY order is complete`() {
+        userList["kajal"]!!.userNonPerfInventory.addESOPsToInventory(50)
+        val sellOrderByKajal = Order(10, "SELL", 10, "kajal")
+        userList["kajal"]!!.userNonPerfInventory.moveESOPsFromFreeToLockedState(10)
+        placeOrder(sellOrderByKajal)
+
+        userList["arun"]!!.userNonPerfInventory.addESOPsToInventory(50)
+        val sellOrderByArun = Order(10, "SELL", 10, "arun")
+        userList["arun"]!!.userNonPerfInventory.moveESOPsFromFreeToLockedState(10)
+        placeOrder(sellOrderByArun)
+
+        userList["sankar"]!!.userWallet.addMoneyToWallet(250)
+        val buyOrderBySankar = Order(20, "BUY", 10, "sankar")
+        userList["sankar"]!!.userWallet.moveMoneyFromFreeToLockedState(200)
+
+
+        placeOrder(buyOrderBySankar)
+
+
+        assertEquals(40, userList["kajal"]!!.userNonPerfInventory.getFreeInventory())
+        assertEquals(40, userList["arun"]!!.userNonPerfInventory.getFreeInventory())
+        assertEquals(20, userList["sankar"]!!.userNonPerfInventory.getFreeInventory())
+        assertEquals(98, userList["kajal"]!!.userWallet.getFreeMoney())
+        assertEquals(98, userList["arun"]!!.userWallet.getFreeMoney())
+        assertEquals(0, userList["sankar"]!!.userWallet.getLockedMoney())
+        assertEquals(
+            "COMPLETED",
+            userList["sankar"]!!.orderList[userList["sankar"]!!.orderList.indexOf(buyOrderBySankar)].orderStatus
+        )
         assertEquals(
             "COMPLETED",
             userList["kajal"]!!.orderList[userList["kajal"]!!.orderList.indexOf(sellOrderByKajal)].orderStatus

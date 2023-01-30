@@ -1,5 +1,6 @@
 package com.esop.dto
 
+import com.esop.PhoneNumber
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.micronaut.core.annotation.Introspected
@@ -34,7 +35,7 @@ class UserCreationDTO @JsonCreator constructor(
 
     @JsonProperty("phoneNumber")
     @field:NotBlank(message = "Phone Number can not be missing or empty.")
-    @field:Pattern(regexp = "($PHONE_NUMBER_REGEX| *)", message = "Invalid Phone Number")
+    @field:PhoneNumber()
     var phoneNumber: String? = null,
 
     @JsonProperty("email")

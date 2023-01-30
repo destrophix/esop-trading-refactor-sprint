@@ -220,6 +220,7 @@ class OrderServiceTest {
         )
     }
 
+<<<<<<< HEAD
     @Test
     fun `It should place 2 BUY orders followed by a SELL order where the SELL order is partial`() {
         //Arrange
@@ -257,6 +258,7 @@ class OrderServiceTest {
             userList["aditya"]!!.orderList[userList["aditya"]!!.orderList.indexOf(buyOrderByAditya)].orderStatus
         )
     }
+<<<<<<< HEAD
 
     @Test
     fun `It should place 2 BUY orders followed by a SELL order where the SELL order is complete`() {
@@ -301,4 +303,11 @@ class OrderServiceTest {
             userList["arun"]!!.orderList[userList["arun"]!!.orderList.indexOf(buyOrderByArun)].orderStatus
         )
     }
+=======
+=======
+
+
+
+>>>>>>> aaae65e (Added unit tests and fixed platform fee bug)
+>>>>>>> f8cc578 (Added unit tests and fixed platform fee bug)
 }

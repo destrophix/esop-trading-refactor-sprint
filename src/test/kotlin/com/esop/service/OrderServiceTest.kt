@@ -341,6 +341,7 @@ class OrderServiceTest {
             userList["aditya"]!!.orderList[userList["aditya"]!!.orderList.indexOf(buyOrderByAditya)].orderStatus
         )
     }
+<<<<<<< HEAD
 
     @Test
     fun `It should place 2 BUY orders followed by a SELL order where the SELL order is complete`() {
@@ -387,6 +388,14 @@ class OrderServiceTest {
     }
 
 
+<<<<<<< HEAD
 >>>>>>> aaae65e (Added unit tests and fixed platform fee bug)
+<<<<<<< HEAD
 >>>>>>> f8cc578 (Added unit tests and fixed platform fee bug)
+=======
+=======
+=======
+>>>>>>> 689d49e (Add unit testcase)
+>>>>>>> b80cd7e (Add unit testcase)
+>>>>>>> 016d777 (Add unit testcase)
 }

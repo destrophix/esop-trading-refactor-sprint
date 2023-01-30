@@ -157,4 +157,70 @@ class OrderServiceTest {
             userList["arun"]!!.orderList[userList["arun"]!!.orderList.indexOf(sellOrderByArun)].orderStatus
         )
     }
+
+    @Test
+    fun `It should place 1 SELL orders followed by a BUY order where the BUY order is complete`() {
+        //Arrange
+        userList["kajal"]!!.userNonPerfInventory.addESOPsToInventory(50)
+        val sellOrderByKajal = Order(10, "SELL", 10, "kajal")
+        userList["kajal"]!!.userNonPerfInventory.moveESOPsFromFreeToLockedState(10)
+        placeOrder(sellOrderByKajal)
+
+
+        userList["sankar"]!!.userWallet.addMoneyToWallet(250)
+        val buyOrderBySankar = Order(5, "BUY", 10, "sankar")
+        userList["sankar"]!!.userWallet.moveMoneyFromFreeToLockedState(50)
+
+        //Act
+        placeOrder(buyOrderBySankar)
+
+        //Assert
+        assertEquals(40, userList["kajal"]!!.userNonPerfInventory.getFreeInventory())
+        assertEquals(5, userList["sankar"]!!.userNonPerfInventory.getFreeInventory())
+        assertEquals(49, userList["kajal"]!!.userWallet.getFreeMoney())
+        assertEquals(0, userList["sankar"]!!.userWallet.getLockedMoney())
+        assertEquals(
+            "COMPLETED",
+            userList["sankar"]!!.orderList[userList["sankar"]!!.orderList.indexOf(buyOrderBySankar)].orderStatus
+        )
+        assertEquals(
+            "PARTIAL",
+            userList["kajal"]!!.orderList[userList["kajal"]!!.orderList.indexOf(sellOrderByKajal)].orderStatus
+        )
+    }
+
+    @Test
+    fun `It should place 1 SELL orders followed by a BUY order where the BUY order is partial`() {
+        //Arrange
+        userList["kajal"]!!.userNonPerfInventory.addESOPsToInventory(50)
+        val sellOrderByKajal = Order(10, "SELL", 10, "kajal")
+        userList["kajal"]!!.userNonPerfInventory.moveESOPsFromFreeToLockedState(10)
+        placeOrder(sellOrderByKajal)
+
+
+        userList["sankar"]!!.userWallet.addMoneyToWallet(250)
+        val buyOrderBySankar = Order(15, "BUY", 10, "sankar")
+        userList["sankar"]!!.userWallet.moveMoneyFromFreeToLockedState(150)
+
+        //Act
+        placeOrder(buyOrderBySankar)
+
+        //Assert
+        assertEquals(40, userList["kajal"]!!.userNonPerfInventory.getFreeInventory())
+        assertEquals(10, userList["sankar"]!!.userNonPerfInventory.getFreeInventory())
+        assertEquals(98, userList["kajal"]!!.userWallet.getFreeMoney())
+        assertEquals(50, userList["sankar"]!!.userWallet.getLockedMoney())
+        assertEquals(
+            "PARTIAL",
+            userList["sankar"]!!.orderList[userList["sankar"]!!.orderList.indexOf(buyOrderBySankar)].orderStatus
+        )
+        assertEquals(
+            "COMPLETED",
+            userList["kajal"]!!.orderList[userList["kajal"]!!.orderList.indexOf(sellOrderByKajal)].orderStatus
+        )
+    }
+
+
+
+
 }

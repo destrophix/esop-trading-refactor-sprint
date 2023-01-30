@@ -17,7 +17,13 @@ class PlatformFee{
             var carry:Int = 0
 
             for (i in (0..len-1)){
-                var sum: Int = (platFee[i]-48).toInt()+(feeToBeAdd[i]-48).toInt()+carry
+                var sum: Int = carry
+                if(i< platFee.length && i<feeToBeAdd.length)
+                    sum += (platFee[i]-48).toInt()+(feeToBeAdd[i]-48).toInt()
+                else if(i< platFee.length)
+                    sum += (platFee[i]-48).toInt()
+                else
+                    sum += (feeToBeAdd[i]-48).toInt()
                 carry = sum/10
                 result += (sum%10).toString()
             }

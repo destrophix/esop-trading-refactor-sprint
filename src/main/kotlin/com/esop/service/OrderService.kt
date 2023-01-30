@@ -208,7 +208,7 @@ class OrderService{
                         val prevQuantity = order.remainingQuantity
                         if(order.remainingQuantity < bestBuyOrder.remainingQuantity){
 
-                            val buyOrderLog = OrderFilledLog(bestBuyOrder.remainingQuantity - order.remainingQuantity,bestBuyOrder.price,order.inventoryType)
+                            val buyOrderLog = OrderFilledLog(order.remainingQuantity,bestBuyOrder.price,order.inventoryType)
                             val sellOrderLog = OrderFilledLog(order.remainingQuantity,bestBuyOrder.price,order.inventoryType)
 
                             bestBuyOrder.remainingQuantity = bestBuyOrder.remainingQuantity - order.remainingQuantity
@@ -225,7 +225,7 @@ class OrderService{
                         }else if (order.remainingQuantity > bestBuyOrder.remainingQuantity){
 
                             val buyOrderLog = OrderFilledLog(bestBuyOrder.remainingQuantity, order.price,order.inventoryType)
-                            val sellOrderLog = OrderFilledLog(order.remainingQuantity - bestBuyOrder.remainingQuantity, order.price,order.inventoryType)
+                            val sellOrderLog = OrderFilledLog(bestBuyOrder.remainingQuantity, order.price,order.inventoryType)
 
 
                             order.remainingQuantity = order.remainingQuantity - bestBuyOrder.remainingQuantity

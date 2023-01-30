@@ -213,11 +213,11 @@ class OrderService{
 
                             bestBuyOrder.remainingQuantity = bestBuyOrder.remainingQuantity - order.remainingQuantity
                             bestBuyOrder.orderStatus = "PARTIAL"
-                            bestBuyOrder.orderFilledLogs.add(sellOrderLog)
+                            bestBuyOrder.orderFilledLogs.add(buyOrderLog)
 
                             order.remainingQuantity = 0
                             order.orderStatus = "COMPLETED"
-                            order.orderFilledLogs.add(buyOrderLog)
+                            order.orderFilledLogs.add(sellOrderLog)
                             sellOrders.remove(order)
 
                             updateOrderDetailsForSell(order.userName, prevQuantity, order.remainingQuantity,  bestBuyOrder, order)

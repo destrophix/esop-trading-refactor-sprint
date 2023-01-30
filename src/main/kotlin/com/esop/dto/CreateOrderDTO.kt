@@ -26,7 +26,7 @@ class CreateOrderDTO @JsonCreator constructor(
     @field:Digits(integer = 9, fraction = 0, message = "amount can't exceed maximum wallet capacity of ${MAX_WALLET_CAPACITY.toString()}")
     var price: Long? = null,
 
-    @JsonProperty("inventoryType")
-    @field:Pattern(regexp = "^((?i)NON_PERFORMANCE|(?i)PERFORMANCE)$", message = "inventoryType should be one of NON_PERFORMANCE or PERFORMANCE")
-    var inventoryType: String? = "NON_PERFORMANCE"
+    @JsonProperty("esopType")
+    @field:Pattern(regexp = "^((?i)NON_PERFORMANCE|(?i)PERFORMANCE)$", message = "esopType should be one of NON_PERFORMANCE or PERFORMANCE")
+    var esopType: String? = "NON_PERFORMANCE"
 )

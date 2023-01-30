@@ -37,12 +37,12 @@ class UserService {
             else if(order.type == "SELL"){
                 wallet.assertWalletWillNotOverflowOnAdding(order.price * order.quantity)
 
-                if(order.inventoryType == "PERFORMANCE"){
+                if(order.esopType == "PERFORMANCE"){
                     val response = user!!.userPerformanceInventory.moveESOPsFromFreeToLockedState(order.quantity)
                     if ( response != "SUCCESS" ){
                         errorList.add(response)
                     }
-                }else if(order.inventoryType == "NON_PERFORMANCE"){
+                }else if(order.esopType == "NON_PERFORMANCE"){
                     val response = user!!.userNonPerfInventory.moveESOPsFromFreeToLockedState(order.quantity)
                     if ( response != "SUCCESS" ){
                         errorList.add(response)
@@ -153,7 +153,7 @@ class UserService {
         {
             var errorList = mutableListOf<String>()
 
-            if ( inventoryData.inventoryType.toString().uppercase() != "NON_PERFORMANCE" && inventoryData.inventoryType.toString().uppercase() != "PERFORMANCE" ){
+            if ( inventoryData.esopType.toString().uppercase() != "NON_PERFORMANCE" && inventoryData.esopType.toString().uppercase() != "PERFORMANCE" ){
                 errorList.add(errors["INVALID_TYPE"].toString())
             }
             else if ( !check_username(userName) ){

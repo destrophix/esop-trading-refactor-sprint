@@ -95,11 +95,11 @@ class UserController {
         var errorList = mutableListOf<String>()
 
         val orderType: String = body.type.toString().uppercase()
-        var inventoryType = "NON_PERFORMANCE"
+        var esopType = "NON_PERFORMANCE"
 
         if(orderType == "SELL"){
-            inventoryType = body.inventoryType.toString().uppercase()
-            if(inventoryType != "PERFORMANCE" && inventoryType != "NON_PERFORMANCE"){
+            esopType = body.esopType.toString().uppercase()
+            if(esopType != "PERFORMANCE" && esopType != "NON_PERFORMANCE"){
                 errorList.add("Invalid inventory type")
                 return HttpResponse.ok(mapOf("errors" to errorList))
             }
@@ -107,8 +107,8 @@ class UserController {
 
         val order = Order(body.quantity!!.toLong(),body.type.toString().uppercase(),body.price!!.toLong(),userName)
         if(orderType == "SELL"){
-            order.inventoryType = inventoryType
-            if(inventoryType == "PERFORMANCE")
+            order.esopType = esopType
+            if(esopType == "PERFORMANCE")
                 order.inventoryPriority = 1
         }
         errorList = UserService.orderCheckBeforePlace(order)

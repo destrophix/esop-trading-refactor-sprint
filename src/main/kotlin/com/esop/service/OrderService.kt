@@ -34,7 +34,7 @@ class OrderService{
 
             // Add money of quantity taken from seller
             var amountToBeAddedToSellersAccount = amountToBeDeductedFromLockedState
-            if (sellerOrder.inventoryType == "NON_PERFORMANCE") {
+            if (sellerOrder.esopType == "NON_PERFORMANCE") {
                 amountToBeAddedToSellersAccount -= round(amountToBeDeductedFromLockedState * 0.02).toLong()
                 addPlatformFee(round(amountToBeDeductedFromLockedState * 0.02).toLong())
 
@@ -42,13 +42,13 @@ class OrderService{
             UserService.userList.get(sellerOrder.userName)!!.userWallet.addMoneyToWallet(amountToBeAddedToSellersAccount)
 
             // Deduct inventory of stock from sellers inventory based on its type
-            if (sellerOrder.inventoryType == "PERFORMANCE") {
+            if (sellerOrder.esopType == "PERFORMANCE") {
                 UserService.userList.get(sellerOrder.userName)!!.userPerformanceInventory.removeESOPsFromLockedState(
                     prevQuantity - remainingQuantity
                 )
             }
 
-            if (sellerOrder.inventoryType == "NON_PERFORMANCE") {
+            if (sellerOrder.esopType == "NON_PERFORMANCE") {
                 UserService.userList.get(sellerOrder.userName)!!.userNonPerfInventory.removeESOPsFromLockedState(
                     prevQuantity - remainingQuantity
                 )
@@ -71,11 +71,11 @@ class OrderService{
         ) {
 
             // Deduct inventory of stock from sellers inventory based on its type
-            if (sellerOrder.inventoryType == "PERFORMANCE") {
+            if (sellerOrder.esopType == "PERFORMANCE") {
                 UserService.userList.get(userName)!!.userPerformanceInventory.removeESOPsFromLockedState(prevQuantity - remainingQuantity)
             }
 
-            if (sellerOrder.inventoryType == "NON_PERFORMANCE") {
+            if (sellerOrder.esopType == "NON_PERFORMANCE") {
                 UserService.userList.get(userName)!!.userNonPerfInventory.removeESOPsFromLockedState(prevQuantity - remainingQuantity)
             }
 
@@ -87,7 +87,7 @@ class OrderService{
 
             // Add money to sellers wallet
             var totOrderPrice = sellerOrder.price * (prevQuantity - remainingQuantity)
-            if (sellerOrder.inventoryType == "NON_PERFORMANCE") {
+            if (sellerOrder.esopType == "NON_PERFORMANCE") {
                 totOrderPrice -= kotlin.math.round(totOrderPrice * 0.02).toLong()
                 addPlatformFee(round(totOrderPrice * 0.02).toLong())
             }
@@ -127,7 +127,7 @@ class OrderService{
 
         fun placeOrder(order: Order): Map<String, Any> {
             var inventoryPriority = 2
-            if (order.inventoryType == "PERFORMANCE") {
+            if (order.esopType == "PERFORMANCE") {
                 inventoryPriority -= 1
             }
             order.orderID = generateOrderId()
@@ -147,8 +147,8 @@ class OrderService{
                         val prevQuantity = order.remainingQuantity
                         if(order.remainingQuantity < bestSellOrder.remainingQuantity){
 
-                            val buyOrderLog = OrderFilledLog(order.remainingQuantity,bestSellOrder.price,bestSellOrder.inventoryType)
-                            val sellOrderLog = OrderFilledLog(order.remainingQuantity,bestSellOrder.price,bestSellOrder.inventoryType)
+                            val buyOrderLog = OrderFilledLog(order.remainingQuantity,bestSellOrder.price,bestSellOrder.esopType)
+                            val sellOrderLog = OrderFilledLog(order.remainingQuantity,bestSellOrder.price,bestSellOrder.esopType)
 
                             bestSellOrder.remainingQuantity = bestSellOrder.remainingQuantity - order.remainingQuantity
                             bestSellOrder.orderStatus = "PARTIAL"
@@ -163,8 +163,8 @@ class OrderService{
 
                         }else if (order.remainingQuantity > bestSellOrder.remainingQuantity){
 
-                            val buyOrderLog = OrderFilledLog(bestSellOrder.remainingQuantity, order.price,bestSellOrder.inventoryType)
-                            val sellOrderLog = OrderFilledLog(bestSellOrder.remainingQuantity, order.price,bestSellOrder.inventoryType)
+                            val buyOrderLog = OrderFilledLog(bestSellOrder.remainingQuantity, order.price,bestSellOrder.esopType)
+                            val sellOrderLog = OrderFilledLog(bestSellOrder.remainingQuantity, order.price,bestSellOrder.esopType)
 
                             order.remainingQuantity = order.remainingQuantity - bestSellOrder.remainingQuantity
                             order.orderStatus = "PARTIAL"
@@ -177,8 +177,8 @@ class OrderService{
 
                             updateOrderDetailsForBuy(order.userName, prevQuantity ,order.remainingQuantity, bestSellOrder, order)
                         }else{
-                            val buyOrderLog = OrderFilledLog(bestSellOrder.remainingQuantity, bestSellOrder.price,bestSellOrder.inventoryType)
-                            val sellOrderLog = OrderFilledLog(order.remainingQuantity, bestSellOrder.price,bestSellOrder.inventoryType)
+                            val buyOrderLog = OrderFilledLog(bestSellOrder.remainingQuantity, bestSellOrder.price,bestSellOrder.esopType)
+                            val sellOrderLog = OrderFilledLog(order.remainingQuantity, bestSellOrder.price,bestSellOrder.esopType)
 
                             bestSellOrder.remainingQuantity = 0
                             bestSellOrder.orderStatus = "COMPLETED"
@@ -208,8 +208,8 @@ class OrderService{
                         val prevQuantity = order.remainingQuantity
                         if(order.remainingQuantity < bestBuyOrder.remainingQuantity){
 
-                            val buyOrderLog = OrderFilledLog(order.remainingQuantity,bestBuyOrder.price,order.inventoryType)
-                            val sellOrderLog = OrderFilledLog(order.remainingQuantity,bestBuyOrder.price,order.inventoryType)
+                            val buyOrderLog = OrderFilledLog(order.remainingQuantity,bestBuyOrder.price,order.esopType)
+                            val sellOrderLog = OrderFilledLog(order.remainingQuantity,bestBuyOrder.price,order.esopType)
 
                             bestBuyOrder.remainingQuantity = bestBuyOrder.remainingQuantity - order.remainingQuantity
                             bestBuyOrder.orderStatus = "PARTIAL"
@@ -224,8 +224,8 @@ class OrderService{
 
                         }else if (order.remainingQuantity > bestBuyOrder.remainingQuantity){
 
-                            val buyOrderLog = OrderFilledLog(bestBuyOrder.remainingQuantity, order.price,order.inventoryType)
-                            val sellOrderLog = OrderFilledLog(bestBuyOrder.remainingQuantity, order.price,order.inventoryType)
+                            val buyOrderLog = OrderFilledLog(bestBuyOrder.remainingQuantity, order.price,order.esopType)
+                            val sellOrderLog = OrderFilledLog(bestBuyOrder.remainingQuantity, order.price,order.esopType)
 
 
                             order.remainingQuantity = order.remainingQuantity - bestBuyOrder.remainingQuantity
@@ -239,8 +239,8 @@ class OrderService{
 
                             updateOrderDetailsForSell(order.userName, prevQuantity ,order.remainingQuantity, bestBuyOrder, order)
                         }else{
-                            val buyOrderLog = OrderFilledLog(bestBuyOrder.remainingQuantity, order.price,order.inventoryType)
-                            val sellOrderLog = OrderFilledLog(order.remainingQuantity, order.price,order.inventoryType)
+                            val buyOrderLog = OrderFilledLog(bestBuyOrder.remainingQuantity, order.price,order.esopType)
+                            val sellOrderLog = OrderFilledLog(order.remainingQuantity, order.price,order.esopType)
 
                             bestBuyOrder.remainingQuantity = 0
                             bestBuyOrder.orderStatus = "COMPLETED"

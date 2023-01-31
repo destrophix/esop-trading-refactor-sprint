@@ -4,6 +4,7 @@ plugins {
     id("org.jetbrains.kotlin.plugin.allopen") version "1.6.21"
     id("com.github.johnrengelman.shadow") version "7.1.2"
     id("io.micronaut.application") version "3.7.0"
+    id("idea")
 }
 
 version = "0.1"
@@ -27,6 +28,10 @@ dependencies {
     implementation("com.googlecode.libphonenumber:libphonenumber:8.2.0")
     runtimeOnly("com.fasterxml.jackson.module:jackson-module-kotlin")
     testImplementation('org.junit.jupiter:junit-jupiter-params:5.1.0')
+<<<<<<< HEAD
+=======
+    implementation("commons-validator:commons-validator:1.7")
+>>>>>>> 84d9aaa (Add dependencies for email validation)
 }
 
 

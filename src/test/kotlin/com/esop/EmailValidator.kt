@@ -1,0 +1,68 @@
+package com.esop
+
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
+import java.util.stream.Stream
+
+class EmailValidator {
+
+    val emailValidator = Validator()
+
+    companion object {
+        @JvmStatic
+        private fun validEmails(): Stream<Arguments> {
+            return Stream.of(
+                Arguments.of("simple@example.com", "very.common@example.com"),
+                Arguments.of("disposable.style.email.with+symbol@example.com"),
+                Arguments.of("other.email-with-hyphen@example.com"),
+                Arguments.of("fully-qualified-domain@example.com"),
+                Arguments.of("user.name+tag+sorting@example.com"),
+                Arguments.of("fully-qualified-domain@example.com"),
+                Arguments.of("x@example.com"),
+                Arguments.of("carlosd'intino@arnet.com.ar"),
+                Arguments.of("example-indeed@strange-example.com"),
+//                Arguments.of("example@s.example"),
+                Arguments.of("\" \"@example.org"),
+                Arguments.of("\"john..doe\"@example.org"),
+                Arguments.of("mkyong-100@yahoo-test.com")
+            );
+        }
+
+        @JvmStatic
+        private fun invalidEmails(): Stream<Arguments> {
+            return Stream.of(
+                Arguments.of("abc.def@mail.c"),
+                Arguments.of("abc.def@mail#archive.com"),
+                Arguments.of("Abc.example.com"),
+                Arguments.of("A@b@c@example.com"),
+                Arguments.of("a\"b(c)d,e:f;g<h>i[j\\k]l@example.com"),
+                Arguments.of("just\"not\"right@example.com"),
+                Arguments.of("this is\"not\\allowed@example.com"),
+                Arguments.of("this\\ still\"not\\allowed@example.com"),
+                Arguments.of("1234567890123456789012345678901234567890123456789012345678901234+x@example.com"),
+                Arguments.of("john..doe@example.com"),
+                Arguments.of("john.doe@example..com"),
+                Arguments.of("mkyong..2002@gmail.com")
+            );
+        }
+
+    }
+
+    @ParameterizedTest
+    @MethodSource("validEmails")
+    fun `it should return true for valid emails`(email: String) {
+        //Assert
+        assertTrue(emailValidator.checkIfEmailIsValid(email))
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidEmails")
+    fun `it should return false for invalid email`(email: String) {
+        //Assert
+        assertFalse(emailValidator.checkIfEmailIsValid(email))
+    }
+
+}

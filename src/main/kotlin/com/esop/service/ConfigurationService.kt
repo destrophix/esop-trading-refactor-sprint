@@ -26,6 +26,12 @@ class ConfigurationService {
             throw InvalidConfigurationException("Platform Fee Percentage should be in between 0 and 1 both inclusive" )
     }
 
+    fun getMaxWalletLimit() = maxWalletLimit
+
+    fun getMaxInventoryLimit() = maxInventoryLimit
+
+    fun getPlatformFeePercentage() = platformFeePercentage
+
     @Value("\${app.max-inventory-limit}")
     private lateinit var maxInventoryLimit: BigInteger
 

@@ -23,7 +23,7 @@ class CustomConstraintFactory {
     }
 
     @Singleton
-    fun emailValidator() : ConstraintValidator<EmailValidatorConstraintAnnotation, String> {
+    fun emailValidator() : ConstraintValidator<EmailConstraintValidator, String> {
 
         return ConstraintValidator { value, annotation, context ->
             value == null || validate(value)

@@ -1,15 +1,18 @@
 package com.esop
 
+import com.esop.validators.EmailValidator
+import com.esop.validators.PhoneNumberValidator
+import com.esop.validators.UsernameValidator
 import com.google.i18n.phonenumbers.NumberParseException
 import com.google.i18n.phonenumbers.PhoneNumberUtil
 import io.micronaut.context.annotation.Factory
 import io.micronaut.validation.validator.constraints.ConstraintValidator
 import jakarta.inject.Singleton
-
+import com.esop.service.UserService
 @Factory
 class CustomConstraintFactory {
     @Singleton
-    fun phoneNumberValidator() : ConstraintValidator<PhoneNumberConstraintValidator, String> {
+    fun phoneNumberValidator() : ConstraintValidator<PhoneNumberValidator, String> {
         val phoneUtil = PhoneNumberUtil.getInstance()
 
         return ConstraintValidator { value, annotation, context ->
@@ -21,10 +24,16 @@ class CustomConstraintFactory {
             }
         }
     }
+    @Singleton
+    fun userNameValidator() : ConstraintValidator<UsernameValidator, String> {
+        val username = UserService()
+        return ConstraintValidator { value, annotation, context ->
+            username.check_username(value)
+        }
+    }
 
     @Singleton
-    fun emailValidator() : ConstraintValidator<EmailConstraintValidator, String> {
-
+    fun emailValidator() : ConstraintValidator<EmailValidator, String> {
         return ConstraintValidator { value, annotation, context ->
             value == null || validate(value)
         }

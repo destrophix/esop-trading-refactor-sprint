@@ -1,5 +1,6 @@
-package com.esop
+package com.esop.validators
 
+import com.esop.CustomConstraintFactory
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.params.ParameterizedTest
@@ -9,7 +10,7 @@ import java.util.stream.Stream
 
 class EmailValidator {
 
-    val emailValidator = Validator()
+    val emailValidator = CustomConstraintFactory()
 
     companion object {
         @JvmStatic
@@ -55,14 +56,14 @@ class EmailValidator {
     @MethodSource("validEmails")
     fun `it should return true for valid emails`(email: String) {
         //Assert
-        assertTrue(emailValidator.checkIfEmailIsValid(email))
+        assertTrue(emailValidator.validate(email))
     }
 
     @ParameterizedTest
     @MethodSource("invalidEmails")
     fun `it should return false for invalid email`(email: String) {
         //Assert
-        assertFalse(emailValidator.checkIfEmailIsValid(email))
+        assertFalse(emailValidator.validate(email))
     }
 
 }

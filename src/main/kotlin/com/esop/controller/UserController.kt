@@ -80,7 +80,6 @@ class UserController {
     }
 
 
-
     @Post(uri="/register", consumes = [MediaType.APPLICATION_JSON],produces=[MediaType.APPLICATION_JSON])
      fun register(@Body @Valid userData: UserCreationDTO): HttpResponse<*> {
         val newUser = this.userService.registerUser(userData)

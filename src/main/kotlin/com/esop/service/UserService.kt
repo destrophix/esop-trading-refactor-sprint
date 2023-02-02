@@ -55,7 +55,7 @@ class UserService {
 
     fun check_username( search_value: String): Boolean
     {
-        return userList.contains(search_value)
+        return !userList.contains(search_value)
     }
 
     fun check_phonenumber(usernumber_set: MutableSet<String>, search_value: String): Boolean
@@ -88,10 +88,10 @@ class UserService {
 
     fun registerUser(userData: UserCreationDTO): Map<String,Any>
     {
-        val errors = validateUserDetails(userData)
-        if(errors.size > 0) {
-            return mapOf("error" to errors)
-        }
+//        val errors = validateUserDetails(userData)
+//        if(errors.size > 0) {
+//            return mapOf("error" to errors)
+//        }
         val user = User(
             userData.firstName!!.trim(),
             userData.lastName!!.trim(),

@@ -1,12 +1,11 @@
 package com.esop.dto
 
-import com.esop.PhoneNumber
+import com.esop.EmailValidatorConstraintAnnotation
+import com.esop.PhoneNumberConstraintValidator
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.micronaut.core.annotation.Introspected
-import javax.validation.constraints.Email
 import javax.validation.constraints.NotBlank
-import javax.validation.constraints.NotNull
 import javax.validation.constraints.Pattern
 import javax.validation.constraints.Size
 
@@ -35,13 +34,12 @@ class UserCreationDTO @JsonCreator constructor(
 
     @JsonProperty("phoneNumber")
     @field:NotBlank(message = "Phone Number can not be missing or empty.")
-    @field:PhoneNumber()
+    @field:PhoneNumberConstraintValidator()
     var phoneNumber: String? = null,
 
     @JsonProperty("email")
     @field:NotBlank(message = "Email can not be missing or empty.")
-    @field:Size(max=30, message = "Email should not exceed 30 characters")
-    @field:Email(regexp = "($EMAIL_REGEX| *)", message = "Invalid Email-ID.")
+    @field:EmailValidatorConstraintAnnotation()
     var email: String? = null,
 
     @JsonProperty("username")
@@ -49,5 +47,5 @@ class UserCreationDTO @JsonCreator constructor(
     @field:Size(max=20, message = "User Name should not exceed 20 characters")
     @field:Pattern(regexp = "($USERNAME_REGEX| *)", message =
     "User Name should only consist alphabets, numbers or underscore(s) and it must start with an alphabet.")
-    var username: String? = null,
+    var username: String? = null
 )

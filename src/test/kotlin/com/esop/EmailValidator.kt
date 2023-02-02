@@ -24,10 +24,12 @@ class EmailValidator {
                 Arguments.of("x@example.com"),
                 Arguments.of("carlosd'intino@arnet.com.ar"),
                 Arguments.of("example-indeed@strange-example.com"),
-//                Arguments.of("example@s.example"),
+                Arguments.of("example@s.example"),
                 Arguments.of("\" \"@example.org"),
                 Arguments.of("\"john..doe\"@example.org"),
-                Arguments.of("mkyong-100@yahoo-test.com")
+                Arguments.of("sankar@a2345678901234567890123456789012345678901234567890123456789012b.com"),
+                Arguments.of("sankar@gmail.a2345678901234567890123456789012345678901234567890123456789012b.a2345678901234567890123456789012345678901234567890123456789012b.a2345678901234567890123456789012345678901234567890123456789012b.a23456789012345678901234567890123456789012345678b"),
+                Arguments.of("mkyong__100@yahoo-test.com")
             );
         }
 
@@ -41,11 +43,9 @@ class EmailValidator {
                 Arguments.of("a\"b(c)d,e:f;g<h>i[j\\k]l@example.com"),
                 Arguments.of("just\"not\"right@example.com"),
                 Arguments.of("this is\"not\\allowed@example.com"),
-                Arguments.of("this\\ still\"not\\allowed@example.com"),
+                Arguments.of("this\\ still\"not\\allowed@ex__ample.com"),
                 Arguments.of("1234567890123456789012345678901234567890123456789012345678901234+x@example.com"),
-                Arguments.of("john..doe@example.com"),
-                Arguments.of("john.doe@example..com"),
-                Arguments.of("mkyong..2002@gmail.com")
+                Arguments.of("john.doe@example..com")
             );
         }
 

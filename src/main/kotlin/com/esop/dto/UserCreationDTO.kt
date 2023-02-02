@@ -1,6 +1,6 @@
 package com.esop.dto
 
-import com.esop.EmailValidatorConstraintAnnotation
+import com.esop.EmailConstraintValidator
 import com.esop.PhoneNumberConstraintValidator
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
@@ -39,7 +39,7 @@ class UserCreationDTO @JsonCreator constructor(
 
     @JsonProperty("email")
     @field:NotBlank(message = "Email can not be missing or empty.")
-    @field:EmailValidatorConstraintAnnotation()
+    @field:EmailConstraintValidator()
     var email: String? = null,
 
     @JsonProperty("username")

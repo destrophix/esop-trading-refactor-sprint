@@ -9,4 +9,4 @@ netty:
 app:
   max-wallet-limit: 10000000
   max-inventory-limit: 10000000
-  platform-fee-percentage: 0.2
+  platform-fee-percentage: 2

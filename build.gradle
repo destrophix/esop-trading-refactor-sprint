@@ -28,20 +28,7 @@ dependencies {
     implementation("com.googlecode.libphonenumber:libphonenumber:8.2.0")
     runtimeOnly("com.fasterxml.jackson.module:jackson-module-kotlin")
     testImplementation('org.junit.jupiter:junit-jupiter-params:5.1.0')
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
     implementation("commons-validator:commons-validator:1.7")
->>>>>>> 84d9aaa (Add dependencies for email validation)
-=======
-    implementation("commons-validator:commons-validator:1.7")
-=======
->>>>>>> 2b12927 (add test for validation and loading of the configuration from the application environment properties)
->>>>>>> 1095a1c (add test for validation and loading of the configuration from the application environment properties)
-=======
-    implementation("commons-validator:commons-validator:1.7")
->>>>>>> c49e1ed (Update gradle - Junit TestImplementation)
 }
 
 

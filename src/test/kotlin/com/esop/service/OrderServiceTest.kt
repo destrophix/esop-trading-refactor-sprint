@@ -258,9 +258,6 @@ class OrderServiceTest {
             userList["aditya"]!!.orderList[userList["aditya"]!!.orderList.indexOf(buyOrderByAditya)].orderStatus
         )
     }
-<<<<<<< HEAD
-<<<<<<< HEAD
-
     @Test
     fun `It should place 2 BUY orders followed by a SELL order where the SELL order is complete`() {
         //Arrange
@@ -304,71 +301,5 @@ class OrderServiceTest {
             userList["arun"]!!.orderList[userList["arun"]!!.orderList.indexOf(buyOrderByArun)].orderStatus
         )
     }
-=======
-=======
-=======
->>>>>>> 4b9511b (Added unit test cases for orders)
-=======
->>>>>>> 360ba87 (Add unit Testcase)
 
-
-
-    @Test
-    fun `It should place 2 BUY orders followed by a SELL order where the SELL order is complete`() {
-        //Arrange
-        userList["kajal"]!!.userWallet.addMoneyToWallet(100)
-        val buyOrderByKajal = Order(10, "BUY", 10, "kajal")
-        userList["kajal"]!!.userWallet.moveMoneyFromFreeToLockedState(10 * 10)
-        placeOrder(buyOrderByKajal)
-
-        userList["arun"]!!.userWallet.addMoneyToWallet(100)
-        val buyOrderByArun = Order(10, "BUY", 10, "arun")
-        userList["arun"]!!.userWallet.moveMoneyFromFreeToLockedState(10 * 10)
-        placeOrder(buyOrderByArun)
-
-        userList["sankar"]!!.userNonPerfInventory.addESOPsToInventory(30)
-        val sellOrderBySankar = Order(20, "SELL", 10, "sankar")
-        userList["sankar"]!!.userNonPerfInventory.moveESOPsFromFreeToLockedState(20)
-
-        //Act
-        placeOrder(sellOrderBySankar)
-
-        //Assert
-        assertEquals(10, userList["kajal"]!!.userNonPerfInventory.getFreeInventory())
-        assertEquals(0, userList["kajal"]!!.userWallet.getFreeMoney())
-
-        assertEquals(10, userList["arun"]!!.userNonPerfInventory.getFreeInventory())
-        assertEquals(0, userList["arun"]!!.userWallet.getFreeMoney())
-
-        assertEquals(10, userList["sankar"]!!.userNonPerfInventory.getFreeInventory())
-        assertEquals(98 + 98, userList["sankar"]!!.userWallet.getFreeMoney())
-
-        assertEquals(
-            "COMPLETED",
-            userList["sankar"]!!.orderList[userList["sankar"]!!.orderList.indexOf(sellOrderBySankar)].orderStatus
-        )
-        assertEquals(
-            "COMPLETED",
-            userList["kajal"]!!.orderList[userList["kajal"]!!.orderList.indexOf(buyOrderByKajal)].orderStatus
-        )
-        assertEquals(
-            "COMPLETED",
-            userList["arun"]!!.orderList[userList["arun"]!!.orderList.indexOf(buyOrderByArun)].orderStatus
-        )
-    }
-<<<<<<< HEAD
-
-
-<<<<<<< HEAD
->>>>>>> aaae65e (Added unit tests and fixed platform fee bug)
-<<<<<<< HEAD
->>>>>>> f8cc578 (Added unit tests and fixed platform fee bug)
-=======
-=======
-=======
->>>>>>> 689d49e (Add unit testcase)
->>>>>>> b80cd7e (Add unit testcase)
->>>>>>> 016d777 (Add unit testcase)
-=======
->>>>>>> 360ba87 (Add unit Testcase)
 }

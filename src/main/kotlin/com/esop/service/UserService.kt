@@ -29,7 +29,7 @@ class UserService {
             if(order.type == "BUY"){
                 nonPerformanceInventory.assertInventoryWillNotOverflowOnAdding(order.quantity)
 
-                val response = user!!.userWallet.moveMoneyFromFreeToLockedState(order.price*order.quantity)
+                val response = user.userWallet.moveMoneyFromFreeToLockedState(order.price*order.quantity)
                 if (response != "SUCCESS"){
                     errorList.add(response)
                 }
@@ -38,12 +38,12 @@ class UserService {
                 wallet.assertWalletWillNotOverflowOnAdding(order.price * order.quantity)
 
                 if(order.esopType == "PERFORMANCE"){
-                    val response = user!!.userPerformanceInventory.moveESOPsFromFreeToLockedState(order.quantity)
+                    val response = user.userPerformanceInventory.moveESOPsFromFreeToLockedState(order.quantity)
                     if ( response != "SUCCESS" ){
                         errorList.add(response)
                     }
                 }else if(order.esopType == "NON_PERFORMANCE"){
-                    val response = user!!.userNonPerfInventory.moveESOPsFromFreeToLockedState(order.quantity)
+                    val response = user.userNonPerfInventory.moveESOPsFromFreeToLockedState(order.quantity)
                     if ( response != "SUCCESS" ){
                         errorList.add(response)
                     }
@@ -53,7 +53,7 @@ class UserService {
         }
     }
 
-    fun check_username( search_value: String): Boolean
+    fun checkIfUerExist(search_value: String): Boolean
     {
         return !userList.contains(search_value)
     }
@@ -72,10 +72,6 @@ class UserService {
     fun validateUserDetails(userData: UserCreationDTO): List<String>
     {
         val errorList = mutableListOf<String>()
-
-        if(check_username(userData.username!!)){
-            errorList.add(errors["USERNAME_EXISTS"].toString())
-        }
         if(check_email(emailList, userData.email!!)){
             errorList.add(errors["EMAIL_EXISTS"].toString())
         }
@@ -88,34 +84,34 @@ class UserService {
 
     fun registerUser(userData: UserCreationDTO): Map<String,Any>
     {
-//        val errors = validateUserDetails(userData)
-//        if(errors.size > 0) {
-//            return mapOf("error" to errors)
-//        }
+        val errors = validateUserDetails(userData)
+        if(errors.isNotEmpty()) {
+            return mapOf("error" to errors)
+        }
         val user = User(
             userData.firstName!!.trim(),
             userData.lastName!!.trim(),
             userData.phoneNumber!!,
             userData.email!!,
             userData.username!!
-        );
+        )
         userList.put(userData.username!!,user)
         emailList.add(userData.email!!)
         phoneNumberList.add(userData.phoneNumber!!)
         return mapOf(
-            "firstName" to user.firstName.toString(),
-            "lastName" to user.lastName.toString(),
-            "phoneNumber" to user.phoneNumber.toString(),
-            "email" to user.email.toString(),
-            "username" to user.username.toString()
+            "firstName" to user.firstName,
+            "lastName" to user.lastName,
+            "phoneNumber" to user.phoneNumber,
+            "email" to user.email,
+            "username" to user.username
         )
     }
 
     fun accountInformation(userName: String): Map<String, Any?>
     {
-        var errorList = mutableListOf<String>()
+        val errorList = mutableListOf<String>()
 
-        if ( !check_username(userName) ){
+        if ( !checkIfUerExist(userName)){
             errorList.add(errors["USER_DOES_NOT_EXISTS"].toString())
         }
 
@@ -151,12 +147,11 @@ class UserService {
 
         fun addingInventory(inventoryData: AddInventoryDTO, userName: String): Map<String, Any>
         {
-            var errorList = mutableListOf<String>()
+            val errorList = mutableListOf<String>()
 
             if ( inventoryData.esopType.toString().uppercase() != "NON_PERFORMANCE" && inventoryData.esopType.toString().uppercase() != "PERFORMANCE" ){
                 errorList.add(errors["INVALID_TYPE"].toString())
-            }
-            else if ( !check_username(userName) ){
+            } else if ( !checkIfUerExist(userName)){
                 errorList.add(errors["USER_DOES_NOT_EXISTS"].toString())
             }
 
@@ -168,9 +163,9 @@ class UserService {
 
     fun addingMoney(walletData: AddWalletDTO, userName: String): Map<String, Any>
     {
-        var errorList = mutableListOf<String>()
+        val errorList = mutableListOf<String>()
 
-        if ( !check_username(userName) ){
+        if ( !checkIfUerExist(userName)){
             errorList.add(errors["USER_DOES_NOT_EXISTS"].toString())
         }
 

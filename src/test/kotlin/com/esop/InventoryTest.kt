@@ -31,7 +31,7 @@ class InventoryTest {
 
     @Test
     fun `It should remove locked ESOPs by the given quantity`() {
-        val initialLockedESOPS = 10L;
+        val initialLockedESOPS = 10L
         val deductQuantity = 10L
         val inventory = Inventory(freeInventory = 100, lockedInventory = initialLockedESOPS, type = "PERFORMANCE")
         val expectedNewLockedESOPs = initialLockedESOPS - deductQuantity
@@ -42,7 +42,7 @@ class InventoryTest {
         Assertions.assertEquals(expectedNewLockedESOPs, actualLockedESOPs)
     }
 
-    @Test()
+    @Test
     fun `It should throw error when the total inventory is greater than the inventory limit`(){
         val inventory = Inventory(freeInventory = 1, lockedInventory = 0, type = "PERFORMANCE")
 

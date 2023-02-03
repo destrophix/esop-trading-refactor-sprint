@@ -41,14 +41,14 @@ class CustomConstraintFactory {
     @Singleton
     fun emailAlreadyExists() : ConstraintValidator<EmailAlreadyExistsValidator, String> {
         return ConstraintValidator { value, annotation, context ->
-            username.check_email(UserService.emailList, value)
+            username.checkIfEmailExist(UserService.emailList, value)
         }
     }
 
     @Singleton
     fun phoneNumberAlreadyExists() : ConstraintValidator<PhoneNumberAlreadyExists, String> {
         return ConstraintValidator { value, annotation, context ->
-            username.check_phonenumber(UserService.phoneNumberList, value)
+            username.checkIfPhoneNumberExist(UserService.phoneNumberList, value)
         }
     }
     fun validate(email :String): Boolean {

@@ -10,7 +10,7 @@ import java.util.stream.Stream
 
 class EmailValidatorTest {
 
-    val emailValidator = CustomConstraintFactory()
+    private val emailValidator = CustomConstraintFactory()
 
     companion object {
         @JvmStatic
@@ -31,7 +31,7 @@ class EmailValidatorTest {
                 Arguments.of("sankar@a2345678901234567890123456789012345678901234567890123456789012b.com"),
                 Arguments.of("sankar@gmail.a2345678901234567890123456789012345678901234567890123456789012b.a2345678901234567890123456789012345678901234567890123456789012b.a2345678901234567890123456789012345678901234567890123456789012b.a23456789012345678901234567890123456789012345678b"),
                 Arguments.of("mkyong__100@yahoo-test.com")
-            );
+            )
         }
 
         @JvmStatic
@@ -47,7 +47,7 @@ class EmailValidatorTest {
                 Arguments.of("this\\ still\"not\\allowed@ex__ample.com"),
                 Arguments.of("1234567890123456789012345678901234567890123456789012345678901234+x@example.com"),
                 Arguments.of("john.doe@example..com")
-            );
+            )
         }
 
     }

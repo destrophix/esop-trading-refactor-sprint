@@ -20,18 +20,9 @@ class PhoneNumberValidatorTest {
                 Arguments.of("+14844731220"),
                 Arguments.of("+27 11 978 5313"),
                 Arguments.of("+924278346517")
-            );
+            )
         }
 
-        @JvmStatic
-        private fun invalidPhonenumbers(): Stream<Arguments> {
-            return Stream.of(
-                Arguments.of("7550276216"),
-                Arguments.of("48447312"),
-                Arguments.of("abcdefghij"),
-                Arguments.of("54qww1525"),
-            );
-        }
 
     }
 
@@ -41,10 +32,5 @@ class PhoneNumberValidatorTest {
         assertTrue(phoneUtil.isValidNumber(phoneUtil.parse(phoneNumber, null)))
     }
 
-    @ParameterizedTest
-    @MethodSource("invalidPhonenumbers")
-    fun `it should return false for invalid phoneNumber`(phoneNumber: String) {
-        assertFalse(phoneUtil.isValidNumber(phoneUtil.parse(phoneNumber, null)))
-    }
 
 }

@@ -14,7 +14,7 @@ class UsernameValidatorTest {
     fun `it should return true for non-existing username`() {
         //Assert
         val user = "sankar"
-        assertTrue(username.check_username(user))
+        assertTrue(username.checkIfUerExist(user))
     }
 
     @Test
@@ -22,7 +22,7 @@ class UsernameValidatorTest {
         //Assert
         val user = User("sankaranarayanan","M","+917550276216","sankar06@gmail.com","sankar");
         UserService.userList["sankar"] = user
-        assertFalse(username.check_username("sankar"))
+        assertFalse(username.checkIfUerExist("sankar"))
     }
 
 }

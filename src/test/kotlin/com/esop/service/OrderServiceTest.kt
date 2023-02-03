@@ -106,7 +106,7 @@ class OrderServiceTest {
         assertEquals(98, userList["kajal"]!!.userWallet.getFreeMoney())
         assertEquals(98, userList["arun"]!!.userWallet.getFreeMoney())
         assertEquals(50, userList["sankar"]!!.userWallet.getLockedMoney())
-        assertEquals("PARTIAL", buyOrders[buyOrders.indexOf(buyOrderBySankar)]!!.orderStatus)
+        assertEquals("PARTIAL", buyOrders[buyOrders.indexOf(buyOrderBySankar)].orderStatus)
         assertEquals(
             "COMPLETED",
             userList["kajal"]!!.orderList[userList["kajal"]!!.orderList.indexOf(sellOrderByKajal)].orderStatus
@@ -220,10 +220,6 @@ class OrderServiceTest {
         )
     }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 4b9511b (Added unit test cases for orders)
     @Test
     fun `It should place 2 BUY orders followed by a SELL order where the SELL order is partial`() {
         //Arrange
@@ -231,7 +227,7 @@ class OrderServiceTest {
         val buyOrderBySankar = Order(10, "BUY", 10, "sankar")
         userList["sankar"]!!.userWallet.moveMoneyFromFreeToLockedState(100)
         placeOrder(buyOrderBySankar)
-<<<<<<< HEAD
+
 
         userList["aditya"]!!.userWallet.addMoneyToWallet(100)
         val buyOrderByAditya = Order(10, "BUY", 10, "aditya")
@@ -252,7 +248,7 @@ class OrderServiceTest {
         assertEquals(196, userList["kajal"]!!.userWallet.getFreeMoney())
         assertEquals(0, userList["sankar"]!!.userWallet.getFreeMoney())
         assertEquals(0, userList["sankar"]!!.userWallet.getFreeMoney())
-        assertEquals("PARTIAL", sellOrders[sellOrders.indexOf(sellOrderByKajal)]!!.orderStatus)
+        assertEquals("PARTIAL", sellOrders[sellOrders.indexOf(sellOrderByKajal)].orderStatus)
         assertEquals(
             "COMPLETED",
             userList["sankar"]!!.orderList[userList["sankar"]!!.orderList.indexOf(buyOrderBySankar)].orderStatus
@@ -262,6 +258,7 @@ class OrderServiceTest {
             userList["aditya"]!!.orderList[userList["aditya"]!!.orderList.indexOf(buyOrderByAditya)].orderStatus
         )
     }
+<<<<<<< HEAD
 <<<<<<< HEAD
 
     @Test
@@ -311,37 +308,10 @@ class OrderServiceTest {
 =======
 =======
 >>>>>>> 4b9511b (Added unit test cases for orders)
+=======
+>>>>>>> 360ba87 (Add unit Testcase)
 
-        userList["aditya"]!!.userWallet.addMoneyToWallet(100)
-        val buyOrderByAditya = Order(10, "BUY", 10, "aditya")
-        userList["sankar"]!!.userWallet.moveMoneyFromFreeToLockedState(100)
-        placeOrder(buyOrderByAditya)
 
-        userList["kajal"]!!.userNonPerfInventory.addESOPsToInventory(50)
-        val sellOrderByKajal = Order(25, "SELL", 10, "kajal")
-        userList["kajal"]!!.userNonPerfInventory.moveESOPsFromFreeToLockedState(25)
-
-        //Act
-        placeOrder(sellOrderByKajal)
-
-        //Assert
-        assertEquals(25, userList["kajal"]!!.userNonPerfInventory.getFreeInventory())
-        assertEquals(10, userList["sankar"]!!.userNonPerfInventory.getFreeInventory())
-        assertEquals(10, userList["aditya"]!!.userNonPerfInventory.getFreeInventory())
-        assertEquals(196, userList["kajal"]!!.userWallet.getFreeMoney())
-        assertEquals(0, userList["sankar"]!!.userWallet.getFreeMoney())
-        assertEquals(0, userList["sankar"]!!.userWallet.getFreeMoney())
-        assertEquals("PARTIAL", sellOrders[sellOrders.indexOf(sellOrderByKajal)]!!.orderStatus)
-        assertEquals(
-            "COMPLETED",
-            userList["sankar"]!!.orderList[userList["sankar"]!!.orderList.indexOf(buyOrderBySankar)].orderStatus
-        )
-        assertEquals(
-            "COMPLETED",
-            userList["aditya"]!!.orderList[userList["aditya"]!!.orderList.indexOf(buyOrderByAditya)].orderStatus
-        )
-    }
-<<<<<<< HEAD
 
     @Test
     fun `It should place 2 BUY orders followed by a SELL order where the SELL order is complete`() {
@@ -386,6 +356,7 @@ class OrderServiceTest {
             userList["arun"]!!.orderList[userList["arun"]!!.orderList.indexOf(buyOrderByArun)].orderStatus
         )
     }
+<<<<<<< HEAD
 
 
 <<<<<<< HEAD
@@ -398,4 +369,6 @@ class OrderServiceTest {
 >>>>>>> 689d49e (Add unit testcase)
 >>>>>>> b80cd7e (Add unit testcase)
 >>>>>>> 016d777 (Add unit testcase)
+=======
+>>>>>>> 360ba87 (Add unit Testcase)
 }

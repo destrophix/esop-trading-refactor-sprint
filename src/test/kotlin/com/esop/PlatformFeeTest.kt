@@ -15,7 +15,7 @@ class PlatformFeeTest {
 
     @Test
     fun `it should add the platform fee to the total platform fee`(){
-        val amountToBeAddedToPlatformFee:Long = 10L
+        val amountToBeAddedToPlatformFee = 10L
 
         PlatformFee.addPlatformFee(amountToBeAddedToPlatformFee)
 

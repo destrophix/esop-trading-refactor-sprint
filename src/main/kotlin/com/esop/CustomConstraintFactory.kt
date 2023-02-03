@@ -59,9 +59,9 @@ class CustomConstraintFactory {
         if (p.containsMatchIn(email)) {
             return false
         }
-        val EMAIL_REGEX =
+        val email_regex =
             "^(?=[\"\'a-zA-Z0-9][\"\\s\'a-zA-Z0-9@._%+-]{5,253}\$)[\\s\"\'a-zA-Z0-9._%+-]{1,64}@(?:(?=[a-zA-Z0-9-]{1,63}\\.)[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*\\.){1,8}[a-z0-9A-Z]{2,63}\$"
-        val pattern = Regex(EMAIL_REGEX)
+        val pattern = Regex(email_regex)
         return pattern.containsMatchIn(email)
     }
 }

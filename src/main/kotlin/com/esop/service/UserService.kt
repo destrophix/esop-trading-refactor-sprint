@@ -60,34 +60,17 @@ class UserService {
 
     fun check_phonenumber(usernumber_set: MutableSet<String>, search_value: String): Boolean
     {
-        return usernumber_set.contains(search_value)
+        return !usernumber_set.contains(search_value)
     }
 
     fun check_email(useremail_set: MutableSet<String>, search_value: String): Boolean
     {
-        return useremail_set.contains(search_value)
+        return !useremail_set.contains(search_value)
     }
 
-
-    fun validateUserDetails(userData: UserCreationDTO): List<String>
-    {
-        val errorList = mutableListOf<String>()
-        if(check_email(emailList, userData.email!!)){
-            errorList.add(errors["EMAIL_EXISTS"].toString())
-        }
-        if(check_phonenumber(phoneNumberList, userData.phoneNumber!!)){
-            errorList.add(errors["PHONENUMBER_EXISTS"].toString())
-        }
-
-        return errorList
-    }
 
     fun registerUser(userData: UserCreationDTO): Map<String,Any>
     {
-        val errors = validateUserDetails(userData)
-        if(errors.isNotEmpty()) {
-            return mapOf("error" to errors)
-        }
         val user = User(
             userData.firstName!!.trim(),
             userData.lastName!!.trim(),

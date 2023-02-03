@@ -1,16 +1,16 @@
 package com.esop
 
-import com.esop.validators.EmailValidator
-import com.esop.validators.PhoneNumberValidator
-import com.esop.validators.UsernameValidator
 import com.google.i18n.phonenumbers.NumberParseException
 import com.google.i18n.phonenumbers.PhoneNumberUtil
 import io.micronaut.context.annotation.Factory
 import io.micronaut.validation.validator.constraints.ConstraintValidator
 import jakarta.inject.Singleton
 import com.esop.service.UserService
+import com.esop.validators.*
+
 @Factory
 class CustomConstraintFactory {
+    val username = UserService()
     @Singleton
     fun phoneNumberValidator() : ConstraintValidator<PhoneNumberValidator, String> {
         val phoneUtil = PhoneNumberUtil.getInstance()
@@ -26,7 +26,6 @@ class CustomConstraintFactory {
     }
     @Singleton
     fun userNameValidator() : ConstraintValidator<UsernameValidator, String> {
-        val username = UserService()
         return ConstraintValidator { value, annotation, context ->
             username.checkIfUerExist(value)
         }
@@ -39,6 +38,19 @@ class CustomConstraintFactory {
         }
     }
 
+    @Singleton
+    fun emailAlreadyExists() : ConstraintValidator<EmailAlreadyExistsValidator, String> {
+        return ConstraintValidator { value, annotation, context ->
+            username.check_email(UserService.emailList, value)
+        }
+    }
+
+    @Singleton
+    fun phoneNumberAlreadyExists() : ConstraintValidator<PhoneNumberAlreadyExists, String> {
+        return ConstraintValidator { value, annotation, context ->
+            username.check_phonenumber(UserService.phoneNumberList, value)
+        }
+    }
     fun validate(email :String): Boolean {
         val p = Regex("^[a-z0-9-_]+[\"]")
         if(p.containsMatchIn(email)){

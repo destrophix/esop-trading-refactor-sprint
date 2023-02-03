@@ -1,8 +1,6 @@
 package com.esop.dto
 
-import com.esop.validators.EmailValidator
-import com.esop.validators.PhoneNumberValidator
-import com.esop.validators.UsernameValidator
+import com.esop.validators.*
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.micronaut.core.annotation.Introspected
@@ -32,11 +30,13 @@ class UserCreationDTO @JsonCreator constructor(
     @JsonProperty("phoneNumber")
     @field:NotBlank(message = "Phone Number can not be missing or empty.")
     @field:PhoneNumberValidator()
+    @field:PhoneNumberAlreadyExists()
     var phoneNumber: String? = null,
 
     @JsonProperty("email")
     @field:NotBlank(message = "Email can not be missing or empty.")
     @field:EmailValidator()
+    @field:EmailAlreadyExistsValidator()
     var email: String? = null,
 
     @JsonProperty("username")

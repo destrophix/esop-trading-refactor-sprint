@@ -29,14 +29,14 @@ class UserCreationDTO @JsonCreator constructor(
 
     @JsonProperty("phoneNumber")
     @field:NotBlank(message = "Phone Number can not be missing or empty.")
-    @field:PhoneNumberValidator()
-    @field:PhoneNumberAlreadyExists()
+    @field:PhoneNumberValidator
+    @field:PhoneNumberAlreadyExists
     var phoneNumber: String? = null,
 
     @JsonProperty("email")
     @field:NotBlank(message = "Email can not be missing or empty.")
-    @field:EmailValidator()
-    @field:EmailAlreadyExistsValidator()
+    @field:EmailValidator
+    @field:EmailAlreadyExistsValidator
     var email: String? = null,
 
     @JsonProperty("username")
@@ -44,6 +44,6 @@ class UserCreationDTO @JsonCreator constructor(
     @field:Size(max=20, message = "User Name should not exceed 20 characters")
     @field:Pattern(regexp = "($USERNAME_REGEX| *)", message =
     "User Name should only consist alphabets, numbers or underscore(s) and it must start with an alphabet.")
-    @field:UsernameValidator()
+    @field:UsernameValidator
     var username: String? = null
 )

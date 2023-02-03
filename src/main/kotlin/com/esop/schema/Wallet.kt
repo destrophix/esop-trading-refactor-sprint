@@ -27,7 +27,7 @@ class Wallet{
 
     fun moveMoneyFromFreeToLockedState(amountToBeLocked : Long) : String{
         if( this.freeMoney < amountToBeLocked){
-            return "Insufficient funds";
+            return "Insufficient funds"
         }
         this.freeMoney = this.freeMoney - amountToBeLocked
         this.lockedMoney = this.lockedMoney + amountToBeLocked
@@ -35,11 +35,11 @@ class Wallet{
     }
 
     fun getFreeMoney():Long{
-        return freeMoney;
+        return freeMoney
     }
 
     fun getLockedMoney():Long{
-        return lockedMoney;
+        return lockedMoney
     }
 
     fun removeMoneyFromLockedState( amountToBeRemoved: Long){

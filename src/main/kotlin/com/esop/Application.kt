@@ -1,6 +1,5 @@
 package com.esop
 
-import com.esop.schema.User
 import io.micronaut.runtime.Micronaut.run
 
 

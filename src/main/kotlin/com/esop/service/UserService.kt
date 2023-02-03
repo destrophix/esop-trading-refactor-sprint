@@ -17,7 +17,7 @@ class UserService {
 
         fun orderCheckBeforePlace(order: Order): MutableList<String> {
             val errorList = mutableListOf<String>()
-            val user = userList.get(order.userName)!!
+            val user = userList[order.userName]!!
             val wallet = user.userWallet
             val nonPerformanceInventory = user.userNonPerfInventory
 
@@ -53,19 +53,19 @@ class UserService {
         }
     }
 
-    fun checkIfUerExist(search_value: String): Boolean
+    fun checkIfUerExist(value: String): Boolean
     {
-        return !userList.contains(search_value)
+        return !userList.contains(value)
     }
 
-    fun check_phonenumber(usernumber_set: MutableSet<String>, search_value: String): Boolean
+    fun checkIfPhoneNumberExist(phoneNumberSet: MutableSet<String>, value: String): Boolean
     {
-        return !usernumber_set.contains(search_value)
+        return !phoneNumberSet.contains(value)
     }
 
-    fun check_email(useremail_set: MutableSet<String>, search_value: String): Boolean
+    fun checkIfEmailExist(emailSet: MutableSet<String>, value: String): Boolean
     {
-        return !useremail_set.contains(search_value)
+        return !emailSet.contains(value)
     }
 
 
@@ -78,7 +78,7 @@ class UserService {
             userData.email!!,
             userData.username!!
         )
-        userList.put(userData.username!!,user)
+        userList[userData.username!!] = user
         emailList.add(userData.email!!)
         phoneNumberList.add(userData.phoneNumber!!)
         return mapOf(
@@ -101,7 +101,7 @@ class UserService {
         if( errorList.size > 0 ){
             return mapOf("error" to errorList)
         }
-        val user = userList.get(userName)!!
+        val user = userList[userName]!!
 
         return mapOf(
             "firstName" to user.firstName,
@@ -141,7 +141,7 @@ class UserService {
             if( errorList.size > 0 ) {
                 return mapOf("error" to errorList)
             }
-            return mapOf("message" to userList.get(userName)!!.addToInventory(inventoryData))
+            return mapOf("message" to userList[userName]!!.addToInventory(inventoryData))
         }
 
     fun addingMoney(walletData: AddWalletDTO, userName: String): Map<String, Any>
@@ -156,6 +156,6 @@ class UserService {
             return mapOf("error" to errorList)
         }
 
-        return mapOf("message" to userList.get(userName)!!.addToWallet(walletData))
+        return mapOf("message" to userList[userName]!!.addToWallet(walletData))
     }
 }

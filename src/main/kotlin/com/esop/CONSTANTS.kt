@@ -17,11 +17,6 @@ val errors = mapOf(
     "INVALID_USERNAME" to "Invalid User Name: username can consist only of alphabets, numbers or hyphen(s) and should start with an alphabet."
 )
 
-val success_response = mapOf(
-    "USER_CREATED" to "User has been registered successfully."
-)
-
-
 
 const val MAX_WALLET_CAPACITY = 10_000_000L
 

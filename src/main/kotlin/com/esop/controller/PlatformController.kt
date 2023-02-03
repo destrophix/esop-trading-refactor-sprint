@@ -1,6 +1,6 @@
 package com.esop.controller
 
-import com.esop.schema.PlatformFee
+import com.esop.schema.PlatformFee.Companion.getPlatformFee
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.MediaType
 import io.micronaut.http.annotation.Controller
@@ -12,7 +12,7 @@ class PlatformController {
     fun platformFee(): HttpResponse<*>{
         return HttpResponse.ok(
             mapOf(
-                "Platform Fee" to PlatformFee.platFee
+                "platformFee" to getPlatformFee()
             ))
     }
 

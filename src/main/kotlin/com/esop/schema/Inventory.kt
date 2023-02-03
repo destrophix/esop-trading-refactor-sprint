@@ -5,7 +5,7 @@ import com.esop.constant.MAX_INVENTORY_CAPACITY
 import java.util.*
 
 class Inventory(
-    private var freeInventory: Long = 0L ,
+    private var freeInventory: Long = 0L,
     private var lockedInventory: Long = 0L,
     private var type: String
 ) {
@@ -37,15 +37,15 @@ class Inventory(
         return "SUCCESS"
     }
 
-    fun getFreeInventory():Long{
+    fun getFreeInventory(): Long {
         return freeInventory
     }
 
-    fun getLockedInventory():Long{
+    fun getLockedInventory(): Long {
         return lockedInventory
     }
 
-    fun removeESOPsFromLockedState( esopsToBeRemoved: Long){
+    fun removeESOPsFromLockedState(esopsToBeRemoved: Long) {
         this.lockedInventory = this.lockedInventory - esopsToBeRemoved
     }
 }

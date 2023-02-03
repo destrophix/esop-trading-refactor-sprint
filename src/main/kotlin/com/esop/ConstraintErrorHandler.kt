@@ -19,7 +19,7 @@ import javax.validation.ConstraintViolationException
 @Requirements(
     Requires(classes = [ConstraintViolationException::class, ExceptionHandler::class])
 )
-class ValidationExceptionHandler (private val errorResponseProcessor: ErrorResponseProcessor<Any>) :
+class ValidationExceptionHandler(private val errorResponseProcessor: ErrorResponseProcessor<Any>) :
     ConstraintExceptionHandler(errorResponseProcessor) {
 
     override fun handle(request: HttpRequest<*>, exception: ConstraintViolationException): HttpResponse<*> {

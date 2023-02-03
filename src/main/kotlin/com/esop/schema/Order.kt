@@ -5,8 +5,7 @@ class Order(
     var type: String,
     var price: Long,
     var userName: String
-)
-{
+) {
     var timeStamp = System.currentTimeMillis()
     var remainingQuantity: Long = 0
     var orderStatus: String = "PENDING" // COMPLETED, PARTIAL, PENDING

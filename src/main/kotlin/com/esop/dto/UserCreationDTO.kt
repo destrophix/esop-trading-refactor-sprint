@@ -17,13 +17,13 @@ const val ALPHABET_SEQUENCE_REGEX = "^\\s*[a-zA-Z]+[a-zA-Z\\s]*"
 class UserCreationDTO @JsonCreator constructor(
     @JsonProperty("firstName")
     @field:NotBlank(message = "First Name can not be missing or empty.")
-    @field:Size(max=30, message = "First Name should not exceed 30 characters.")
+    @field:Size(max = 30, message = "First Name should not exceed 30 characters.")
     @field:Pattern(regexp = "($ALPHABET_SEQUENCE_REGEX| *)", message = "First Name can only contain alphabets.")
     var firstName: String? = null,
 
     @JsonProperty("lastName")
     @field:NotBlank(message = "Last Name can not be missing or empty.")
-    @field:Size(max=30, message = "Last Name should not exceed 30 characters")
+    @field:Size(max = 30, message = "Last Name should not exceed 30 characters")
     @field:Pattern(regexp = "($ALPHABET_SEQUENCE_REGEX| *)", message = "Last Name can only contain alphabets")
     var lastName: String? = null,
 
@@ -41,9 +41,11 @@ class UserCreationDTO @JsonCreator constructor(
 
     @JsonProperty("username")
     @field:NotBlank(message = "User Name can not be missing or empty.")
-    @field:Size(max=20, message = "User Name should not exceed 20 characters")
-    @field:Pattern(regexp = "($USERNAME_REGEX| *)", message =
-    "User Name should only consist alphabets, numbers or underscore(s) and it must start with an alphabet.")
+    @field:Size(max = 20, message = "User Name should not exceed 20 characters")
+    @field:Pattern(
+        regexp = "($USERNAME_REGEX| *)", message =
+        "User Name should only consist alphabets, numbers or underscore(s) and it must start with an alphabet."
+    )
     @field:UsernameValidator
     var username: String? = null
 )

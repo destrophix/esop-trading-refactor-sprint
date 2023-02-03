@@ -13,7 +13,7 @@ import javax.annotation.PostConstruct
 class Configuration {
     private fun checkMaxWalletLimitIsValid() {
         if (maxWalletLimit <= BigInteger.ZERO)
-            throw InvalidConfigurationException( "Max Wallet Limit should be greater than zero")
+            throw InvalidConfigurationException("Max Wallet Limit should be greater than zero")
     }
 
     private fun checkMaxInventoryLimitIsValid() {
@@ -23,7 +23,7 @@ class Configuration {
 
     private fun checkPlatformFeeIsValid() {
         if (platformFeePercentage < 0.0 || platformFeePercentage > 100.0)
-            throw InvalidConfigurationException("Platform Fee Percentage should be in between 0 and 100 both inclusive" )
+            throw InvalidConfigurationException("Platform Fee Percentage should be in between 0 and 100 both inclusive")
     }
 
     fun getMaxWalletLimit() = maxWalletLimit

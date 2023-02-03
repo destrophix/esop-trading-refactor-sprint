@@ -15,7 +15,7 @@ import jakarta.inject.Singleton
 @Requirements(
     Requires(classes = [HttpException::class, ExceptionHandler::class])
 )
-class HttpExceptionHandler () :
+class HttpExceptionHandler :
     ExceptionHandler<HttpException, HttpResponse<*>> {
 
     override fun handle(request: HttpRequest<*>, exception: HttpException): HttpResponse<*> {

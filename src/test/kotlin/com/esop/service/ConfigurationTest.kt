@@ -67,7 +67,7 @@ class ConfigurationTest {
 
     @ParameterizedTest
     @MethodSource("validMaxWalletValues")
-    fun `It should read the maximum wallet limit from application environment without throwing exception`(maxWalletLimit: BigInteger){
+    fun `It should read the maximum wallet limit from application environment without throwing exception`(maxWalletLimit: BigInteger) {
         val properties = mapOf("app.max-wallet-limit" to maxWalletLimit)
 
         val ctx = ApplicationContext.run(properties)
@@ -79,7 +79,9 @@ class ConfigurationTest {
 
     @ParameterizedTest
     @MethodSource("invalidMaxWalletValues")
-    fun `It should throw Exception when the given maximum wallet limit configuration is not a positive Integer`(maxWalletLimit: BigInteger) {
+    fun `It should throw Exception when the given maximum wallet limit configuration is not a positive Integer`(
+        maxWalletLimit: BigInteger
+    ) {
         val properties = mapOf("app.max-wallet-limit" to maxWalletLimit)
 
         Assertions.assertThrows(BeanInstantiationException::class.java) {
@@ -90,7 +92,9 @@ class ConfigurationTest {
 
     @ParameterizedTest
     @MethodSource("validMaxInventoryValues")
-    fun `It should read the maximum inventory limit from application environment without throwing exception`(maxInventoryLimit: BigInteger){
+    fun `It should read the maximum inventory limit from application environment without throwing exception`(
+        maxInventoryLimit: BigInteger
+    ) {
         val properties = mapOf("app.max-inventory-limit" to maxInventoryLimit)
 
         val ctx = ApplicationContext.run(properties)
@@ -102,7 +106,9 @@ class ConfigurationTest {
 
     @ParameterizedTest
     @MethodSource("inValidMaxInventoryValues")
-    fun `It should throw Exception when the given maximum inventory limit configuration is not a positive Integer`(maxInventoryLimit: BigInteger) {
+    fun `It should throw Exception when the given maximum inventory limit configuration is not a positive Integer`(
+        maxInventoryLimit: BigInteger
+    ) {
         val properties = mapOf("app.max-inventory-limit" to maxInventoryLimit)
 
         Assertions.assertThrows(BeanInstantiationException::class.java) {
@@ -112,7 +118,9 @@ class ConfigurationTest {
 
     @ParameterizedTest
     @MethodSource("validPlatformFeePercentageValues")
-    fun `It should read the platform fee percentage from application environment without throwing exception`(platformFeePercentage: Double){
+    fun `It should read the platform fee percentage from application environment without throwing exception`(
+        platformFeePercentage: Double
+    ) {
         val properties = mapOf("app.platform-fee-percentage" to platformFeePercentage)
 
         val ctx = ApplicationContext.run(properties)
@@ -124,7 +132,9 @@ class ConfigurationTest {
 
     @ParameterizedTest
     @MethodSource("invalidPlatformFeePercentageValues")
-    fun `It should throw Exception when the given platform fee percentage configuration is not between 0 and 1 both inclusive`(platformFeePercentage: Double) {
+    fun `It should throw Exception when the given platform fee percentage configuration is not between 0 and 1 both inclusive`(
+        platformFeePercentage: Double
+    ) {
         val properties = mapOf("app.platform-fee-percentage" to platformFeePercentage)
 
         Assertions.assertThrows(BeanInstantiationException::class.java) {

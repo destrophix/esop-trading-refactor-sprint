@@ -13,7 +13,11 @@ import javax.validation.constraints.NotNull
 class AddWalletDTO @JsonCreator constructor(
     @JsonProperty("amount")
     @field:NotNull(message = "Amount can not be missing.")
-    @field:Digits(integer = 9, fraction = 0, message = "amount can't exceed maximum wallet capacity of $MAX_WALLET_CAPACITY" )
+    @field:Digits(
+        integer = 9,
+        fraction = 0,
+        message = "amount can't exceed maximum wallet capacity of $MAX_WALLET_CAPACITY"
+    )
     @field:Min(1, message = "Amount can not be less than zero")
     var price: Long? = null,
 )

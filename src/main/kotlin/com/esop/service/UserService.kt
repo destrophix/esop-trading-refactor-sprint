@@ -129,7 +129,7 @@ class UserService {
                 .uppercase() != "PERFORMANCE"
         ) {
             errorList.add(errors["INVALID_TYPE"].toString())
-        } else if (!checkIfUerExist(userName)) {
+        } else if (checkIfUerExist(userName)) {
             errorList.add(errors["USER_DOES_NOT_EXISTS"].toString())
         }
 
@@ -142,7 +142,7 @@ class UserService {
     fun addingMoney(walletData: AddWalletDTO, userName: String): Map<String, Any> {
         val errorList = mutableListOf<String>()
 
-        if (!checkIfUerExist(userName)) {
+        if (checkIfUerExist(userName)) {
             errorList.add(errors["USER_DOES_NOT_EXISTS"].toString())
         }
 

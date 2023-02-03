@@ -16,7 +16,7 @@ class CustomConstraintFactory {
     fun phoneNumberValidator(): ConstraintValidator<PhoneNumberValidator, String> {
         val phoneUtil = PhoneNumberUtil.getInstance()
 
-        return ConstraintValidator { value, annotation, context ->
+        return ConstraintValidator { value, _, context ->
             value == null || try {
                 phoneUtil.isValidNumber(phoneUtil.parse(value, null))
             } catch (e: NumberParseException) {
@@ -28,29 +28,29 @@ class CustomConstraintFactory {
 
     @Singleton
     fun userNameValidator(): ConstraintValidator<UsernameValidator, String> {
-        return ConstraintValidator { value, annotation, context ->
-            username.checkIfUerExist(value)
+        return ConstraintValidator { value, _, _ ->
+            value == null || username.checkIfUerExist(value)
         }
     }
 
     @Singleton
     fun emailValidator(): ConstraintValidator<EmailValidator, String> {
-        return ConstraintValidator { value, annotation, context ->
+        return ConstraintValidator { value, _, _ ->
             value == null || validate(value)
         }
     }
 
     @Singleton
     fun emailAlreadyExists(): ConstraintValidator<EmailAlreadyExistsValidator, String> {
-        return ConstraintValidator { value, annotation, context ->
-            username.checkIfEmailExist(UserService.emailList, value)
+        return ConstraintValidator { value, _, _ ->
+            value == null || username.checkIfEmailExist(UserService.emailList, value)
         }
     }
 
     @Singleton
     fun phoneNumberAlreadyExists(): ConstraintValidator<PhoneNumberAlreadyExists, String> {
-        return ConstraintValidator { value, annotation, context ->
-            username.checkIfPhoneNumberExist(UserService.phoneNumberList, value)
+        return ConstraintValidator { value, _, _ ->
+            value == null || username.checkIfPhoneNumberExist(UserService.phoneNumberList, value)
         }
     }
 

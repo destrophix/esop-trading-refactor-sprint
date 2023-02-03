@@ -20,18 +20,11 @@ import io.micronaut.web.router.exceptions.UnsatisfiedBodyRouteException
 import jakarta.inject.Inject
 import javax.validation.ConstraintViolationException
 import javax.validation.Valid
-import javax.validation.Validator
 
 
 @Validated
 @Controller("/user")
 class UserController {
-
-    @Inject
-    lateinit var validator: Validator
-
-    @Inject
-    lateinit var orderService: OrderService
 
     @Inject
     lateinit var userService: UserService
@@ -53,12 +46,12 @@ class UserController {
         request: HttpRequest<*>,
         ex: UnsatisfiedBodyRouteException
     ): HttpResponse<Map<String, List<*>>> {
-        return HttpResponse.badRequest(mapOf("errors" to arrayListOf("request body missing")))
+        return HttpResponse.badRequest(mapOf("errors" to arrayListOf("Request body missing")))
     }
 
     @Error(status = HttpStatus.NOT_FOUND, global = true)
     fun onRouteNotFound(): HttpResponse<Map<String, List<*>>> {
-        return HttpResponse.badRequest(mapOf("errors" to arrayListOf("route not found")))
+        return HttpResponse.notFound(mapOf("errors" to arrayListOf("Route not found")))
     }
 
     @Error(exception = ConversionErrorException::class)

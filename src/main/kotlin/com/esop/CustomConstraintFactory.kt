@@ -28,7 +28,7 @@ class CustomConstraintFactory {
     fun userNameValidator() : ConstraintValidator<UsernameValidator, String> {
         val username = UserService()
         return ConstraintValidator { value, annotation, context ->
-            username.check_username(value)
+            username.checkIfUerExist(value)
         }
     }
 

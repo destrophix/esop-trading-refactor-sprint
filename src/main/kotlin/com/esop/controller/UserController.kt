@@ -29,6 +29,8 @@ class UserController {
     @Inject
     lateinit var userService: UserService
 
+    @Inject
+    lateinit var orderService: OrderService
 
     @Error(exception = HttpException::class)
     fun onHttpException(exception: HttpException): HttpResponse<*> {
@@ -104,7 +106,7 @@ class UserController {
         if (errorList.size > 0) {
             return HttpResponse.badRequest(mapOf("errors" to errorList))
         }
-        val userOrderOrErrors = OrderService.placeOrder(order)
+        val userOrderOrErrors = orderService.placeOrder(order)
 
         if (userOrderOrErrors["orderId"] != null) {
             return HttpResponse.ok(
@@ -159,7 +161,7 @@ class UserController {
 
     @Get(uri = "/{userName}/orderHistory", produces = [MediaType.APPLICATION_JSON])
     fun orderHistory(userName: String): HttpResponse<*> {
-        val orderHistoryData = OrderService.orderHistory(userName)
+        val orderHistoryData = orderService.orderHistory(userName)
         if (orderHistoryData is Map<*, *>) {
             return HttpResponse.badRequest(orderHistoryData)
         }

@@ -82,4 +82,36 @@ class UserRecordsTest {
         val response = userRecords.checkIfEmailExists(emailId)
         assertTrue(response)
     }
+
+    @Test
+    fun `check if phone number exists`(){
+        val phoneNumber = "+911231231231"
+        val userRecords = UserRecords()
+        userRecords.addPhoneNumber(phoneNumber)
+
+        val response = userRecords.checkIfPhoneNumberExists(phoneNumber)
+
+        assertTrue(response)
+    }
+
+    @Test
+    fun `check if phone number does not exists`(){
+        val phoneNumber = "+911231231231"
+        val userRecords = UserRecords()
+
+        val response = userRecords.checkIfPhoneNumberExists(phoneNumber)
+
+        assertFalse(response)
+    }
+
+    @Test
+    fun `add phone number`(){
+        val phoneNumber = "+911231231231"
+        val userRecords = UserRecords()
+
+        userRecords.addPhoneNumber(phoneNumber)
+
+        val response = userRecords.checkIfPhoneNumberExists(phoneNumber)
+        assertTrue(response)
+    }
 }

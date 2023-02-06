@@ -5,7 +5,6 @@ import com.esop.schema.Order
 import com.esop.schema.User
 import com.esop.service.OrderService.Companion.buyOrders
 import com.esop.service.OrderService.Companion.sellOrders
-import com.esop.service.UserService.Companion.userList
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -14,11 +13,14 @@ import org.junit.jupiter.api.Test
 
 class OrderServiceTest {
 
-    private val userRecords:UserRecords = UserRecords()
-    private val orderService:OrderService = OrderService(userRecords)
-    
+    private lateinit var userRecords:UserRecords
+    private lateinit var orderService:OrderService
+
     @BeforeEach
     fun `It should create user`() {
+        userRecords = UserRecords()
+        orderService = OrderService(userRecords)
+
         val buyer1 = User("Sankaranarayanan", "M", "7550276216", "sankaranarayananm@sahaj.ai", "sankar")
         val buyer2 = User("Aditya", "Tiwari", "", "aditya@sahaj.ai", "aditya")
         val seller1 = User("Kajal", "Pawar", "", "kajal@sahaj.ai", "kajal")
@@ -34,7 +36,6 @@ class OrderServiceTest {
     fun `It should clear the in memory data`() {
         buyOrders.clear()
         sellOrders.clear()
-        userList.clear()
     }
 
     @Test

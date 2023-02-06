@@ -2,6 +2,7 @@ package com.esop.service
 
 
 import com.esop.constant.errors
+import com.esop.repository.UserRecords
 import com.esop.schema.History
 import com.esop.schema.Order
 import com.esop.schema.OrderFilledLog
@@ -10,12 +11,13 @@ import jakarta.inject.Singleton
 import kotlin.math.round
 
 @Singleton
-class OrderService {
+class OrderService(private val userRecords: UserRecords){
     companion object {
         private var orderId = 1L
 
         var buyOrders = mutableListOf<Order>()
         var sellOrders = mutableListOf<Order>()
+    }
 
         @Synchronized
         fun generateOrderId(): Long {
@@ -31,7 +33,7 @@ class OrderService {
         ) {
             // Deduct money of quantity taken from buyer
             val amountToBeDeductedFromLockedState = sellerOrder.price * (prevQuantity - remainingQuantity)
-            UserService.userList[userName]!!.userWallet.removeMoneyFromLockedState(amountToBeDeductedFromLockedState)
+            userRecords.getUser(userName)!!.userWallet.removeMoneyFromLockedState(amountToBeDeductedFromLockedState)
 
             // Add money of quantity taken from seller
             var amountToBeAddedToSellersAccount = amountToBeDeductedFromLockedState
@@ -40,27 +42,27 @@ class OrderService {
                 addPlatformFee(round(amountToBeDeductedFromLockedState * 0.02).toLong())
 
             }
-            UserService.userList[sellerOrder.userName]!!.userWallet.addMoneyToWallet(amountToBeAddedToSellersAccount)
+            userRecords.getUser(sellerOrder.userName)!!.userWallet.addMoneyToWallet(amountToBeAddedToSellersAccount)
 
             // Deduct inventory of stock from sellers inventory based on its type
             if (sellerOrder.esopType == "PERFORMANCE") {
-                UserService.userList[sellerOrder.userName]!!.userPerformanceInventory.removeESOPsFromLockedState(
+                userRecords.getUser(sellerOrder.userName)!!.userPerformanceInventory.removeESOPsFromLockedState(
                     prevQuantity - remainingQuantity
                 )
             }
 
             if (sellerOrder.esopType == "NON_PERFORMANCE") {
-                UserService.userList[sellerOrder.userName]!!.userNonPerfInventory.removeESOPsFromLockedState(
+                userRecords.getUser(sellerOrder.userName)!!.userNonPerfInventory.removeESOPsFromLockedState(
                     prevQuantity - remainingQuantity
                 )
             }
 
             // Add purchased inventory to buyer
-            UserService.userList[userName]!!.userNonPerfInventory.addESOPsToInventory(prevQuantity - remainingQuantity)
+            userRecords.getUser(userName)!!.userNonPerfInventory.addESOPsToInventory(prevQuantity - remainingQuantity)
 
             // Add buyers money back to free from locked
-            UserService.userList[userName]!!.userWallet.addMoneyToWallet((buyerOrder.price - sellerOrder.price) * (prevQuantity - remainingQuantity))
-            UserService.userList[userName]!!.userWallet.removeMoneyFromLockedState((buyerOrder.price - sellerOrder.price) * (prevQuantity - remainingQuantity))
+            userRecords.getUser(userName)!!.userWallet.addMoneyToWallet((buyerOrder.price - sellerOrder.price) * (prevQuantity - remainingQuantity))
+            userRecords.getUser(userName)!!.userWallet.removeMoneyFromLockedState((buyerOrder.price - sellerOrder.price) * (prevQuantity - remainingQuantity))
         }
 
         private fun updateOrderDetailsForSell(
@@ -73,18 +75,18 @@ class OrderService {
 
             // Deduct inventory of stock from sellers inventory based on its type
             if (sellerOrder.esopType == "PERFORMANCE") {
-                UserService.userList[userName]!!.userPerformanceInventory.removeESOPsFromLockedState(prevQuantity - remainingQuantity)
+                userRecords.getUser(userName)!!.userPerformanceInventory.removeESOPsFromLockedState(prevQuantity - remainingQuantity)
             }
 
             if (sellerOrder.esopType == "NON_PERFORMANCE") {
-                UserService.userList[userName]!!.userNonPerfInventory.removeESOPsFromLockedState(prevQuantity - remainingQuantity)
+                userRecords.getUser(userName)!!.userNonPerfInventory.removeESOPsFromLockedState(prevQuantity - remainingQuantity)
             }
 
             // Add inventory to buyers stock
-            UserService.userList[buyerOrder.userName]!!.userNonPerfInventory.addESOPsToInventory(prevQuantity - remainingQuantity)
+            userRecords.getUser(buyerOrder.userName)!!.userNonPerfInventory.addESOPsToInventory(prevQuantity - remainingQuantity)
 
             // Deduct money from buyers wallet
-            UserService.userList[buyerOrder.userName]!!.userWallet.removeMoneyFromLockedState((sellerOrder.price * (prevQuantity - remainingQuantity)))
+            userRecords.getUser(buyerOrder.userName)!!.userWallet.removeMoneyFromLockedState((sellerOrder.price * (prevQuantity - remainingQuantity)))
 
             // Add money to sellers wallet
             var totOrderPrice = sellerOrder.price * (prevQuantity - remainingQuantity)
@@ -92,11 +94,11 @@ class OrderService {
                 totOrderPrice -= round(totOrderPrice * 0.02).toLong()
                 addPlatformFee(round(totOrderPrice * 0.02).toLong())
             }
-            UserService.userList[userName]!!.userWallet.addMoneyToWallet(totOrderPrice)
+            userRecords.getUser(userName)!!.userWallet.addMoneyToWallet(totOrderPrice)
 
             // Add buyers luck back to free from locked
-            UserService.userList[buyerOrder.userName]!!.userWallet.addMoneyToWallet((buyerOrder.price - sellerOrder.price) * (prevQuantity - remainingQuantity))
-            UserService.userList[buyerOrder.userName]!!.userWallet.removeMoneyFromLockedState((buyerOrder.price - sellerOrder.price) * (prevQuantity - remainingQuantity))
+            userRecords.getUser(buyerOrder.userName)!!.userWallet.addMoneyToWallet((buyerOrder.price - sellerOrder.price) * (prevQuantity - remainingQuantity))
+            userRecords.getUser(buyerOrder.userName)!!.userWallet.removeMoneyFromLockedState((buyerOrder.price - sellerOrder.price) * (prevQuantity - remainingQuantity))
 
         }
 
@@ -351,18 +353,18 @@ class OrderService {
                 }
             }
 
-            UserService.userList[order.userName]?.orderList?.add(order)
+            userRecords.getUser(order.userName)?.orderList?.add(order)
 
             return mapOf("orderId" to order.orderID)
         }
 
         fun orderHistory(userName: String): Any {
             val userErrors = ArrayList<String>()
-            if (!UserService.userList.contains(userName)) {
+            if (userRecords.checkIfUserExists(userName)) {
                 errors["USER_DOES_NOT_EXISTS"]?.let { userErrors.add(it) }
                 return mapOf("error" to userErrors)
             }
-            val orderDetails = UserService.userList[userName]!!.orderList
+            val orderDetails = userRecords.getUser(userName)!!.orderList
             val orderHistory = ArrayList<History>()
 
             for (orders in orderDetails) {
@@ -380,6 +382,6 @@ class OrderService {
 
             return orderHistory
         }
-    }
+    
 }
 

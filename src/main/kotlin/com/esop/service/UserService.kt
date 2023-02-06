@@ -12,12 +12,6 @@ import jakarta.inject.Singleton
 @Singleton
 class UserService(private val userRecords: UserRecords) {
 
-    companion object {
-        val emailList = mutableSetOf<String>()
-        val phoneNumberList = mutableSetOf<String>()
-        var userList = HashMap<String, User>()
-    }
-
     fun orderCheckBeforePlace(order: Order): MutableList<String> {
         val errorList = mutableListOf<String>()
         val user = userRecords.getUser(order.userName)!!
@@ -52,14 +46,6 @@ class UserService(private val userRecords: UserRecords) {
             }
         }
         return errorList
-    }
-
-    fun checkIfPhoneNumberExist(phoneNumberSet: MutableSet<String>, value: String): Boolean {
-        return !phoneNumberSet.contains(value)
-    }
-
-    fun checkIfEmailExist(emailSet: MutableSet<String>, value: String): Boolean {
-        return !emailSet.contains(value)
     }
 
 

@@ -44,7 +44,7 @@ class CustomConstraintFactory(private val userRecords: UserRecords) {
     @Singleton
     fun emailAlreadyExists(): ConstraintValidator<EmailAlreadyExistsValidator, String> {
         return ConstraintValidator { value, _, _ ->
-            value == null || username.checkIfEmailExist(UserService.emailList, value)
+            value == null || userRecords.checkIfEmailExists(value)
         }
     }
 

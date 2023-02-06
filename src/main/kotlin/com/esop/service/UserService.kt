@@ -72,7 +72,7 @@ class UserService(private val userRecords: UserRecords) {
             userData.username!!
         )
         userRecords.addUser(user)
-        emailList.add(userData.email!!)
+        userRecords.addEmail(user.email)
         phoneNumberList.add(userData.phoneNumber!!)
         return mapOf(
             "firstName" to user.firstName,

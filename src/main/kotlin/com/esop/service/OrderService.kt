@@ -360,7 +360,7 @@ class OrderService(private val userRecords: UserRecords){
 
         fun orderHistory(userName: String): Any {
             val userErrors = ArrayList<String>()
-            if (userRecords.checkIfUserExists(userName)) {
+            if (!userRecords.checkIfUserExists(userName)) {
                 errors["USER_DOES_NOT_EXISTS"]?.let { userErrors.add(it) }
                 return mapOf("error" to userErrors)
             }

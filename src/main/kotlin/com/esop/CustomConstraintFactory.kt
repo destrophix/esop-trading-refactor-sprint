@@ -51,7 +51,7 @@ class CustomConstraintFactory(private val userRecords: UserRecords) {
     @Singleton
     fun phoneNumberAlreadyExists(): ConstraintValidator<PhoneNumberAlreadyExists, String> {
         return ConstraintValidator { value, _, _ ->
-            value == null || username.checkIfPhoneNumberExist(UserService.phoneNumberList, value)
+            value == null || !userRecords.checkIfPhoneNumberExists(value)
         }
     }
 

@@ -50,4 +50,36 @@ class UserRecordsTest {
 
         assertFalse(response)
     }
+
+    @Test
+    fun `check if email exists`() {
+        val emailId = "myemail@abc.in"
+        val userRecords = UserRecords()
+        userRecords.addEmail(emailId)
+
+        val response = userRecords.checkIfEmailExists(emailId)
+
+        assertTrue(response)
+    }
+
+    @Test
+    fun `check if email does not exists`() {
+        val emailId = "myemail@abc.in"
+        val userRecords = UserRecords()
+
+        val response = userRecords.checkIfEmailExists(emailId)
+
+        assertFalse(response)
+    }
+
+    @Test
+    fun `add email`() {
+        val emailId = "myemail@abc.in"
+        val userRecords = UserRecords()
+
+        userRecords.addEmail(emailId)
+
+        val response = userRecords.checkIfEmailExists(emailId)
+        assertTrue(response)
+    }
 }

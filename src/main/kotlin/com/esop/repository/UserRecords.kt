@@ -6,6 +6,7 @@ import jakarta.inject.Singleton
 @Singleton
 class UserRecords {
     private val users = mutableMapOf<String, User>()
+    private val emails = mutableListOf<String>()
 
     fun addUser(user: User) {
         users[user.username] = user
@@ -15,7 +16,15 @@ class UserRecords {
         return users[userName]
     }
 
-    fun checkIfUserExists(userName: String): Boolean{
+    fun checkIfUserExists(userName: String): Boolean {
         return users.containsKey(userName)
+    }
+
+    fun addEmail(emailId: String) {
+        emails.add(emailId)
+    }
+
+    fun checkIfEmailExists(emailId: String): Boolean {
+        return emails.contains(emailId)
     }
 }

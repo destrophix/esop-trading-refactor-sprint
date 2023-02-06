@@ -1,7 +1,9 @@
 package com.esop.repository
 
 import com.esop.schema.User
+import jakarta.inject.Singleton
 
+@Singleton
 class UserRecords {
     private val users = mutableMapOf<String, User>()
 
@@ -11,6 +13,9 @@ class UserRecords {
 
     fun getUser(userName: String): User? {
         return users[userName]
+    }
 
+    fun checkIfUserExists(userName: String): Boolean{
+        return users.containsKey(userName)
     }
 }

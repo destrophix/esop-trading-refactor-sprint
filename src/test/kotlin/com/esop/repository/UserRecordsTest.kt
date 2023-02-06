@@ -1,6 +1,5 @@
 package com.esop.repository
 
-import com.esop.repository.UserRecords
 import com.esop.schema.User
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test

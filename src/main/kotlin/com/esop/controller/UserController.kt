@@ -100,7 +100,7 @@ class UserController {
             if (esopType == "PERFORMANCE")
                 order.inventoryPriority = 1
         }
-        errorList = UserService.orderCheckBeforePlace(order)
+        errorList = userService.orderCheckBeforePlace(order)
         if (errorList.size > 0) {
             return HttpResponse.badRequest(mapOf("errors" to errorList))
         }

@@ -1,5 +1,6 @@
 package com.esop
 
+import com.esop.repository.UserRecords
 import com.esop.service.UserService
 import com.esop.validators.*
 import com.google.i18n.phonenumbers.NumberParseException
@@ -9,8 +10,8 @@ import io.micronaut.validation.validator.constraints.ConstraintValidator
 import jakarta.inject.Singleton
 
 @Factory
-class CustomConstraintFactory {
-    val username = UserService()
+class CustomConstraintFactory(private val userRecords: UserRecords) {
+    val username = UserService(userRecords)
 
     @Singleton
     fun phoneNumberValidator(): ConstraintValidator<PhoneNumberValidator, String> {
@@ -29,7 +30,7 @@ class CustomConstraintFactory {
     @Singleton
     fun userNameValidator(): ConstraintValidator<UsernameValidator, String> {
         return ConstraintValidator { value, _, _ ->
-            value == null || username.checkIfUerExist(value)
+            value == null || !userRecords.checkIfUserExists(value)
         }
     }
 

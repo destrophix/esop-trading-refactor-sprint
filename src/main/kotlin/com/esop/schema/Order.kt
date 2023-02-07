@@ -1,10 +1,10 @@
 package com.esop.schema
 
 class Order(
-    var quantity: Long,
-    var type: String,
-    var price: Long,
-    var userName: String
+    private var quantity: Long,
+    private var type: String,
+    private var price: Long,
+    private var userName: String
 ) {
     var timeStamp = System.currentTimeMillis()
     var remainingQuantity: Long = 0
@@ -14,4 +14,19 @@ class Order(
     var esopType = "NON_PERFORMANCE"
     var inventoryPriority = 2
 
+    fun getQuantity(): Long {
+        return quantity
+    }
+
+    fun getPrice(): Long {
+        return price
+    }
+
+    fun getType(): String {
+        return type
+    }
+
+    fun getUserName(): String {
+        return userName
+    }
 }

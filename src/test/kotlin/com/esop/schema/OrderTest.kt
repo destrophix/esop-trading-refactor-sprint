@@ -11,27 +11,7 @@ class OrderTest{
 
         buy.subtractFromRemainingQuantity(5L)
 
-        assertEquals(expectedRemainingQuantity,buy.remainingQuantity)
-    }
-
-    @Test
-    fun `it should set the status as completed`(){
-        val buy = Order(10,"BUY",10,"sankar")
-        buy.remainingQuantity = 0
-
-        buy.updateStatus()
-
-        assertEquals("COMPLETED",buy.orderStatus)
-    }
-
-    @Test
-    fun `it should set the status as partial`(){
-        val buy = Order(10,"BUY",10,"sankar")
-        buy.remainingQuantity = 5
-
-        buy.updateStatus()
-
-        assertEquals("PARTIAL",buy.orderStatus)
+        assertEquals(expectedRemainingQuantity,buy.getRemainingQuantity())
     }
 
     @Test
@@ -47,6 +27,6 @@ class OrderTest{
 
         buyOrder.addOrderFilledLogs(buyOrderLog)
 
-        assertEquals(1,buyOrder.orderFilledLogs.size)
+        assertEquals(1,buyOrder.getOrderFilledLogs().size)
     }
 }

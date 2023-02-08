@@ -36,12 +36,12 @@ class UserService(private val userRecords: UserRecords) {
         } else if (order.getType() == "SELL") {
             wallet.assertWalletWillNotOverflowOnAdding(order.getPrice() * order.getQuantity())
 
-            if (order.esopType == "PERFORMANCE") {
+            if (order.getESOPType() == "PERFORMANCE") {
                 val response = user.lockPerformanceInventory(order.getQuantity())
                 if (response != "SUCCESS") {
                     errorList.add(response)
                 }
-            } else if (order.esopType == "NON_PERFORMANCE") {
+            } else if (order.getESOPType() == "NON_PERFORMANCE") {
                 val response = user.lockNonPerformanceInventory(order.getQuantity())
                 if (response != "SUCCESS") {
                     errorList.add(response)

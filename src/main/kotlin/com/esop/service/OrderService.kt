@@ -30,13 +30,13 @@ class OrderService(private val userRecords: UserRecords) {
         var platformFee = 0L
 
 
-        if (sellerOrder.esopType == "NON_PERFORMANCE")
+        if (sellerOrder.getESOPType() == "NON_PERFORMANCE")
             platformFee = round(sellAmount * TWO_PERCENT).toLong()
 
         updateWalletBalances(sellAmount, platformFee, buyer, seller)
 
 
-        seller.transferLockedESOPsTo(buyer, EsopTransferRequest(sellerOrder.esopType, currentTradeQuantity))
+        seller.transferLockedESOPsTo(buyer, EsopTransferRequest(sellerOrder.getESOPType(), currentTradeQuantity))
 
         val amountToBeReleased = (buyerOrder.getPrice() - sellerOrder.getPrice()) * (currentTradeQuantity)
         buyer.userWallet.moveMoneyFromLockedToFree(amountToBeReleased)
@@ -94,17 +94,14 @@ class OrderService(private val userRecords: UserRecords) {
     }
 
     private fun sellAndBuyOrderMatch(sellOrder: Order, buyOrder: Order): Boolean =
-        sellOrder.getPrice() <= buyOrder.getPrice() && sellOrder.remainingQuantity > 0 && buyOrder.remainingQuantity > 0
+        sellOrder.getPrice() <= buyOrder.getPrice() && sellOrder.getRemainingQuantity() > 0 && buyOrder.getRemainingQuantity() > 0
 
     private fun performOrderMatching(sellOrder: Order, buyOrder: Order) {
         val orderExecutionPrice = sellOrder.getPrice()
-        val orderExecutionQuantity = min(sellOrder.remainingQuantity, buyOrder.remainingQuantity)
+        val orderExecutionQuantity = min(sellOrder.getRemainingQuantity(), buyOrder.getRemainingQuantity())
 
         buyOrder.subtractFromRemainingQuantity(orderExecutionQuantity)
         sellOrder.subtractFromRemainingQuantity(orderExecutionQuantity)
-
-        buyOrder.updateStatus()
-        sellOrder.updateStatus()
 
         createOrderFilledLogs(orderExecutionQuantity, orderExecutionPrice, sellOrder, buyOrder)
 
@@ -114,10 +111,10 @@ class OrderService(private val userRecords: UserRecords) {
             buyOrder
         )
 
-        if (buyOrder.orderStatus == "COMPLETED") {
+        if (buyOrder.isCompleted()) {
             buyOrders.remove(buyOrder)
         }
-        if (sellOrder.orderStatus == "COMPLETED") {
+        if (sellOrder.isCompleted()) {
             sellOrders.remove(sellOrder)
         }
     }
@@ -138,7 +135,7 @@ class OrderService(private val userRecords: UserRecords) {
         val sellOrderLog = OrderFilledLog(
             orderExecutionQuantity,
             orderExecutionPrice,
-            sellOrder.esopType,
+            sellOrder.getESOPType(),
             null,
             buyOrder.getUserName()
         )
@@ -163,8 +160,8 @@ class OrderService(private val userRecords: UserRecords) {
                     orders.getQuantity(),
                     orders.getType(),
                     orders.getPrice(),
-                    orders.orderStatus,
-                    orders.orderFilledLogs
+                    orders.getESOPType(),
+                    orders.getOrderFilledLogs()
                 )
             )
         }

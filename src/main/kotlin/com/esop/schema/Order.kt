@@ -14,15 +14,14 @@ class Order(
     private var quantity: Long,
     private var type: String,
     private var price: Long,
-    private var userName: String
+    private var userName: String,
+    private var esopType: String = "NON_PERFORMANCE",
 ) : Comparable<Order> {
-    var timeStamp = System.currentTimeMillis()
-    var orderStatus: String = "PENDING" // COMPLETED, PARTIAL, PENDING
-    var orderFilledLogs: MutableList<OrderFilledLog> = mutableListOf()
+    private val timeStamp = System.currentTimeMillis()
+    private var orderFilledLogs: MutableList<OrderFilledLog> = mutableListOf()
     private var orderID: Long = -1
-    var esopType = "NON_PERFORMANCE"
-    var inventoryPriority = NONE
-    var remainingQuantity = quantity
+    private var inventoryPriority = NONE
+    private var remainingQuantity = quantity
 
     companion object {
         fun from(orderDetails: CreateOrderDTO, userName: String): Order {
@@ -30,7 +29,8 @@ class Order(
                 quantity = orderDetails.quantity!!,
                 type = orderDetails.type!!,
                 price = orderDetails.price!!,
-                userName = userName
+                userName = userName,
+                esopType = orderDetails.esopType!!
             )
         }
     }
@@ -72,13 +72,6 @@ class Order(
         remainingQuantity -= quantityToBeUpdated
     }
 
-    fun updateStatus() {
-        if (remainingQuantity == 0L) {
-            orderStatus = "COMPLETED"
-        } else if (remainingQuantity != quantity) {
-            orderStatus = "PARTIAL"
-        }
-    }
 
     fun addOrderFilledLogs(orderFilledLog: OrderFilledLog) {
         orderFilledLogs.add(orderFilledLog)
@@ -107,5 +100,29 @@ class Order(
         if (getPrice() < other.getPrice())
             return -1
         return 1
+    }
+
+    fun isCompleted(): Boolean {
+        return getOrderStatus() == "COMPLETED"
+    }
+
+    fun getRemainingQuantity(): Long {
+        return remainingQuantity
+    }
+
+    fun getESOPType(): String {
+        return esopType
+    }
+
+    fun getOrderFilledLogs(): MutableList<OrderFilledLog> {
+        return orderFilledLogs
+    }
+
+    fun getOrderStatus(): String {
+        return when (remainingQuantity) {
+            0L -> "COMPLETED"
+            quantity -> "PENDING"
+            else -> "PARTIAL"
+        }
     }
 }

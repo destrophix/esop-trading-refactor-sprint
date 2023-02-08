@@ -76,7 +76,7 @@ class OrderService(private val userRecords: UserRecords) {
         val sortedSellOrders = sortAscending()
 
         for (sellOrder in sortedSellOrders) {
-            if ((buyOrder.getPrice() >= sellOrder.getPrice()) && (sellOrder.remainingQuantity > 0)) {
+            if (sellAndBuyOrderMatch(sellOrder, buyOrder)) {
                 performOrderMatching(sellOrder, buyOrder)
             }
         }
@@ -87,11 +87,14 @@ class OrderService(private val userRecords: UserRecords) {
         val sortedBuyOrders = buyOrders.sorted()
 
         for (buyOrder in sortedBuyOrders) {
-            if ((sellOrder.getPrice() <= buyOrder.getPrice()) && (buyOrder.remainingQuantity > 0)) {
+            if (sellAndBuyOrderMatch(sellOrder, buyOrder)) {
                 performOrderMatching(sellOrder, buyOrder)
             }
         }
     }
+
+    private fun sellAndBuyOrderMatch(sellOrder: Order, buyOrder: Order): Boolean =
+        sellOrder.getPrice() <= buyOrder.getPrice() && sellOrder.remainingQuantity > 0 && buyOrder.remainingQuantity > 0
 
     private fun performOrderMatching(sellOrder: Order, buyOrder: Order) {
         val orderExecutionPrice = sellOrder.getPrice()

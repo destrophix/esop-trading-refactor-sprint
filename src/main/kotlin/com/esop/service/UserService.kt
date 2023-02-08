@@ -29,7 +29,7 @@ class UserService(private val userRecords: UserRecords) {
         if (order.getType() == "BUY") {
             nonPerformanceInventory.assertInventoryWillNotOverflowOnAdding(order.getQuantity())
 
-            val response = user.userWallet.moveMoneyFromFreeToLockedState(order.getPrice() * order.getQuantity())
+            val response = user.lockAmount(order.getPrice() * order.getQuantity())
             if (response != "SUCCESS") {
                 errorList.add(response)
             }
@@ -37,7 +37,7 @@ class UserService(private val userRecords: UserRecords) {
             wallet.assertWalletWillNotOverflowOnAdding(order.getPrice() * order.getQuantity())
 
             if (order.esopType == "PERFORMANCE") {
-                val response = user.userPerformanceInventory.moveESOPsFromFreeToLockedState(order.getQuantity())
+                val response = user.lockPerformanceInventory(order.getQuantity())
                 if (response != "SUCCESS") {
                     errorList.add(response)
                 }

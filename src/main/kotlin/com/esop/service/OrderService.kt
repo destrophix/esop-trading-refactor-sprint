@@ -3,12 +3,13 @@ package com.esop.service
 
 import com.esop.constant.errors
 import com.esop.repository.UserRecords
-import com.esop.schema.History
-import com.esop.schema.Order
-import com.esop.schema.OrderFilledLog
+import com.esop.schema.*
 import com.esop.schema.PlatformFee.Companion.addPlatformFee
 import jakarta.inject.Singleton
+import kotlin.math.min
 import kotlin.math.round
+
+private const val TWO_PERCENT = 0.02
 
 @Singleton
 class OrderService(private val userRecords: UserRecords) {
@@ -24,90 +25,53 @@ class OrderService(private val userRecords: UserRecords) {
         return orderId++
     }
 
-    private fun updateOrderDetailsForBuy(
-        userName: String,
-        prevQuantity: Long,
-        remainingQuantity: Long,
+    private fun updateOrderDetails(
+        currentTradeQuantity: Long,
         sellerOrder: Order,
         buyerOrder: Order
     ) {
         // Deduct money of quantity taken from buyer
-        val amountToBeDeductedFromLockedState = sellerOrder.getPrice() * (prevQuantity - remainingQuantity)
-        userRecords.getUser(userName)!!.userWallet.removeMoneyFromLockedState(amountToBeDeductedFromLockedState)
+        val sellAmount = sellerOrder.getPrice() * (currentTradeQuantity)
+        val buyer = userRecords.getUser(buyerOrder.getUserName())!!
+        val seller = userRecords.getUser(sellerOrder.getUserName())!!
+        var platformFee = 0L
 
-        // Add money of quantity taken from seller
-        var amountToBeAddedToSellersAccount = amountToBeDeductedFromLockedState
-        if (sellerOrder.esopType == "NON_PERFORMANCE") {
-            amountToBeAddedToSellersAccount -= round(amountToBeDeductedFromLockedState * 0.02).toLong()
-            addPlatformFee(round(amountToBeDeductedFromLockedState * 0.02).toLong())
-        }
-        userRecords.getUser(sellerOrder.getUserName())!!.userWallet.addMoneyToWallet(amountToBeAddedToSellersAccount)
 
-        // Deduct inventory of stock from sellers inventory based on its type
-        if (sellerOrder.esopType == "PERFORMANCE") {
-            userRecords.getUser(sellerOrder.getUserName())!!.userPerformanceInventory.removeESOPsFromLockedState(
-                prevQuantity - remainingQuantity
-            )
-        }
+        if (sellerOrder.esopType == "NON_PERFORMANCE")
+            platformFee = round(sellAmount * TWO_PERCENT).toLong()
 
-        if (sellerOrder.esopType == "NON_PERFORMANCE") {
-            userRecords.getUser(sellerOrder.getUserName())!!.userNonPerfInventory.removeESOPsFromLockedState(
-                prevQuantity - remainingQuantity
-            )
-        }
+        updateWalletBalances(sellAmount, platformFee, buyer, seller)
 
-        // Add purchased inventory to buyer
-        userRecords.getUser(userName)!!.userNonPerfInventory.addESOPsToInventory(prevQuantity - remainingQuantity)
 
-        // Add buyers money back to free from locked
-        userRecords.getUser(userName)!!.userWallet.addMoneyToWallet((buyerOrder.getPrice() - sellerOrder.getPrice()) * (prevQuantity - remainingQuantity))
-        userRecords.getUser(userName)!!.userWallet.removeMoneyFromLockedState((buyerOrder.getPrice() - sellerOrder.getPrice()) * (prevQuantity - remainingQuantity))
+        seller.transferLockedESOPsTo(buyer, EsopTransferRequest(sellerOrder.esopType, currentTradeQuantity))
+
+        val amountToBeReleased = (buyerOrder.getPrice() - sellerOrder.getPrice()) * (currentTradeQuantity)
+        buyer.userWallet.moveMoneyFromLockedToFree(amountToBeReleased)
+
     }
 
-    private fun updateOrderDetailsForSell(
-        userName: String,
-        prevQuantity: Long,
-        remainingQuantity: Long,
-        buyerOrder: Order,
-        sellerOrder: Order
+    private fun updateWalletBalances(
+        sellAmount: Long,
+        platformFee: Long,
+        buyer: User,
+        seller: User
     ) {
+        val adjustedSellAmount = sellAmount - platformFee
+        addPlatformFee(platformFee)
 
-        // Deduct inventory of stock from sellers inventory based on its type
-        if (sellerOrder.esopType == "PERFORMANCE") {
-            userRecords.getUser(userName)!!.userPerformanceInventory.removeESOPsFromLockedState(prevQuantity - remainingQuantity)
-        }
-
-        if (sellerOrder.esopType == "NON_PERFORMANCE") {
-            userRecords.getUser(userName)!!.userNonPerfInventory.removeESOPsFromLockedState(prevQuantity - remainingQuantity)
-        }
-
-        // Add inventory to buyers stock
-        userRecords.getUser(buyerOrder.getUserName())!!.userNonPerfInventory.addESOPsToInventory(prevQuantity - remainingQuantity)
-
-        // Deduct money from buyers wallet
-        userRecords.getUser(buyerOrder.getUserName())!!.userWallet.removeMoneyFromLockedState((sellerOrder.getPrice() * (prevQuantity - remainingQuantity)))
-
-        // Add money to sellers wallet
-        var totOrderPrice = sellerOrder.getPrice() * (prevQuantity - remainingQuantity)
-        if (sellerOrder.esopType == "NON_PERFORMANCE") {
-            totOrderPrice -= round(totOrderPrice * 0.02).toLong()
-            addPlatformFee(round(totOrderPrice * 0.02).toLong())
-        }
-        userRecords.getUser(userName)!!.userWallet.addMoneyToWallet(totOrderPrice)
-
-        // Add buyers luck back to free from locked
-        userRecords.getUser(buyerOrder.getUserName())!!.userWallet.addMoneyToWallet((buyerOrder.getPrice() - sellerOrder.getPrice()) * (prevQuantity - remainingQuantity))
-        userRecords.getUser(buyerOrder.getUserName())!!.userWallet.removeMoneyFromLockedState((buyerOrder.getPrice() - sellerOrder.getPrice()) * (prevQuantity - remainingQuantity))
+        buyer.userWallet.removeMoneyFromLockedState(sellAmount)
+        seller.userWallet.addMoneyToWallet(adjustedSellAmount)
     }
+
 
     private fun sortAscending(): List<Order> {
         return sellOrders.sortedWith(object : Comparator<Order> {
             override fun compare(o1: Order, o2: Order): Int {
 
                 if (o1.inventoryPriority != o2.inventoryPriority)
-                    return o1.inventoryPriority - o2.inventoryPriority
+                    return o1.inventoryPriority.priority - o2.inventoryPriority.priority
 
-                if (o1.inventoryPriority == 1) {
+                if (o1.inventoryPriority.priority == 1) {
                     if (o1.timeStamp < o2.timeStamp)
                         return -1
                     return 1
@@ -126,250 +90,89 @@ class OrderService(private val userRecords: UserRecords) {
     }
 
     fun placeOrder(order: Order): Map<String, Any> {
-        var inventoryPriority = 2
-        if (order.esopType == "PERFORMANCE") {
-            inventoryPriority -= 1
-        }
         order.orderID = generateOrderId()
-        order.inventoryPriority = inventoryPriority
-        order.remainingQuantity = order.getQuantity()
 
         if (order.getType() == "BUY") {
-            buyOrders.add(order)
-            val sortedSellOrders = sortAscending()
-
-
-            for (bestSellOrder in sortedSellOrders) {
-                if (order.remainingQuantity == 0L) {
-                    break
-                }
-                if ((order.getPrice() >= bestSellOrder.getPrice()) && (bestSellOrder.remainingQuantity > 0)) {
-                    val prevQuantity = order.remainingQuantity
-                    if (order.remainingQuantity < bestSellOrder.remainingQuantity) {
-
-                        val buyOrderLog = OrderFilledLog(
-                            order.remainingQuantity,
-                            bestSellOrder.getPrice(),
-                            null,
-                            bestSellOrder.getUserName(),
-                            null
-                        )
-                        val sellOrderLog = OrderFilledLog(
-                            order.remainingQuantity,
-                            bestSellOrder.getPrice(),
-                            bestSellOrder.esopType,
-                            null,
-                            order.getUserName()
-                        )
-
-                        bestSellOrder.remainingQuantity = bestSellOrder.remainingQuantity - order.remainingQuantity
-                        bestSellOrder.orderStatus = "PARTIAL"
-                        bestSellOrder.orderFilledLogs.add(sellOrderLog)
-
-                        order.remainingQuantity = 0
-                        order.orderStatus = "COMPLETED"
-                        order.orderFilledLogs.add(buyOrderLog)
-                        buyOrders.remove(order)
-
-                        updateOrderDetailsForBuy(
-                            order.getUserName(),
-                            prevQuantity,
-                            order.remainingQuantity,
-                            bestSellOrder,
-                            order
-                        )
-
-                    } else if (order.remainingQuantity > bestSellOrder.remainingQuantity) {
-
-                        val buyOrderLog = OrderFilledLog(
-                            bestSellOrder.remainingQuantity,
-                            order.getPrice(),
-                            null,
-                            bestSellOrder.getUserName(),
-                            null
-                        )
-                        val sellOrderLog = OrderFilledLog(
-                            bestSellOrder.remainingQuantity,
-                            order.getPrice(),
-                            bestSellOrder.esopType,
-                            null
-                        )
-
-                        order.remainingQuantity = order.remainingQuantity - bestSellOrder.remainingQuantity
-                        order.orderStatus = "PARTIAL"
-                        order.orderFilledLogs.add(sellOrderLog)
-
-                        bestSellOrder.remainingQuantity = 0
-                        bestSellOrder.orderStatus = "COMPLETED"
-                        bestSellOrder.orderFilledLogs.add(buyOrderLog)
-                        sellOrders.remove(bestSellOrder)
-
-                        updateOrderDetailsForBuy(
-                            order.getUserName(),
-                            prevQuantity,
-                            order.remainingQuantity,
-                            bestSellOrder,
-                            order
-                        )
-                    } else {
-                        val buyOrderLog = OrderFilledLog(
-                            bestSellOrder.remainingQuantity,
-                            bestSellOrder.getPrice(),
-                            null,
-                            bestSellOrder.getUserName()
-                        )
-                        val sellOrderLog = OrderFilledLog(
-                            order.remainingQuantity,
-                            bestSellOrder.getPrice(),
-                            bestSellOrder.esopType,
-                            order.getUserName(),
-                            null
-                        )
-
-                        bestSellOrder.remainingQuantity = 0
-                        bestSellOrder.orderStatus = "COMPLETED"
-                        bestSellOrder.orderFilledLogs.add(buyOrderLog)
-                        sellOrders.remove(bestSellOrder)
-
-                        order.remainingQuantity = 0
-                        order.orderStatus = "COMPLETED"
-                        order.orderFilledLogs.add(sellOrderLog)
-                        buyOrders.remove(order)
-
-                        updateOrderDetailsForBuy(
-                            order.getUserName(),
-                            prevQuantity,
-                            order.remainingQuantity,
-                            bestSellOrder,
-                            order
-                        )
-
-                    }
-
-                }
-            }
+            executeBuyOrder(order)
         } else {
-            sellOrders.add(order)
-            val sortedBuyOrders =
-                buyOrders.sortedWith(compareByDescending<Order> { it.getPrice() }.thenBy { it.timeStamp })
-
-            for (bestBuyOrder in sortedBuyOrders) {
-                if (order.remainingQuantity == 0L) {
-                    break
-                }
-                if ((order.getPrice() <= bestBuyOrder.getPrice()) && (bestBuyOrder.remainingQuantity > 0)) {
-                    val prevQuantity = order.remainingQuantity
-                    if (order.remainingQuantity < bestBuyOrder.remainingQuantity) {
-
-                        val buyOrderLog =
-                            OrderFilledLog(
-                                order.remainingQuantity,
-                                bestBuyOrder.getPrice(),
-                                null,
-                                order.getUserName(),
-                                null
-                            )
-                        val sellOrderLog = OrderFilledLog(
-                            order.remainingQuantity,
-                            bestBuyOrder.getPrice(),
-                            order.esopType,
-                            null,
-                            bestBuyOrder.getUserName()
-                        )
-
-                        bestBuyOrder.remainingQuantity = bestBuyOrder.remainingQuantity - order.remainingQuantity
-                        bestBuyOrder.orderStatus = "PARTIAL"
-                        bestBuyOrder.orderFilledLogs.add(buyOrderLog)
-
-                        order.remainingQuantity = 0
-                        order.orderStatus = "COMPLETED"
-                        order.orderFilledLogs.add(sellOrderLog)
-                        sellOrders.remove(order)
-
-                        updateOrderDetailsForSell(
-                            order.getUserName(),
-                            prevQuantity,
-                            order.remainingQuantity,
-                            bestBuyOrder,
-                            order
-                        )
-
-                    } else if (order.remainingQuantity > bestBuyOrder.remainingQuantity) {
-
-                        val buyOrderLog =
-                            OrderFilledLog(
-                                bestBuyOrder.remainingQuantity,
-                                order.getPrice(),
-                                null,
-                                order.getUserName(),
-                                null
-                            )
-                        val sellOrderLog = OrderFilledLog(
-                            bestBuyOrder.remainingQuantity,
-                            order.getPrice(),
-                            order.esopType,
-                            null,
-                            bestBuyOrder.getUserName()
-                        )
-
-
-                        order.remainingQuantity = order.remainingQuantity - bestBuyOrder.remainingQuantity
-                        order.orderStatus = "PARTIAL"
-                        order.orderFilledLogs.add(sellOrderLog)
-
-                        bestBuyOrder.remainingQuantity = 0
-                        bestBuyOrder.orderStatus = "COMPLETED"
-                        bestBuyOrder.orderFilledLogs.add(buyOrderLog)
-                        buyOrders.remove(bestBuyOrder)
-
-                        updateOrderDetailsForSell(
-                            order.getUserName(),
-                            prevQuantity,
-                            order.remainingQuantity,
-                            bestBuyOrder,
-                            order
-                        )
-                    } else {
-                        val buyOrderLog =
-                            OrderFilledLog(
-                                bestBuyOrder.remainingQuantity,
-                                order.getPrice(),
-                                null,
-                                order.getUserName(),
-                                null
-                            )
-                        val sellOrderLog = OrderFilledLog(
-                            order.remainingQuantity,
-                            order.getPrice(),
-                            order.esopType,
-                            null,
-                            bestBuyOrder.getUserName()
-                        )
-
-                        bestBuyOrder.remainingQuantity = 0
-                        bestBuyOrder.orderStatus = "COMPLETED"
-                        bestBuyOrder.orderFilledLogs.add(buyOrderLog)
-                        buyOrders.remove(bestBuyOrder)
-
-                        order.remainingQuantity = 0
-                        order.orderStatus = "COMPLETED"
-                        order.orderFilledLogs.add(sellOrderLog)
-                        sellOrders.remove(order)
-
-                        updateOrderDetailsForSell(
-                            order.getUserName(),
-                            prevQuantity,
-                            order.remainingQuantity,
-                            bestBuyOrder,
-                            order
-                        )
-
-                    }
-                }
-            }
+            executeSellOrder(order)
         }
         userRecords.getUser(order.getUserName())?.orderList?.add(order)
         return mapOf("orderId" to order.orderID)
+    }
+
+    private fun executeBuyOrder(buyOrder: Order) {
+        buyOrders.add(buyOrder)
+        val sortedSellOrders = sortAscending()
+
+        for (sellOrder in sortedSellOrders) {
+            if ((buyOrder.getPrice() >= sellOrder.getPrice()) && (sellOrder.remainingQuantity > 0)) {
+                performOrderMatching(sellOrder, buyOrder)
+            }
+        }
+    }
+
+    private fun executeSellOrder(sellOrder: Order) {
+        sellOrders.add(sellOrder)
+        val sortedBuyOrders =
+            buyOrders.sortedWith(compareByDescending<Order> { it.getPrice() }.thenBy { it.timeStamp })
+
+        for (buyOrder in sortedBuyOrders) {
+            if ((sellOrder.getPrice() <= buyOrder.getPrice()) && (buyOrder.remainingQuantity > 0)) {
+                performOrderMatching(sellOrder, buyOrder)
+            }
+        }
+    }
+
+    private fun performOrderMatching(sellOrder: Order, buyOrder: Order) {
+        val orderExecutionPrice = sellOrder.getPrice()
+        val orderExecutionQuantity = min(sellOrder.remainingQuantity, buyOrder.remainingQuantity)
+
+        buyOrder.subtractFromRemainingQuantity(orderExecutionQuantity)
+        sellOrder.subtractFromRemainingQuantity(orderExecutionQuantity)
+
+        buyOrder.updateStatus()
+        sellOrder.updateStatus()
+
+        createOrderFilledLogs(orderExecutionQuantity, orderExecutionPrice, sellOrder, buyOrder)
+
+        updateOrderDetails(
+            orderExecutionQuantity,
+            sellOrder,
+            buyOrder
+        )
+
+        if (buyOrder.orderStatus == "COMPLETED") {
+            buyOrders.remove(buyOrder)
+        }
+        if (sellOrder.orderStatus == "COMPLETED") {
+            sellOrders.remove(sellOrder)
+        }
+    }
+
+    private fun createOrderFilledLogs(
+        orderExecutionQuantity: Long,
+        orderExecutionPrice: Long,
+        sellOrder: Order,
+        buyOrder: Order
+    ) {
+        val buyOrderLog = OrderFilledLog(
+            orderExecutionQuantity,
+            orderExecutionPrice,
+            null,
+            sellOrder.getUserName(),
+            null
+        )
+        val sellOrderLog = OrderFilledLog(
+            orderExecutionQuantity,
+            orderExecutionPrice,
+            sellOrder.esopType,
+            null,
+            buyOrder.getUserName()
+        )
+
+        buyOrder.addOrderFilledLogs(buyOrderLog)
+        sellOrder.addOrderFilledLogs(sellOrderLog)
     }
 
     fun orderHistory(userName: String): Any {
@@ -396,4 +199,3 @@ class OrderService(private val userRecords: UserRecords) {
         return orderHistory
     }
 }
-

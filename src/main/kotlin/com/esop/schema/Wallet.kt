@@ -45,4 +45,9 @@ class Wallet {
     fun removeMoneyFromLockedState(amountToBeRemoved: Long) {
         this.lockedMoney = this.lockedMoney - amountToBeRemoved
     }
+
+    fun moveMoneyFromLockedToFree(amount: Long) {
+        removeMoneyFromLockedState(amount)
+        addMoneyToWallet(amount)
+    }
 }

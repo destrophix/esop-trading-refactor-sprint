@@ -2,6 +2,7 @@ package com.esop.schema
 
 import com.esop.dto.CreateOrderDTO
 import com.esop.schema.InventoryPriority.*
+import com.esop.utils.Counter
 
 enum class InventoryPriority(val priority: Int) {
     NONE(0),
@@ -34,6 +35,8 @@ class Order(
         }
     }
     init {
+        orderID = Counter.next()
+
         if (isTypeSellAndEsopTypePerformance()) {
             inventoryPriority = PERFORMANCE
         } else if (isTypeSellAndEsopTypeNonPerformance()) {

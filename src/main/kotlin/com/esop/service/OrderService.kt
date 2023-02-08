@@ -14,15 +14,8 @@ private const val TWO_PERCENT = 0.02
 @Singleton
 class OrderService(private val userRecords: UserRecords) {
     companion object {
-        private var orderId = 1L
-
         var buyOrders = mutableListOf<Order>()
         var sellOrders = mutableListOf<Order>()
-    }
-
-    @Synchronized
-    fun generateOrderId(): Long {
-        return orderId++
     }
 
     private fun updateOrderDetails(
@@ -90,8 +83,6 @@ class OrderService(private val userRecords: UserRecords) {
     }
 
     fun placeOrder(order: Order): Map<String, Any> {
-        order.orderID = generateOrderId()
-
         if (order.getType() == "BUY") {
             executeBuyOrder(order)
         } else {

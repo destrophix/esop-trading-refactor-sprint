@@ -83,8 +83,7 @@ class UserController {
 
     @Post(uri = "/{userName}/order", consumes = [MediaType.APPLICATION_JSON], produces = [MediaType.APPLICATION_JSON])
     fun order(userName: String, @Body @Valid orderData: CreateOrderDTO): Any? {
-        val order = Order(orderData.quantity!!.toLong(), orderData.type.toString().uppercase(), orderData.price!!.toLong(), userName)
-
+        val order = Order.from(orderData, userName)
         val errorList = userService.orderCheckBeforePlace(order)
         if (errorList.size > 0) {
             return HttpResponse.badRequest(mapOf("errors" to errorList))

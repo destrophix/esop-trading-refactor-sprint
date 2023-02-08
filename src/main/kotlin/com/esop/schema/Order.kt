@@ -1,5 +1,6 @@
 package com.esop.schema
 
+import com.esop.dto.CreateOrderDTO
 import com.esop.schema.InventoryPriority.*
 
 enum class InventoryPriority(val priority: Int) {
@@ -22,6 +23,16 @@ class Order(
     var inventoryPriority = NONE
     var remainingQuantity = quantity
 
+    companion object {
+        fun from(orderDetails: CreateOrderDTO, userName: String): Order {
+            return Order(
+                quantity = orderDetails.quantity!!,
+                type = orderDetails.type!!,
+                price = orderDetails.price!!,
+                userName = userName
+            )
+        }
+    }
     init {
         if (isTypeSellAndEsopTypePerformance()) {
             inventoryPriority = PERFORMANCE

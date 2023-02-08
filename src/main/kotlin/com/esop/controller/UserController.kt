@@ -84,24 +84,22 @@ class UserController {
     @Post(uri = "/{userName}/order", consumes = [MediaType.APPLICATION_JSON], produces = [MediaType.APPLICATION_JSON])
     fun order(userName: String, @Body @Valid orderData: CreateOrderDTO): Any? {
         val order = Order.from(orderData, userName)
+
         val errorList = userService.orderCheckBeforePlace(order)
         if (errorList.size > 0) {
             return HttpResponse.badRequest(mapOf("errors" to errorList))
         }
-        val userOrderOrErrors = orderService.placeOrder(order)
 
-        if (userOrderOrErrors["orderId"] != null) {
-            return HttpResponse.ok(
-                mapOf(
-                    "orderId" to userOrderOrErrors["orderId"],
-                    "quantity" to orderData.quantity,
-                    "type" to orderData.type,
-                    "price" to orderData.price
-                )
+        orderService.placeOrder(order)
+
+        return HttpResponse.ok(
+            mapOf(
+                "orderId" to order.getOrderID(),
+                "quantity" to order.getQuantity(),
+                "type" to order.getType(),
+                "price" to order.getPrice()
             )
-        } else {
-            return HttpResponse.badRequest(userOrderOrErrors)
-        }
+        )
     }
 
     @Get(uri = "/{userName}/accountInformation", produces = [MediaType.APPLICATION_JSON])

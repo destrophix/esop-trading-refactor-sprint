@@ -61,14 +61,14 @@ class OrderService(private val userRecords: UserRecords) {
         return sellOrders.sorted()
     }
 
-    fun placeOrder(order: Order): Map<String, Any> {
+    fun placeOrder(order: Order): Order {
         if (order.getType() == "BUY") {
             executeBuyOrder(order)
         } else {
             executeSellOrder(order)
         }
         userRecords.getUser(order.getUserName())?.orderList?.add(order)
-        return mapOf("orderId" to order.orderID)
+        return order
     }
 
     private fun executeBuyOrder(buyOrder: Order) {
@@ -159,7 +159,7 @@ class OrderService(private val userRecords: UserRecords) {
         for (orders in orderDetails) {
             orderHistory.add(
                 History(
-                    orders.orderID,
+                    orders.getOrderID(),
                     orders.getQuantity(),
                     orders.getType(),
                     orders.getPrice(),

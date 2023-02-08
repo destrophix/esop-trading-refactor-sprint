@@ -19,7 +19,7 @@ class Order(
     var timeStamp = System.currentTimeMillis()
     var orderStatus: String = "PENDING" // COMPLETED, PARTIAL, PENDING
     var orderFilledLogs: MutableList<OrderFilledLog> = mutableListOf()
-    var orderID: Long = -1
+    private var orderID: Long = -1
     var esopType = "NON_PERFORMANCE"
     var inventoryPriority = NONE
     var remainingQuantity = quantity
@@ -64,6 +64,9 @@ class Order(
         return userName
     }
 
+    fun getOrderID(): Long {
+        return orderID
+    }
 
     fun subtractFromRemainingQuantity(quantityToBeUpdated: Long) {
         remainingQuantity -= quantityToBeUpdated

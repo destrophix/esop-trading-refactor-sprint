@@ -25,8 +25,8 @@ class OrderService(private val userRecords: UserRecords) {
     ) {
         // Deduct money of quantity taken from buyer
         val sellAmount = sellerOrder.getPrice() * (currentTradeQuantity)
-        val buyer = userRecords.getUser(buyerOrder.getUserName())!!
-        val seller = userRecords.getUser(sellerOrder.getUserName())!!
+        val buyer = buyerOrder.getOrderPlacer()
+        val seller = sellerOrder.getOrderPlacer()
         var platformFee = 0L
 
 
@@ -67,7 +67,8 @@ class OrderService(private val userRecords: UserRecords) {
         } else {
             executeSellOrder(order)
         }
-        userRecords.getUser(order.getUserName())?.orderList?.add(order)
+
+        order.getOrderPlacer().orderList.add(order)
         return order
     }
 
@@ -129,7 +130,7 @@ class OrderService(private val userRecords: UserRecords) {
             orderExecutionQuantity,
             orderExecutionPrice,
             null,
-            sellOrder.getUserName(),
+            sellOrder.getOrderPlacer().username,
             null
         )
         val sellOrderLog = OrderFilledLog(
@@ -137,7 +138,7 @@ class OrderService(private val userRecords: UserRecords) {
             orderExecutionPrice,
             sellOrder.getESOPType(),
             null,
-            buyOrder.getUserName()
+            buyOrder.getOrderPlacer().username
         )
 
         buyOrder.addOrderFilledLogs(buyOrderLog)

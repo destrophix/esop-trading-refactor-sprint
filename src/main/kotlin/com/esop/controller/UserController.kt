@@ -6,6 +6,7 @@ import com.esop.dto.AddInventoryDTO
 import com.esop.dto.AddWalletDTO
 import com.esop.dto.CreateOrderDTO
 import com.esop.dto.UserCreationDTO
+import com.esop.exceptions.UserNotFoundException
 import com.esop.schema.Order
 import com.esop.service.*
 import com.fasterxml.jackson.core.JsonProcessingException
@@ -71,6 +72,10 @@ class UserController {
         return HttpResponse.serverError(mapOf("errors" to arrayListOf(ex.message)))
     }
 
+    @Error(exception = UserNotFoundException::class)
+    fun onUserNotFoundException(ex: UserNotFoundException): HttpResponse<Map<String, List<String>>> {
+        return HttpResponse.notFound(mapOf("errors" to arrayListOf("User not found")))
+    }
 
     @Post(uri = "/register", consumes = [MediaType.APPLICATION_JSON], produces = [MediaType.APPLICATION_JSON])
     fun register(@Body @Valid userData: UserCreationDTO): HttpResponse<*> {
@@ -82,8 +87,13 @@ class UserController {
     }
 
     @Post(uri = "/{userName}/order", consumes = [MediaType.APPLICATION_JSON], produces = [MediaType.APPLICATION_JSON])
-    fun order(userName: String, @Body @Valid orderData: CreateOrderDTO): Any? {
-        val order = Order.from(orderData, userName)
+    fun order(userName: String, @Body @Valid newOrderDetails: CreateOrderDTO): Any? {
+        val user = userService.getUserOrNull(userName) ?: throw UserNotFoundException("User not found")
+
+        val order = Order.from(
+            orderDetails = newOrderDetails,
+            orderPlacer = user
+        )
 
         val errorList = userService.orderCheckBeforePlace(order)
         if (errorList.size > 0) {

@@ -14,7 +14,7 @@ class Order(
     private var quantity: Long,
     private var type: String,
     private var price: Long,
-    private var userName: String,
+    private val orderPlacer: User,
     private var esopType: String = "NON_PERFORMANCE",
 ) : Comparable<Order> {
     private val timeStamp = System.currentTimeMillis()
@@ -24,12 +24,12 @@ class Order(
     private var remainingQuantity = quantity
 
     companion object {
-        fun from(orderDetails: CreateOrderDTO, userName: String): Order {
+        fun from(orderDetails: CreateOrderDTO, orderPlacer: User): Order {
             return Order(
                 quantity = orderDetails.quantity!!,
                 type = orderDetails.type!!,
                 price = orderDetails.price!!,
-                userName = userName,
+                orderPlacer = orderPlacer,
                 esopType = orderDetails.esopType!!
             )
         }
@@ -60,18 +60,18 @@ class Order(
         return type
     }
 
-    fun getUserName(): String {
-        return userName
-    }
 
     fun getOrderID(): Long {
         return orderID
     }
 
+    fun getOrderPlacer(): User {
+        return orderPlacer
+    }
+
     fun subtractFromRemainingQuantity(quantityToBeUpdated: Long) {
         remainingQuantity -= quantityToBeUpdated
     }
-
 
     fun addOrderFilledLogs(orderFilledLog: OrderFilledLog) {
         orderFilledLogs.add(orderFilledLog)

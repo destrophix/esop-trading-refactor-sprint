@@ -15,12 +15,7 @@ class UserService(private val userRecords: UserRecords) {
     fun orderCheckBeforePlace(order: Order): MutableList<String> {
         val errorList = mutableListOf<String>()
 
-        if (!userRecords.checkIfUserExists(order.getUserName())) {
-            errorList.add("User doesn't exist.")
-            return errorList
-        }
-
-        val user = userRecords.getUser(order.getUserName())!!
+        val user = order.getOrderPlacer()
         val wallet = user.userWallet
         val nonPerformanceInventory = user.userNonPerfInventory
 
@@ -138,5 +133,9 @@ class UserService(private val userRecords: UserRecords) {
         }
 
         return mapOf("message" to userRecords.getUser(userName)!!.addToWallet(walletData))
+    }
+
+    fun getUserOrNull(userName: String): User? {
+        return userRecords.getUser(userName)
     }
 }

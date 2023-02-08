@@ -46,18 +46,6 @@ class UserServiceTest {
     }
 
     @Test
-    fun `should check user doesn't exist before placing Order`() {
-        val order = Order(
-            quantity = 10, type = "BUY", price = 10, userName = "Sankar"
-        )
-        val expectedErrors = listOf("User doesn't exist.")
-
-        val errors = userService.orderCheckBeforePlace(order)
-
-        assertEquals(expectedErrors, errors, "user non existent error should be present in the errors list")
-    }
-
-    @Test
     fun `should add money to wallet`() {
         val user = UserCreationDTO("Sankar", "M", "+917550276216", "sankar@sahaj.ai", "Sankar")
         userService.registerUser(user)
@@ -91,7 +79,7 @@ class UserServiceTest {
         userService.registerUser(user)
         userService.addingMoney(AddWalletDTO(price = 100L), userName = "sankar06")
         val order = Order(
-            quantity = 10, type = "BUY", price = 10, userName = "sankar06"
+            quantity = 10, type = "BUY", price = 10, orderPlacer = userRecords.getUser("sankar06")!!
         )
 
         val actualErrors = userService.orderCheckBeforePlace(order)
@@ -105,7 +93,7 @@ class UserServiceTest {
         val user = UserCreationDTO("Sankar", "M", "+917550276216", "sankar@sahaj.ai", "sankar06")
         userService.registerUser(user)
         val order = Order(
-            quantity = 10, type = "BUY", price = 10, userName = "sankar06"
+            quantity = 10, type = "BUY", price = 10, orderPlacer = userRecords.getUser("sankar06")!!
         )
         userService.addingMoney(AddWalletDTO(price = 99L), userName = "sankar06")
 
@@ -120,7 +108,7 @@ class UserServiceTest {
         val user = UserCreationDTO("Sankar", "M", "+917550276216", "sankar@sahaj.ai", "sankar06")
         userService.registerUser(user)
         val order = Order(
-            quantity = 10, type = "BUY", price = 10, userName = "sankar06"
+            quantity = 10, type = "BUY", price = 10, orderPlacer = userRecords.getUser("sankar06")!!
         )
         userService.addingInventory(AddInventoryDTO(MAX_INVENTORY_CAPACITY, "NON_PERFORMANCE"), userName = "sankar06")
 
@@ -135,7 +123,7 @@ class UserServiceTest {
         userService.registerUser(user)
         userService.addingInventory(AddInventoryDTO(quantity = 10L), userName = "sankar06")
         val order = Order(
-            quantity = 10, type = "SELL", price = 10, userName = "sankar06"
+            quantity = 10, type = "SELL", price = 10, orderPlacer = userRecords.getUser("sankar06")!!,
         )
 
         val actualErrors = userService.orderCheckBeforePlace(order)
@@ -150,7 +138,7 @@ class UserServiceTest {
         userService.registerUser(user)
         userService.addingInventory(AddInventoryDTO(quantity = 10L), userName = "sankar06")
         val order = Order(
-            quantity = 29, type = "SELL", price = 10, userName = "sankar06"
+            quantity = 29, type = "SELL", price = 10, orderPlacer = userRecords.getUser("sankar06")!!
         )
 
         val actualErrors = userService.orderCheckBeforePlace(order)
@@ -168,7 +156,7 @@ class UserServiceTest {
         val user = UserCreationDTO("Sankar", "M", "+917550276216", "sankar@sahaj.ai", "sankar06")
         userService.registerUser(user)
         val order = Order(
-            quantity = 10, type = "SELL", price = 10, userName = "sankar06"
+            quantity = 10, type = "SELL", price = 10, orderPlacer = userRecords.getUser("sankar06")!!,
         )
         userService.addingMoney(AddWalletDTO(MAX_WALLET_CAPACITY), userName = "sankar06")
 
@@ -183,7 +171,7 @@ class UserServiceTest {
         userService.registerUser(user)
         userService.addingInventory(AddInventoryDTO(quantity = 10L, esopType = "PERFORMANCE"), userName = "sankar06")
         val order = Order(
-            quantity = 10, type = "SELL", price = 10, userName = "sankar06", esopType = "PERFORMANCE"
+            quantity = 10, type = "SELL", price = 10, orderPlacer = userRecords.getUser("sankar06")!!, esopType = "PERFORMANCE"
         )
 
         val actualErrors = userService.orderCheckBeforePlace(order)
@@ -197,7 +185,7 @@ class UserServiceTest {
         val user = UserCreationDTO("Sankar", "M", "+917550276216", "sankar@sahaj.ai", "sankar06")
         userService.registerUser(user)
         val order = Order(
-            quantity = 29, type = "SELL", price = 10, userName = "sankar06", esopType = "PERFORMANCE"
+            quantity = 29, type = "SELL", price = 10, orderPlacer = userRecords.getUser("sankar06")!!, esopType = "PERFORMANCE"
         )
 
         val actualErrors = userService.orderCheckBeforePlace(order)

@@ -15,7 +15,7 @@ class Order(
     private var type: String,
     private var price: Long,
     private var userName: String
-) {
+) : Comparable<Order> {
     var timeStamp = System.currentTimeMillis()
     var orderStatus: String = "PENDING" // COMPLETED, PARTIAL, PENDING
     var orderFilledLogs: MutableList<OrderFilledLog> = mutableListOf()
@@ -34,6 +34,7 @@ class Order(
             )
         }
     }
+
     init {
         orderID = Counter.next()
 
@@ -78,5 +79,30 @@ class Order(
 
     fun addOrderFilledLogs(orderFilledLog: OrderFilledLog) {
         orderFilledLogs.add(orderFilledLog)
+    }
+
+    override fun compareTo(other: Order): Int {
+        if (type == "BUY") {
+            return compareByDescending<Order> { it.getPrice() }.thenBy { it.timeStamp }.compare(this, other)
+        }
+
+        if (inventoryPriority != other.inventoryPriority)
+            return inventoryPriority.priority - other.inventoryPriority.priority
+
+        if (inventoryPriority.priority == 1) {
+            if (timeStamp < other.timeStamp)
+                return -1
+            return 1
+        }
+
+        if (getPrice() == other.getPrice()) {
+            if (timeStamp < other.timeStamp)
+                return -1
+            return 1
+        }
+
+        if (getPrice() < other.getPrice())
+            return -1
+        return 1
     }
 }

@@ -58,28 +58,7 @@ class OrderService(private val userRecords: UserRecords) {
 
 
     private fun sortAscending(): List<Order> {
-        return sellOrders.sortedWith(object : Comparator<Order> {
-            override fun compare(o1: Order, o2: Order): Int {
-
-                if (o1.inventoryPriority != o2.inventoryPriority)
-                    return o1.inventoryPriority.priority - o2.inventoryPriority.priority
-
-                if (o1.inventoryPriority.priority == 1) {
-                    if (o1.timeStamp < o2.timeStamp)
-                        return -1
-                    return 1
-                }
-
-                if (o1.getPrice() == o2.getPrice()) {
-                    if (o1.timeStamp < o2.timeStamp)
-                        return -1
-                    return 1
-                }
-                if (o1.getPrice() < o2.getPrice())
-                    return -1
-                return 1
-            }
-        })
+        return sellOrders.sorted()
     }
 
     fun placeOrder(order: Order): Map<String, Any> {
@@ -105,8 +84,7 @@ class OrderService(private val userRecords: UserRecords) {
 
     private fun executeSellOrder(sellOrder: Order) {
         sellOrders.add(sellOrder)
-        val sortedBuyOrders =
-            buyOrders.sortedWith(compareByDescending<Order> { it.getPrice() }.thenBy { it.timeStamp })
+        val sortedBuyOrders = buyOrders.sorted()
 
         for (buyOrder in sortedBuyOrders) {
             if ((sellOrder.getPrice() <= buyOrder.getPrice()) && (buyOrder.remainingQuantity > 0)) {

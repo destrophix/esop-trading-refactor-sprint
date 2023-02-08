@@ -83,22 +83,9 @@ class UserController {
 
     @Post(uri = "/{userName}/order", consumes = [MediaType.APPLICATION_JSON], produces = [MediaType.APPLICATION_JSON])
     fun order(userName: String, @Body @Valid orderData: CreateOrderDTO): Any? {
-        var errorList = mutableListOf<String>()
-
-        val orderType: String = orderData.type.toString().uppercase()
-        var esopType = "NON_PERFORMANCE"
-
-        if (orderType == "SELL") {
-            esopType = orderData.esopType.toString().uppercase()
-            if (esopType != "PERFORMANCE" && esopType != "NON_PERFORMANCE") {
-                errorList.add("Invalid inventory type")
-                return HttpResponse.ok(mapOf("errors" to errorList))
-            }
-        }
-
         val order = Order(orderData.quantity!!.toLong(), orderData.type.toString().uppercase(), orderData.price!!.toLong(), userName)
 
-        errorList = userService.orderCheckBeforePlace(order)
+        val errorList = userService.orderCheckBeforePlace(order)
         if (errorList.size > 0) {
             return HttpResponse.badRequest(mapOf("errors" to errorList))
         }

@@ -18,12 +18,12 @@ import jakarta.inject.Singleton
 @Singleton
 class OrderService(
     private val userRecords: UserRecords,
-    private val orderExecutionPool: OrderExecutionPool
+    private val orderExecutor: OrderExecutor
 ) {
 
     fun placeOrder(orderDetails: CreateOrderDTO): Order {
         val order = createOrder(orderDetails)
-        orderExecutionPool.add(order)
+        orderExecutor.add(order)
 
         return order
     }

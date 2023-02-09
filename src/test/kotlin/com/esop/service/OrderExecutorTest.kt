@@ -8,15 +8,15 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-class OrderExecutionPoolTest {
+class OrderExecutorTest {
 
     private lateinit var userRecords: UserRecords
-    private lateinit var orderExecutionPool: OrderExecutionPool
+    private lateinit var orderExecutor: OrderExecutor
 
     @BeforeEach
     fun `It should create user`() {
         userRecords = UserRecords()
-        orderExecutionPool = OrderExecutionPool()
+        orderExecutor = OrderExecutor()
 
         val buyer1 = User("Sankaranarayanan", "M", "7550276216", "sankaranarayananm@sahaj.ai", "sankar")
         val buyer2 = User("Aditya", "Tiwari", "", "aditya@sahaj.ai", "aditya")
@@ -38,7 +38,7 @@ class OrderExecutionPoolTest {
         val sellOrder = Order(10, "SELL", 10, kajal)
         kajal.lockNonPerformanceInventory(10)
 
-        orderExecutionPool.add(sellOrder)
+        orderExecutor.add(sellOrder)
 
         val sankar = userRecords.getUser("sankar")!!
         sankar.addMoneyToWallet(100)
@@ -46,7 +46,7 @@ class OrderExecutionPoolTest {
         sankar.lockAmount(100)
 
         //Act
-        orderExecutionPool.add(buyOrder)
+        orderExecutor.add(buyOrder)
 
         //Assert
         assertEquals(40, kajal.getFreeESOPsInInventory("NON_PERFORMANCE"))
@@ -63,14 +63,14 @@ class OrderExecutionPoolTest {
         val sellOrderByKajal = Order(10, "SELL", 10, kajal)
         kajal.lockNonPerformanceInventory(10)
 
-        orderExecutionPool.add(sellOrderByKajal)
+        orderExecutor.add(sellOrderByKajal)
 
         val arun = userRecords.getUser("arun")!!
         arun.addToInventory(AddInventoryDTO(50, esopType = "NON_PERFORMANCE"))
         val sellOrderByArun = Order(10, "SELL", 10, arun)
         arun.lockNonPerformanceInventory(10)
 
-        orderExecutionPool.add(sellOrderByArun)
+        orderExecutor.add(sellOrderByArun)
 
         val sankar = userRecords.getUser("sankar")!!
         sankar.addMoneyToWallet(250)
@@ -78,7 +78,7 @@ class OrderExecutionPoolTest {
         sankar.lockAmount(250)
 
         //Act
-        orderExecutionPool.add(buyOrderBySankar)
+        orderExecutor.add(buyOrderBySankar)
 
         //Assert
         assertEquals(40, kajal.getFreeESOPsInInventory("NON_PERFORMANCE"))
@@ -108,14 +108,14 @@ class OrderExecutionPoolTest {
         val sellOrderByKajal = Order(10, "SELL", 10, kajal)
         kajal.lockNonPerformanceInventory(10)
 
-        orderExecutionPool.add(sellOrderByKajal)
+        orderExecutor.add(sellOrderByKajal)
 
         val arun = userRecords.getUser("arun")!!
         arun.addToInventory(AddInventoryDTO(50, esopType = "NON_PERFORMANCE"))
         val sellOrderByArun = Order(10, "SELL", 10, arun)
         arun.lockNonPerformanceInventory(10)
 
-        orderExecutionPool.add(sellOrderByArun)
+        orderExecutor.add(sellOrderByArun)
 
         val sankar = userRecords.getUser("sankar")!!
         sankar.addMoneyToWallet(250)
@@ -123,7 +123,7 @@ class OrderExecutionPoolTest {
         sankar.lockAmount(200)
 
         //Act
-        orderExecutionPool.add(buyOrderBySankar)
+        orderExecutor.add(buyOrderBySankar)
         //Assert
         assertEquals(40, kajal.getFreeESOPsInInventory("NON_PERFORMANCE"))
         assertEquals(40, arun.getFreeESOPsInInventory("NON_PERFORMANCE"))
@@ -152,7 +152,7 @@ class OrderExecutionPoolTest {
         kajal.addToInventory(AddInventoryDTO(50, esopType = "NON_PERFORMANCE"))
         val sellOrderByKajal = Order(10, "SELL", 10, kajal)
         kajal.lockNonPerformanceInventory(10)
-        orderExecutionPool.add(sellOrderByKajal)
+        orderExecutor.add(sellOrderByKajal)
 
         val sankar = userRecords.getUser("sankar")!!
         sankar.addMoneyToWallet(250)
@@ -160,7 +160,7 @@ class OrderExecutionPoolTest {
         sankar.lockAmount(50)
 
         //Act
-        orderExecutionPool.add(buyOrderBySankar)
+        orderExecutor.add(buyOrderBySankar)
 
         //Assert
         assertEquals(40, kajal.getFreeESOPsInInventory("NON_PERFORMANCE"))
@@ -185,7 +185,7 @@ class OrderExecutionPoolTest {
         val sellOrderByKajal = Order(10, "SELL", 10, kajal)
         kajal.lockNonPerformanceInventory(10)
 
-        orderExecutionPool.add(sellOrderByKajal)
+        orderExecutor.add(sellOrderByKajal)
 
         val sankar = userRecords.getUser("sankar")!!
         sankar.addMoneyToWallet(250)
@@ -193,7 +193,7 @@ class OrderExecutionPoolTest {
         sankar.lockAmount(150)
 
         //Act
-        orderExecutionPool.add(buyOrderBySankar)
+        orderExecutor.add(buyOrderBySankar)
 
         //Assert
         assertEquals(40, kajal.getFreeESOPsInInventory("NON_PERFORMANCE"))
@@ -216,20 +216,20 @@ class OrderExecutionPoolTest {
         sankar.addMoneyToWallet(100)
         val buyOrderBySankar = Order(10, "BUY", 10, sankar)
         sankar.lockAmount(100)
-        orderExecutionPool.add(buyOrderBySankar)
+        orderExecutor.add(buyOrderBySankar)
 
         val aditya = userRecords.getUser("aditya")!!
         aditya.addMoneyToWallet(100)
         val buyOrderByAditya = Order(10, "BUY", 10, aditya)
         sankar.lockAmount(100)
-        orderExecutionPool.add(buyOrderByAditya)
+        orderExecutor.add(buyOrderByAditya)
 
         userRecords.getUser("kajal")!!.addToInventory(AddInventoryDTO(50, esopType = "NON_PERFORMANCE"))
         val sellOrderByKajal = Order(25, "SELL", 10, userRecords.getUser("kajal")!!)
         userRecords.getUser("kajal")!!.lockNonPerformanceInventory(25)
 
         //Act
-        orderExecutionPool.add(sellOrderByKajal)
+        orderExecutor.add(sellOrderByKajal)
 
         //Assert
         assertEquals(25, userRecords.getUser("kajal")!!.getFreeESOPsInInventory("NON_PERFORMANCE"))
@@ -256,13 +256,13 @@ class OrderExecutionPoolTest {
         kajal.addMoneyToWallet(100)
         val buyOrderByKajal = Order(10, "BUY", 10, kajal)
         kajal.lockAmount(10 * 10)
-        orderExecutionPool.add(buyOrderByKajal)
+        orderExecutor.add(buyOrderByKajal)
 
         val arun = userRecords.getUser("arun")!!
         arun.addMoneyToWallet(100)
         val buyOrderByArun = Order(10, "BUY", 10, arun)
         arun.lockAmount(10 * 10)
-        orderExecutionPool.add(buyOrderByArun)
+        orderExecutor.add(buyOrderByArun)
 
         val sankar = userRecords.getUser("sankar")!!
         sankar.addToInventory(AddInventoryDTO(30, esopType = "NON_PERFORMANCE"))
@@ -270,7 +270,7 @@ class OrderExecutionPoolTest {
         sankar.lockNonPerformanceInventory(20)
 
         //Act
-        orderExecutionPool.add(sellOrderBySankar)
+        orderExecutor.add(sellOrderBySankar)
 
         //Assert
         assertEquals(10, kajal.getFreeESOPsInInventory("NON_PERFORMANCE"))
@@ -303,7 +303,7 @@ class OrderExecutionPoolTest {
         kajal.addToInventory(AddInventoryDTO(50, esopType = "PERFORMANCE"))
         val sellOrder = Order(10, "SELL", 10, kajal, esopType = "PERFORMANCE")
         kajal.lockPerformanceInventory(10)
-        orderExecutionPool.add(sellOrder)
+        orderExecutor.add(sellOrder)
 
         val sankar = userRecords.getUser("sankar")!!
         sankar.addMoneyToWallet(100)
@@ -311,7 +311,7 @@ class OrderExecutionPoolTest {
         sankar.lockAmount(100)
 
         //Act
-        orderExecutionPool.add(buyOrder)
+        orderExecutor.add(buyOrder)
 
         //Assert
         assertEquals(40, kajal.getFreeESOPsInInventory("PERFORMANCE"))
@@ -327,7 +327,7 @@ class OrderExecutionPoolTest {
         sankar.addMoneyToWallet(100)
         val buyOrder = Order(10, "BUY", 10, sankar)
         sankar.lockAmount(100)
-        orderExecutionPool.add(buyOrder)
+        orderExecutor.add(buyOrder)
 
         val kajal = userRecords.getUser("kajal")!!
         kajal.addToInventory(AddInventoryDTO(50, esopType = "PERFORMANCE"))
@@ -335,7 +335,7 @@ class OrderExecutionPoolTest {
         kajal.lockPerformanceInventory(10)
 
         //Act
-        orderExecutionPool.add(sellOrder)
+        orderExecutor.add(sellOrder)
 
         //Assert
         assertEquals(40, kajal.getFreeESOPsInInventory("PERFORMANCE"))
@@ -351,7 +351,7 @@ class OrderExecutionPoolTest {
         sankar.addMoneyToWallet(200)
         val buyOrder = Order(20, "BUY", 10, sankar)
         sankar.lockAmount(200)
-        orderExecutionPool.add(buyOrder)
+        orderExecutor.add(buyOrder)
 
         val kajal = userRecords.getUser("kajal")!!
         kajal.addToInventory(AddInventoryDTO(50, esopType = "NON_PERFORMANCE"))
@@ -359,7 +359,7 @@ class OrderExecutionPoolTest {
         kajal.lockNonPerformanceInventory(10)
 
         //Act
-        orderExecutionPool.add(sellOrder)
+        orderExecutor.add(sellOrder)
 
         //Assert
         assertEquals(40, kajal.getFreeESOPsInInventory("NON_PERFORMANCE"))
@@ -375,13 +375,13 @@ class OrderExecutionPoolTest {
         kajal.addToInventory(AddInventoryDTO(50, esopType = "NON_PERFORMANCE"))
         val sellOrderByKajal = Order(10, "SELL", 10, kajal)
         kajal.lockNonPerformanceInventory(10)
-        orderExecutionPool.add(sellOrderByKajal)
+        orderExecutor.add(sellOrderByKajal)
 
         val arun = userRecords.getUser("arun")!!
         arun.addToInventory(AddInventoryDTO(50, esopType = "PERFORMANCE"))
         val sellOrderByArun = Order(10, "SELL", 10, arun, "PERFORMANCE")
         arun.lockPerformanceInventory(10)
-        orderExecutionPool.add(sellOrderByArun)
+        orderExecutor.add(sellOrderByArun)
 
         val sankar = userRecords.getUser("sankar")!!
         sankar.addMoneyToWallet(250)
@@ -389,7 +389,7 @@ class OrderExecutionPoolTest {
         sankar.lockAmount(200)
 
         //Act
-        orderExecutionPool.add(buyOrderBySankar)
+        orderExecutor.add(buyOrderBySankar)
 
         //Assert
         assertEquals(40, kajal.getFreeESOPsInInventory("NON_PERFORMANCE"))
@@ -419,13 +419,13 @@ class OrderExecutionPoolTest {
         kajal.addToInventory(AddInventoryDTO(50, esopType = "PERFORMANCE"))
         val sellOrderByKajal = Order(10, "SELL", 10, kajal, "PERFORMANCE")
         kajal.lockPerformanceInventory(10)
-        orderExecutionPool.add(sellOrderByKajal)
+        orderExecutor.add(sellOrderByKajal)
 
         val arun = userRecords.getUser("arun")!!
         arun.addToInventory(AddInventoryDTO(50, esopType = "PERFORMANCE"))
         val sellOrderByArun = Order(10, "SELL", 10, arun, "PERFORMANCE")
         arun.lockPerformanceInventory(10)
-        orderExecutionPool.add(sellOrderByArun)
+        orderExecutor.add(sellOrderByArun)
 
         val sankar = userRecords.getUser("sankar")!!
         sankar.addMoneyToWallet(250)
@@ -433,7 +433,7 @@ class OrderExecutionPoolTest {
         sankar.lockAmount(200)
 
         //Act
-        orderExecutionPool.add(buyOrderBySankar)
+        orderExecutor.add(buyOrderBySankar)
 
         //Assert
         assertEquals(40, kajal.getFreeESOPsInInventory("PERFORMANCE"))
@@ -464,13 +464,13 @@ class OrderExecutionPoolTest {
         arun.addToInventory(AddInventoryDTO(50, esopType = "PERFORMANCE"))
         val sellOrderByArun = Order(10, "SELL", 10, arun, "PERFORMANCE")
         arun.lockPerformanceInventory(10)
-        orderExecutionPool.add(sellOrderByArun)
+        orderExecutor.add(sellOrderByArun)
 
         val kajal = userRecords.getUser("kajal")!!
         kajal.addToInventory(AddInventoryDTO(50, esopType = "PERFORMANCE"))
         val sellOrderByKajal = Order(10, "SELL", 10, kajal, "PERFORMANCE")
         kajal.lockPerformanceInventory(10)
-        orderExecutionPool.add(sellOrderByKajal)
+        orderExecutor.add(sellOrderByKajal)
 
         val sankar = userRecords.getUser("sankar")!!
         sankar.addMoneyToWallet(250)
@@ -478,7 +478,7 @@ class OrderExecutionPoolTest {
         sankar.lockAmount(200)
 
         //Act
-        orderExecutionPool.add(buyOrderBySankar)
+        orderExecutor.add(buyOrderBySankar)
 
         //Assert
         assertEquals(40, kajal.getFreeESOPsInInventory("PERFORMANCE"))
@@ -508,13 +508,13 @@ class OrderExecutionPoolTest {
         arun.addToInventory(AddInventoryDTO(50, esopType = "NON_PERFORMANCE"))
         val sellOrderByArun = Order(10, "SELL", 10, arun)
         arun.lockNonPerformanceInventory(10)
-        orderExecutionPool.add(sellOrderByArun)
+        orderExecutor.add(sellOrderByArun)
 
         val kajal = userRecords.getUser("kajal")!!
         kajal.addToInventory(AddInventoryDTO(50, esopType = "NON_PERFORMANCE"))
         val sellOrderByKajal = Order(10, "SELL", 10, kajal)
         kajal.lockNonPerformanceInventory(10)
-        orderExecutionPool.add(sellOrderByKajal)
+        orderExecutor.add(sellOrderByKajal)
 
         val sankar = userRecords.getUser("sankar")!!
         sankar.addMoneyToWallet(250)
@@ -522,7 +522,7 @@ class OrderExecutionPoolTest {
         sankar.lockAmount(200)
 
         //Act
-        orderExecutionPool.add(buyOrderBySankar)
+        orderExecutor.add(buyOrderBySankar)
 
         //Assert
         assertEquals(40, kajal.getFreeESOPsInInventory("NON_PERFORMANCE"))
@@ -552,13 +552,13 @@ class OrderExecutionPoolTest {
         kajal.addToInventory(AddInventoryDTO(50, esopType = "NON_PERFORMANCE"))
         val sellOrderByKajal = Order(10, "SELL", 20, kajal)
         kajal.lockNonPerformanceInventory(10)
-        orderExecutionPool.add(sellOrderByKajal)
+        orderExecutor.add(sellOrderByKajal)
 
         val arun = userRecords.getUser("arun")!!
         arun.addToInventory(AddInventoryDTO(50, esopType = "NON_PERFORMANCE"))
         val sellOrderByArun = Order(10, "SELL", 10, arun)
         arun.lockNonPerformanceInventory(10)
-        orderExecutionPool.add(sellOrderByArun)
+        orderExecutor.add(sellOrderByArun)
 
 
         val sankar = userRecords.getUser("sankar")!!
@@ -567,7 +567,7 @@ class OrderExecutionPoolTest {
         sankar.lockAmount(400)
 
         //Act
-        orderExecutionPool.add(buyOrderBySankar)
+        orderExecutor.add(buyOrderBySankar)
 
         //Assert
         assertEquals(40, kajal.getFreeESOPsInInventory("NON_PERFORMANCE"))
@@ -603,8 +603,8 @@ class OrderExecutionPoolTest {
         val sellOrderByArun = Order(10, "SELL", 10, arun)
         arun.lockNonPerformanceInventory(10)
 
-        orderExecutionPool.add(sellOrderByArun)
-        orderExecutionPool.add(sellOrderByKajal)
+        orderExecutor.add(sellOrderByArun)
+        orderExecutor.add(sellOrderByKajal)
 
         val sankar = userRecords.getUser("sankar")!!
         sankar.addMoneyToWallet(400)
@@ -612,7 +612,7 @@ class OrderExecutionPoolTest {
         sankar.lockAmount(400)
 
         //Act
-        orderExecutionPool.add(buyOrderBySankar)
+        orderExecutor.add(buyOrderBySankar)
 
         //Assert
         assertEquals(40, kajal.getFreeESOPsInInventory("NON_PERFORMANCE"))

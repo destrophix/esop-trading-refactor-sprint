@@ -19,13 +19,13 @@ class OrderServiceTest {
 
     private lateinit var orderService: OrderService
     private lateinit var userRecords: UserRecords
-    private lateinit var orderExecutionPool: OrderExecutionPool
+    private lateinit var orderExecutor: OrderExecutor
 
     @BeforeEach
     fun setup() {
         userRecords = UserRecords()
-        orderExecutionPool = OrderExecutionPool()
-        orderService = OrderService(userRecords, orderExecutionPool)
+        orderExecutor = OrderExecutor()
+        orderService = OrderService(userRecords, orderExecutor)
     }
 
     @Test

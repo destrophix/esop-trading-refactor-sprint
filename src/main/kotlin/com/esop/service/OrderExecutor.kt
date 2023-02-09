@@ -6,7 +6,7 @@ import kotlin.math.min
 import kotlin.math.round
 
 @Singleton
-class OrderExecutionPool {
+class OrderExecutor {
     private val buyOrders = mutableListOf<Order>()
     private val sellOrders = mutableListOf<Order>()
 

@@ -10,6 +10,54 @@ class OrderExecutionPool {
     private val buyOrders = mutableListOf<Order>()
     private val sellOrders = mutableListOf<Order>()
 
+    fun add(order: Order) {
+        addToOrdersPool(order)
+        executeTransactionIfMatchFound(order)
+    }
+
+    private fun addToOrdersPool(order: Order) {
+        when (order.getType()) {
+            "BUY" -> addBuyOrder(order)
+            "SELL" -> addSellOrder(order)
+        }
+    }
+
+    private fun executeTransactionIfMatchFound(order: Order) {
+        findOrderMatch(order)?.let {
+            executeTransaction(transaction = it)
+        }
+    }
+
+    private fun findOrderMatch(order: Order): Transaction? {
+        return when (order.getType()) {
+            "SELL" -> findSellOrderMatch(sellOrder = order)
+            else -> findBuyOrderMatch(buyOrder = order)
+        }
+    }
+
+    private fun addBuyOrder(order: Order) {
+        buyOrders.add(order)
+    }
+
+    private fun addSellOrder(order: Order) {
+        sellOrders.add(order)
+    }
+
+    private fun findBuyOrderMatch(buyOrder: Order): Transaction? =
+        sellOrders.filter { sellOrder -> isOrderMatch(sellOrder, buyOrder) }.minOrNull()
+            ?.let { sellOrder -> Transaction(sellOrder = sellOrder, buyOrder = buyOrder) }
+
+
+    private fun findSellOrderMatch(sellOrder: Order): Transaction? =
+        buyOrders.filter { buyOrder -> isOrderMatch(sellOrder, buyOrder) }.minOrNull()
+            ?.let { buyOrder -> Transaction(sellOrder = sellOrder, buyOrder = buyOrder) }
+
+
+    private fun isOrderMatch(sellOrder: Order, buyOrder: Order): Boolean =
+        sellOrder.getPrice() <= buyOrder.getPrice() && sellOrder.getRemainingQuantity() > 0
+                && buyOrder.getRemainingQuantity() > 0
+
+
     private fun executeTransaction(transaction: Transaction) {
         val sellOrder = transaction.sellOrder
         val buyOrder = transaction.buyOrder
@@ -49,6 +97,18 @@ class OrderExecutionPool {
         }
     }
 
+    private fun updateWalletBalances(
+        sellAmount: Long,
+        platformFee: Long,
+        buyer: User,
+        seller: User
+    ) {
+        val adjustedSellAmount = sellAmount - platformFee
+        PlatformFee.addPlatformFee(platformFee)
+
+        buyer.removeMoneyFromLockedState(sellAmount)
+        seller.addMoneyToWallet(adjustedSellAmount)
+    }
 
     private fun appendTransactionLogs(
         orderExecutionQuantity: Long,
@@ -94,67 +154,5 @@ class OrderExecutionPool {
 
         val amountToBeReleased = (buyerOrder.getPrice() - sellerOrder.getPrice()) * (currentTradeQuantity)
         buyer.moveMoneyFromLockedToFree(amountToBeReleased)
-
-    }
-
-    private fun updateWalletBalances(
-        sellAmount: Long,
-        platformFee: Long,
-        buyer: User,
-        seller: User
-    ) {
-        val adjustedSellAmount = sellAmount - platformFee
-        PlatformFee.addPlatformFee(platformFee)
-
-        buyer.removeMoneyFromLockedState(sellAmount)
-        seller.addMoneyToWallet(adjustedSellAmount)
-    }
-
-    private fun findOrderMatch(order: Order): Transaction? {
-        return when (order.getType()) {
-            "SELL" -> findSellOrderMatch(sellOrder = order)
-            else -> findBuyOrderMatch(buyOrder = order)
-        }
-    }
-
-    private fun findBuyOrderMatch(buyOrder: Order): Transaction? =
-        sellOrders.filter { sellOrder -> isOrderMatch(sellOrder, buyOrder) }.minOrNull()
-            ?.let { sellOrder -> Transaction(sellOrder = sellOrder, buyOrder = buyOrder) }
-
-
-    private fun findSellOrderMatch(sellOrder: Order): Transaction? =
-        buyOrders.filter { buyOrder -> isOrderMatch(sellOrder, buyOrder) }.minOrNull()
-            ?.let { buyOrder -> Transaction(sellOrder = sellOrder, buyOrder = buyOrder) }
-
-
-    private fun isOrderMatch(sellOrder: Order, buyOrder: Order): Boolean =
-        sellOrder.getPrice() <= buyOrder.getPrice() && sellOrder.getRemainingQuantity() > 0
-                && buyOrder.getRemainingQuantity() > 0
-
-    private fun addBuyOrder(order: Order) {
-        buyOrders.add(order)
-    }
-
-    private fun addSellOrder(order: Order) {
-        sellOrders.add(order)
-    }
-
-
-    fun add(order: Order) {
-        addToOrdersPool(order)
-        executeTransactionIfMatchFound(order)
-    }
-
-    private fun addToOrdersPool(order: Order) {
-        when (order.getType()) {
-            "BUY" -> addBuyOrder(order)
-            "SELL" -> addSellOrder(order)
-        }
-    }
-
-    private fun executeTransactionIfMatchFound(order: Order) {
-        findOrderMatch(order)?.let {
-            executeTransaction(transaction = it)
-        }
     }
 }

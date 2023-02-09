@@ -33,18 +33,18 @@ class UserController {
     @Inject
     lateinit var orderService: OrderService
 
-    @Error(exception = HttpException::class)
+    @Error(exception = HttpException::class, global = true)
     fun onHttpException(exception: HttpException): HttpResponse<*> {
         return HttpResponse.status<Map<String, ArrayList<String>>>(exception.status)
             .body(mapOf("errors" to arrayListOf(exception.message)))
     }
 
-    @Error(exception = JsonProcessingException::class)
+    @Error(exception = JsonProcessingException::class, global = true)
     fun onJSONProcessingExceptionError(ex: JsonProcessingException): HttpResponse<Map<String, ArrayList<String>>> {
         return HttpResponse.badRequest(mapOf("errors" to arrayListOf("Invalid JSON format")))
     }
 
-    @Error(exception = UnsatisfiedBodyRouteException::class)
+    @Error(exception = UnsatisfiedBodyRouteException::class, global = true)
     fun onUnsatisfiedBodyRouteException(
         request: HttpRequest<*>,
         ex: UnsatisfiedBodyRouteException
@@ -57,22 +57,22 @@ class UserController {
         return HttpResponse.notFound(mapOf("errors" to arrayListOf("Route not found")))
     }
 
-    @Error(exception = ConversionErrorException::class)
+    @Error(exception = ConversionErrorException::class, global = true)
     fun onConversionErrorException(ex: ConversionErrorException): HttpResponse<Map<String, List<*>>> {
         return HttpResponse.badRequest(mapOf("errors" to arrayListOf(ex.message)))
     }
 
-    @Error(exception = ConstraintViolationException::class)
+    @Error(exception = ConstraintViolationException::class, global = true)
     fun onConstraintViolationException(ex: ConstraintViolationException): HttpResponse<Map<String, List<*>>> {
         return HttpResponse.badRequest(mapOf("errors" to ex.constraintViolations.map { it.message }))
     }
 
-    @Error(exception = RuntimeException::class)
+    @Error(exception = RuntimeException::class, global = true)
     fun onRuntimeError(ex: RuntimeException): HttpResponse<Map<String, List<*>>> {
         return HttpResponse.serverError(mapOf("errors" to arrayListOf(ex.message)))
     }
 
-    @Error(exception = UserNotFoundException::class)
+    @Error(exception = UserNotFoundException::class, global = true)
     fun onUserNotFoundException(ex: UserNotFoundException): HttpResponse<Map<String, List<String>>> {
         return HttpResponse.notFound(mapOf("errors" to arrayListOf("User not found")))
     }

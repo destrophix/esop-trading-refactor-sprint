@@ -29,7 +29,9 @@ class OrderController {
     }
 
     @Post(uri = "/{userName}/order", consumes = [MediaType.APPLICATION_JSON], produces = [MediaType.APPLICATION_JSON])
-    fun order(userName: String, @Body @Valid newOrderDetails: CreateOrderDTO): HttpResponse<CreateOrderResponse> {
+    fun placeOrderRouteHandler(
+        userName: String, @Body @Valid newOrderDetails: CreateOrderDTO
+    ): HttpResponse<CreateOrderResponse> {
         val user = userService.getUserOrNull(userName) ?: throw UserNotFoundException("User not found")
 
         val order = orderService.placeOrder(newOrderDetails, user)
@@ -45,7 +47,7 @@ class OrderController {
     }
 
     @Get(uri = "/{userName}/orderHistory", produces = [MediaType.APPLICATION_JSON])
-    fun orderHistory(userName: String): HttpResponse<*> {
+    fun fetchOrderHistoryRouteHandler(userName: String): HttpResponse<*> {
         val orderHistoryData = orderService.orderHistory(userName)
         if (orderHistoryData is Map<*, *>) {
             return HttpResponse.badRequest(orderHistoryData)

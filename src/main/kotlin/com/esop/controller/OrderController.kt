@@ -1,19 +1,13 @@
 package com.esop.controller
 
-import com.esop.HttpException
 import com.esop.dto.CreateOrderDTO
 import com.esop.exceptions.InsufficientFreeESOPsInInventoryException
 import com.esop.exceptions.UserNotFoundException
-import com.esop.schema.Order
 import com.esop.service.OrderService
 import com.esop.service.UserService
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.MediaType
-import io.micronaut.http.annotation.Body
-import io.micronaut.http.annotation.Controller
-import io.micronaut.http.annotation.Error
-import io.micronaut.http.annotation.Get
-import io.micronaut.http.annotation.Post
+import io.micronaut.http.annotation.*
 import io.micronaut.validation.Validated
 import jakarta.inject.Inject
 import javax.validation.Valid
@@ -37,14 +31,7 @@ class OrderController {
     fun order(userName: String, @Body @Valid newOrderDetails: CreateOrderDTO): Any? {
         val user = userService.getUserOrNull(userName) ?: throw UserNotFoundException("User not found")
 
-        val order = Order.from(
-            orderDetails = newOrderDetails,
-            orderPlacer = user
-        )
-
-        userService.orderCheckBeforePlace(order)
-
-        orderService.placeOrder(order)
+        val order = orderService.placeOrder(newOrderDetails, user)
 
         return HttpResponse.ok(
             mapOf(

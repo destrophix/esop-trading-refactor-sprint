@@ -10,10 +10,10 @@ class User(
     var email: String,
     var username: String
 ) {
-    val userWallet: Wallet = Wallet()
-    val userNonPerfInventory: Inventory = Inventory(type = "NON_PERFORMANCE")
-    val userPerformanceInventory: Inventory = Inventory(type = "PERFORMANCE")
-    val orderList: ArrayList<Order> = ArrayList()
+    private val userWallet: Wallet = Wallet()
+    private val userNonPerfInventory: Inventory = Inventory(type = "NON_PERFORMANCE")
+    private val userPerformanceInventory: Inventory = Inventory(type = "PERFORMANCE")
+    private val orders: ArrayList<Order> = ArrayList()
 
     fun addToWallet(walletData: AddWalletDTO): String {
         userWallet.addMoneyToWallet(walletData.price!!)
@@ -50,5 +50,53 @@ class User(
     fun transferLockedESOPsTo(buyer: User, esopTransferData : EsopTransferRequest) {
         this.getInventory(esopTransferData.esopType).removeESOPsFromLockedState(esopTransferData.currentTradeQuantity)
         buyer.getInventory("NON_PERFORMANCE").addESOPsToInventory(esopTransferData.currentTradeQuantity)
+    }
+
+    fun addOrder(order: Order) {
+        orders.add(order)
+    }
+
+    fun getAllOrders(): List<Order> {
+        return orders
+    }
+
+    fun removeMoneyFromLockedState(amount: Long) {
+        userWallet.removeMoneyFromLockedState(amount)
+    }
+
+    fun addMoneyToWallet(amount: Long) {
+        userWallet.addMoneyToWallet(amount)
+    }
+
+    fun moveMoneyFromLockedToFree(amount: Long) {
+        userWallet.moveMoneyFromLockedToFree(amount)
+    }
+
+    fun getFreeAmountInWallet(): Long {
+        return userWallet.getFreeMoney()
+    }
+
+    fun getLockedAmountInWallet(): Long {
+        return userWallet.getLockedMoney()
+    }
+
+    fun getFreeESOPsInInventory(esopType: String): Long {
+        return getInventory(esopType).getFreeInventory()
+    }
+
+    fun getLockedESOPsInInventory(esopType: String): Long {
+        return getInventory(esopType).getLockedInventory()
+    }
+
+    fun lockESOPs(esopType: String, quantity: Long) {
+        getInventory(esopType).moveESOPsFromFreeToLockedState(quantity)
+    }
+
+    fun getTotalESOP(): Long {
+        return userPerformanceInventory.getFreeInventory() + userPerformanceInventory.getLockedInventory() + userNonPerfInventory.getFreeInventory() + userNonPerfInventory.getLockedInventory()
+    }
+
+    fun getTotalAmount(): Long {
+        return userWallet.getFreeMoney() + userWallet.getLockedMoney()
     }
 }

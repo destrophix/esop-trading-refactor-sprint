@@ -1,5 +1,6 @@
 package com.esop.schema
 
+import com.esop.dto.AddInventoryDTO
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -29,12 +30,12 @@ class UserTest {
     ) {
         val userOne = User("Sankaranarayanan", "M", "7550276216", "sankaranarayananm@sahaj.ai", "sankar")
         val userTwo = User("Aditya", "Tiwari", "", "aditya@sahaj.ai", "aditya")
-        userOne.userPerformanceInventory.addESOPsToInventory(esopToBeAdded)
-        userOne.userPerformanceInventory.moveESOPsFromFreeToLockedState(esopToBeLocked)
+        userOne.addToInventory(AddInventoryDTO(esopToBeAdded, "PERFORMANCE"))
+        userOne.lockPerformanceInventory(esopToBeLocked)
 
         userOne.transferLockedESOPsTo(userTwo, EsopTransferRequest("PERFORMANCE", currentTradeQuantity))
 
-        Assertions.assertEquals(expectedFreeInventoryForUserOne, userOne.userPerformanceInventory.getFreeInventory())
-        Assertions.assertEquals(expectedNonPerformanceInventoryForUserTwo, userTwo.userNonPerfInventory.getFreeInventory())
+        Assertions.assertEquals(expectedFreeInventoryForUserOne, userOne.getFreeESOPsInInventory("PERFORMANCE"))
+        Assertions.assertEquals(expectedNonPerformanceInventoryForUserTwo, userTwo.getFreeESOPsInInventory("NON_PERFORMANCE"))
     }
 }

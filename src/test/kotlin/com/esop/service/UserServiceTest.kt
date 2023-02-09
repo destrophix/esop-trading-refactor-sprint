@@ -1,18 +1,12 @@
 package com.esop.service
 
-import com.esop.InventoryLimitExceededException
-import com.esop.WalletLimitExceededException
-import com.esop.constant.MAX_INVENTORY_CAPACITY
-import com.esop.constant.MAX_WALLET_CAPACITY
 import com.esop.dto.AddInventoryDTO
 import com.esop.dto.AddWalletDTO
 import com.esop.dto.UserCreationDTO
 import com.esop.repository.UserRecords
-import com.esop.schema.Order
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 
 class UserServiceTest {
 
@@ -55,7 +49,7 @@ class UserServiceTest {
 
         userService.addingMoney(walletDetails, "Sankar")
 
-        val actualFreeMoney = userRecords.getUser(expectedUsername)!!.userWallet.getFreeMoney()
+        val actualFreeMoney = userRecords.getUser(expectedUsername)!!.getFreeAmountInWallet()
         assertEquals(expectedFreeMoney, actualFreeMoney)
     }
 
@@ -69,133 +63,9 @@ class UserServiceTest {
 
         userService.addingInventory(inventoryDetails, "Sankar")
 
-        val actualFreeMoney = userRecords.getUser(expectedUsername)!!.userNonPerfInventory.getFreeInventory()
+        val actualFreeMoney = userRecords.getUser(expectedUsername)!!.getFreeESOPsInInventory("NON_PERFORMANCE")
         assertEquals(expectedFreeInventory, actualFreeMoney)
     }
 
-    @Test
-    fun `should check if return empty list if there is sufficient free amount is in wallet to place BUY order`() {
-        val user = UserCreationDTO("Sankar", "M", "+917550276216", "sankar@sahaj.ai", "sankar06")
-        userService.registerUser(user)
-        userService.addingMoney(AddWalletDTO(price = 100L), userName = "sankar06")
-        val order = Order(
-            quantity = 10, type = "BUY", price = 10, orderPlacer = userRecords.getUser("sankar06")!!
-        )
-
-        val actualErrors = userService.orderCheckBeforePlace(order)
-
-        val expectedErrors = emptyList<String>()
-        assertEquals(expectedErrors, actualErrors, "error list returned must be empty")
-    }
-
-    @Test
-    fun `it should return error list with error if there is insufficient free amount in wallet to place BUY order`() {
-        val user = UserCreationDTO("Sankar", "M", "+917550276216", "sankar@sahaj.ai", "sankar06")
-        userService.registerUser(user)
-        val order = Order(
-            quantity = 10, type = "BUY", price = 10, orderPlacer = userRecords.getUser("sankar06")!!
-        )
-        userService.addingMoney(AddWalletDTO(price = 99L), userName = "sankar06")
-
-        val actualErrors = userService.orderCheckBeforePlace(order)
-
-        val expectedErrors = listOf("Insufficient funds")
-        assertEquals(expectedErrors, actualErrors)
-    }
-
-    @Test
-    fun `it should return error when the buyer inventory overflows`() {
-        val user = UserCreationDTO("Sankar", "M", "+917550276216", "sankar@sahaj.ai", "sankar06")
-        userService.registerUser(user)
-        val order = Order(
-            quantity = 10, type = "BUY", price = 10, orderPlacer = userRecords.getUser("sankar06")!!
-        )
-        userService.addingInventory(AddInventoryDTO(MAX_INVENTORY_CAPACITY, "NON_PERFORMANCE"), userName = "sankar06")
-
-        assertThrows<InventoryLimitExceededException> {
-            userService.orderCheckBeforePlace(order)
-        }
-    }
-
-    @Test
-    fun `it should return empty error list when there is sufficient free Non Performance ESOPs in the Inventory`() {
-        val user = UserCreationDTO("Sankar", "M", "+917550276216", "sankar@sahaj.ai", "sankar06")
-        userService.registerUser(user)
-        userService.addingInventory(AddInventoryDTO(quantity = 10L), userName = "sankar06")
-        val order = Order(
-            quantity = 10, type = "SELL", price = 10, orderPlacer = userRecords.getUser("sankar06")!!,
-        )
-
-        val actualErrors = userService.orderCheckBeforePlace(order)
-
-        val expectedErrors = emptyList<String>()
-        assertEquals(expectedErrors, actualErrors, "error list returned must be empty")
-    }
-
-    @Test
-    fun `it should return error list with error when there is insufficient free Non Performance ESOPs in Inventory`() {
-        val user = UserCreationDTO("Sankar", "M", "+917550276216", "sankar@sahaj.ai", "sankar06")
-        userService.registerUser(user)
-        userService.addingInventory(AddInventoryDTO(quantity = 10L), userName = "sankar06")
-        val order = Order(
-            quantity = 29, type = "SELL", price = 10, orderPlacer = userRecords.getUser("sankar06")!!
-        )
-
-        val actualErrors = userService.orderCheckBeforePlace(order)
-
-        val expectedErrors = listOf("Insufficient non_performance inventory.")
-        assertEquals(
-            expectedErrors,
-            actualErrors,
-            "error list should contain \"Insufficient non_performance inventory.\""
-        )
-    }
-
-    @Test
-    fun `it should return error when the seller wallet overflows`() {
-        val user = UserCreationDTO("Sankar", "M", "+917550276216", "sankar@sahaj.ai", "sankar06")
-        userService.registerUser(user)
-        val order = Order(
-            quantity = 10, type = "SELL", price = 10, orderPlacer = userRecords.getUser("sankar06")!!,
-        )
-        userService.addingMoney(AddWalletDTO(MAX_WALLET_CAPACITY), userName = "sankar06")
-
-        assertThrows<WalletLimitExceededException> {
-            userService.orderCheckBeforePlace(order)
-        }
-    }
-
-    @Test
-    fun `it should return empty error list when there is sufficient free Performance ESOPs in the Inventory`() {
-        val user = UserCreationDTO("Sankar", "M", "+917550276216", "sankar@sahaj.ai", "sankar06")
-        userService.registerUser(user)
-        userService.addingInventory(AddInventoryDTO(quantity = 10L, esopType = "PERFORMANCE"), userName = "sankar06")
-        val order = Order(
-            quantity = 10, type = "SELL", price = 10, orderPlacer = userRecords.getUser("sankar06")!!, esopType = "PERFORMANCE"
-        )
-
-        val actualErrors = userService.orderCheckBeforePlace(order)
-
-        val expectedErrors = emptyList<String>()
-        assertEquals(expectedErrors, actualErrors, "error list returned must be empty")
-    }
-
-    @Test
-    fun `it should return error list with error when there is insufficient free Performance ESOPs in Inventory`() {
-        val user = UserCreationDTO("Sankar", "M", "+917550276216", "sankar@sahaj.ai", "sankar06")
-        userService.registerUser(user)
-        val order = Order(
-            quantity = 29, type = "SELL", price = 10, orderPlacer = userRecords.getUser("sankar06")!!, esopType = "PERFORMANCE"
-        )
-
-        val actualErrors = userService.orderCheckBeforePlace(order)
-
-        val expectedErrors = listOf("Insufficient performance inventory.")
-        assertEquals(
-            expectedErrors,
-            actualErrors,
-            "error list should contain \"Insufficient performance inventory.\""
-        )
-    }
 
 }

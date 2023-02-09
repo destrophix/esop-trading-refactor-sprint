@@ -24,7 +24,7 @@ class Order(
     private var remainingQuantity = quantity
 
     companion object {
-        fun from(orderDetails: CreateOrderDTO, orderPlacer: User): Order {
+        fun  from(orderDetails: CreateOrderDTO, orderPlacer: User): Order {
             return Order(
                 quantity = orderDetails.quantity!!,
                 type = orderDetails.type!!,

@@ -1,149 +1,93 @@
 package com.esop.service
 
 
+import com.esop.InventoryLimitExceededException
+import com.esop.WalletLimitExceededException
+import com.esop.constant.MAX_INVENTORY_CAPACITY
+import com.esop.constant.MAX_WALLET_CAPACITY
 import com.esop.constant.errors
+import com.esop.dto.CreateOrderDTO
+import com.esop.exceptions.InsufficientFreeAmountInWalletException
+import com.esop.exceptions.InsufficientFreeESOPsInInventoryException
 import com.esop.repository.UserRecords
-import com.esop.schema.*
-import com.esop.schema.PlatformFee.Companion.addPlatformFee
+import com.esop.schema.History
+import com.esop.schema.Order
+import com.esop.schema.User
+import jakarta.inject.Inject
 import jakarta.inject.Singleton
-import kotlin.math.min
-import kotlin.math.round
 
-private const val TWO_PERCENT = 0.02
 
 @Singleton
-class OrderService(private val userRecords: UserRecords) {
-    companion object {
-        var buyOrders = mutableListOf<Order>()
-        var sellOrders = mutableListOf<Order>()
-    }
-
-    private fun updateOrderDetails(
-        currentTradeQuantity: Long,
-        sellerOrder: Order,
-        buyerOrder: Order
-    ) {
-        // Deduct money of quantity taken from buyer
-        val sellAmount = sellerOrder.getPrice() * (currentTradeQuantity)
-        val buyer = buyerOrder.getOrderPlacer()
-        val seller = sellerOrder.getOrderPlacer()
-        var platformFee = 0L
+class OrderService(private val userRecords: UserRecords, private val orderExecutionPool: OrderExecutionPool) {
 
 
-        if (sellerOrder.getESOPType() == "NON_PERFORMANCE")
-            platformFee = round(sellAmount * TWO_PERCENT).toLong()
+    fun placeOrder(orderDetails: CreateOrderDTO, orderPlacer: User): Order {
+        val order = createOrder(orderDetails, orderPlacer)
+        orderExecutionPool.add(order)
 
-        updateWalletBalances(sellAmount, platformFee, buyer, seller)
-
-
-        seller.transferLockedESOPsTo(buyer, EsopTransferRequest(sellerOrder.getESOPType(), currentTradeQuantity))
-
-        val amountToBeReleased = (buyerOrder.getPrice() - sellerOrder.getPrice()) * (currentTradeQuantity)
-        buyer.userWallet.moveMoneyFromLockedToFree(amountToBeReleased)
-
-    }
-
-    private fun updateWalletBalances(
-        sellAmount: Long,
-        platformFee: Long,
-        buyer: User,
-        seller: User
-    ) {
-        val adjustedSellAmount = sellAmount - platformFee
-        addPlatformFee(platformFee)
-
-        buyer.userWallet.removeMoneyFromLockedState(sellAmount)
-        seller.userWallet.addMoneyToWallet(adjustedSellAmount)
-    }
-
-
-    private fun sortAscending(): List<Order> {
-        return sellOrders.sorted()
-    }
-
-    fun placeOrder(order: Order): Order {
-        if (order.getType() == "BUY") {
-            executeBuyOrder(order)
-        } else {
-            executeSellOrder(order)
-        }
-
-        order.getOrderPlacer().orderList.add(order)
         return order
     }
 
-    private fun executeBuyOrder(buyOrder: Order) {
-        buyOrders.add(buyOrder)
-        val sortedSellOrders = sortAscending()
+    private fun createOrder(orderDetails: CreateOrderDTO, orderPlacer: User): Order {
+        checkOrderPlacementPossible(orderDetails, orderPlacer)
 
-        for (sellOrder in sortedSellOrders) {
-            if (sellAndBuyOrderMatch(sellOrder, buyOrder)) {
-                performOrderMatching(sellOrder, buyOrder)
-            }
+        lockResources(orderDetails, orderPlacer)
+
+        val order = Order.from(orderDetails, orderPlacer)
+        orderPlacer.addOrder(order)
+
+        return order
+    }
+
+    private fun lockResources(orderDetails: CreateOrderDTO, orderPlacer: User) {
+        when (orderDetails.type) {
+            "BUY" -> orderPlacer.lockAmount(orderDetails.quantity!! * orderDetails.price!!)
+            "SELL" -> orderPlacer.lockESOPs(orderDetails.esopType!!, orderDetails.quantity!!)
         }
     }
 
-    private fun executeSellOrder(sellOrder: Order) {
-        sellOrders.add(sellOrder)
-        val sortedBuyOrders = buyOrders.sorted()
-
-        for (buyOrder in sortedBuyOrders) {
-            if (sellAndBuyOrderMatch(sellOrder, buyOrder)) {
-                performOrderMatching(sellOrder, buyOrder)
-            }
+    private fun checkOrderPlacementPossible(orderDetails: CreateOrderDTO, orderPlacer: User) {
+        when (orderDetails.type) {
+            "BUY" -> checkBuyOrderPlacementPossible(orderDetails, orderPlacer)
+            "SELL" -> checkSellOrderPlacementPossible(orderDetails, orderPlacer)
         }
     }
 
-    private fun sellAndBuyOrderMatch(sellOrder: Order, buyOrder: Order): Boolean =
-        sellOrder.getPrice() <= buyOrder.getPrice() && sellOrder.getRemainingQuantity() > 0 && buyOrder.getRemainingQuantity() > 0
-
-    private fun performOrderMatching(sellOrder: Order, buyOrder: Order) {
-        val orderExecutionPrice = sellOrder.getPrice()
-        val orderExecutionQuantity = min(sellOrder.getRemainingQuantity(), buyOrder.getRemainingQuantity())
-
-        buyOrder.subtractFromRemainingQuantity(orderExecutionQuantity)
-        sellOrder.subtractFromRemainingQuantity(orderExecutionQuantity)
-
-        createOrderFilledLogs(orderExecutionQuantity, orderExecutionPrice, sellOrder, buyOrder)
-
-        updateOrderDetails(
-            orderExecutionQuantity,
-            sellOrder,
-            buyOrder
+    private fun checkSellOrderPlacementPossible(orderDetails: CreateOrderDTO, orderPlacer: User) {
+        checkEnoughFreeESOPsInInventory(orderDetails, orderPlacer)
+        checkWalletWillNotExceedMaxLimitOnOrderCompletion(
+            orderDetails.quantity!! * orderDetails.price!!,
+            orderPlacer
         )
-
-        if (buyOrder.isCompleted()) {
-            buyOrders.remove(buyOrder)
-        }
-        if (sellOrder.isCompleted()) {
-            sellOrders.remove(sellOrder)
-        }
     }
 
-    private fun createOrderFilledLogs(
-        orderExecutionQuantity: Long,
-        orderExecutionPrice: Long,
-        sellOrder: Order,
-        buyOrder: Order
-    ) {
-        val buyOrderLog = OrderFilledLog(
-            orderExecutionQuantity,
-            orderExecutionPrice,
-            null,
-            sellOrder.getOrderPlacer().username,
-            null
-        )
-        val sellOrderLog = OrderFilledLog(
-            orderExecutionQuantity,
-            orderExecutionPrice,
-            sellOrder.getESOPType(),
-            null,
-            buyOrder.getOrderPlacer().username
-        )
-
-        buyOrder.addOrderFilledLogs(buyOrderLog)
-        sellOrder.addOrderFilledLogs(sellOrderLog)
+    private fun checkEnoughFreeESOPsInInventory(orderDetails: CreateOrderDTO, orderPlacer: User) {
+        if (orderPlacer.getFreeESOPsInInventory(orderDetails.esopType!!) < orderDetails.quantity!!)
+            throw InsufficientFreeESOPsInInventoryException(
+                "Insufficient ${if (orderDetails.esopType == "PERFORMANCE") "PERFORMANCE" else ""} ESOPs in Inventory"
+            )
     }
+
+    private fun checkBuyOrderPlacementPossible(orderDetails: CreateOrderDTO, orderPlacer: User) {
+        checkEnoughFreeAmountInWallet(orderDetails.quantity!! * orderDetails.price!!, orderPlacer)
+        checkInventoryWillNotExceedMaxLimitOnOrderCompletion(orderDetails.quantity!!, orderPlacer)
+    }
+
+    private fun checkEnoughFreeAmountInWallet(amount: Long, orderPlacer: User) {
+        if (orderPlacer.getFreeAmountInWallet() < amount)
+            throw InsufficientFreeAmountInWalletException("Insufficient funds")
+    }
+
+    private fun checkInventoryWillNotExceedMaxLimitOnOrderCompletion(quantity: Long, orderPlacer: User) {
+        if (orderPlacer.getTotalESOP() + quantity > MAX_INVENTORY_CAPACITY)
+            throw InventoryLimitExceededException()
+    }
+
+    private fun checkWalletWillNotExceedMaxLimitOnOrderCompletion(amount: Long, orderPlacer: User) {
+        if (orderPlacer.getTotalAmount() + amount > MAX_WALLET_CAPACITY)
+            throw WalletLimitExceededException()
+    }
+
 
     fun orderHistory(userName: String): Any {
         val userErrors = ArrayList<String>()
@@ -151,7 +95,7 @@ class OrderService(private val userRecords: UserRecords) {
             errors["USER_DOES_NOT_EXISTS"]?.let { userErrors.add(it) }
             return mapOf("error" to userErrors)
         }
-        val orderDetails = userRecords.getUser(userName)!!.orderList
+        val orderDetails = userRecords.getUser(userName)!!.getAllOrders()
         val orderHistory = ArrayList<History>()
 
         for (orders in orderDetails) {
@@ -168,4 +112,6 @@ class OrderService(private val userRecords: UserRecords) {
         }
         return orderHistory
     }
+
+
 }

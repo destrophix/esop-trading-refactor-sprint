@@ -1,6 +1,5 @@
 package com.esop.service
 
-
 import com.esop.InventoryLimitExceededException
 import com.esop.WalletLimitExceededException
 import com.esop.constant.MAX_INVENTORY_CAPACITY
@@ -17,8 +16,10 @@ import jakarta.inject.Singleton
 
 
 @Singleton
-class OrderService(private val userRecords: UserRecords, private val orderExecutionPool: OrderExecutionPool) {
-
+class OrderService(
+    private val userRecords: UserRecords,
+    private val orderExecutionPool: OrderExecutionPool
+) {
 
     fun placeOrder(orderDetails: CreateOrderDTO): Order {
         val order = createOrder(orderDetails)
@@ -115,6 +116,4 @@ class OrderService(private val userRecords: UserRecords, private val orderExecut
         }
         return orderHistory
     }
-
-
 }

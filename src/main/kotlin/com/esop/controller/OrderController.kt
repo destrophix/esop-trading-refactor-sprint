@@ -1,6 +1,8 @@
 package com.esop.controller
 
+import com.esop.HttpException
 import com.esop.dto.CreateOrderDTO
+import com.esop.exceptions.InsufficientFreeESOPsInInventoryException
 import com.esop.exceptions.UserNotFoundException
 import com.esop.schema.Order
 import com.esop.service.OrderService
@@ -9,6 +11,7 @@ import io.micronaut.http.HttpResponse
 import io.micronaut.http.MediaType
 import io.micronaut.http.annotation.Body
 import io.micronaut.http.annotation.Controller
+import io.micronaut.http.annotation.Error
 import io.micronaut.http.annotation.Get
 import io.micronaut.http.annotation.Post
 import io.micronaut.validation.Validated
@@ -25,6 +28,10 @@ class OrderController {
     @Inject
     lateinit var orderService: OrderService
 
+    @Error(exception = InsufficientFreeESOPsInInventoryException::class)
+    fun onInsufficientESOPsInInventoryException(exception: InsufficientFreeESOPsInInventoryException): HttpResponse<*> {
+        return HttpResponse.badRequest(mapOf("errors" to arrayListOf(exception.message)))
+    }
 
     @Post(uri = "/{userName}/order", consumes = [MediaType.APPLICATION_JSON], produces = [MediaType.APPLICATION_JSON])
     fun order(userName: String, @Body @Valid newOrderDetails: CreateOrderDTO): Any? {
@@ -35,10 +42,7 @@ class OrderController {
             orderPlacer = user
         )
 
-        val errorList = userService.orderCheckBeforePlace(order)
-        if (errorList.size > 0) {
-            return HttpResponse.badRequest(mapOf("errors" to errorList))
-        }
+        userService.orderCheckBeforePlace(order)
 
         orderService.placeOrder(order)
 

@@ -4,46 +4,45 @@ import com.esop.constant.errors
 import com.esop.dto.AddInventoryDTO
 import com.esop.dto.AddWalletDTO
 import com.esop.dto.UserCreationDTO
+import com.esop.exceptions.InsufficientFreeAmountInWalletException
+import com.esop.exceptions.InsufficientFreeESOPsInInventoryException
 import com.esop.repository.UserRecords
 import com.esop.schema.Order
 import com.esop.schema.User
 import jakarta.inject.Singleton
+import java.util.*
 
 @Singleton
 class UserService(private val userRecords: UserRecords) {
 
-    fun orderCheckBeforePlace(order: Order): MutableList<String> {
-        val errorList = mutableListOf<String>()
-
+    fun orderCheckBeforePlace(order: Order) {
         val user = order.getOrderPlacer()
         val wallet = user.userWallet
         val nonPerformanceInventory = user.userNonPerfInventory
-
-
 
         if (order.getType() == "BUY") {
             nonPerformanceInventory.assertInventoryWillNotOverflowOnAdding(order.getQuantity())
 
             val response = user.lockAmount(order.getPrice() * order.getQuantity())
-            if (response != "SUCCESS") {
-                errorList.add(response)
-            }
+
+            if (response != "SUCCESS")
+                throw InsufficientFreeAmountInWalletException("Insufficient funds")
+
         } else if (order.getType() == "SELL") {
             wallet.assertWalletWillNotOverflowOnAdding(order.getPrice() * order.getQuantity())
 
             if (order.getESOPType() == "PERFORMANCE") {
                 val response = user.lockPerformanceInventory(order.getQuantity())
-                if (response != "SUCCESS") {
-                    errorList.add(response)
-                }
+                if (response != "SUCCESS")
+                    throw InsufficientFreeESOPsInInventoryException("Insufficient ${order.getESOPType()} ESOPs in inventory.")
+
             } else if (order.getESOPType() == "NON_PERFORMANCE") {
                 val response = user.lockNonPerformanceInventory(order.getQuantity())
-                if (response != "SUCCESS") {
-                    errorList.add(response)
-                }
+                if (response != "SUCCESS")
+                    throw InsufficientFreeESOPsInInventoryException("Insufficient ESOPs in inventory.")
+
             }
         }
-        return errorList
     }
 
 

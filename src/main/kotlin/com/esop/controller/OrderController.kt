@@ -3,6 +3,7 @@ package com.esop.controller
 import com.esop.dto.CreateOrderDTO
 import com.esop.exceptions.InsufficientFreeESOPsInInventoryException
 import com.esop.exceptions.UserNotFoundException
+import com.esop.schema.CreateOrderResponse
 import com.esop.service.OrderService
 import com.esop.service.UserService
 import io.micronaut.http.HttpResponse
@@ -28,17 +29,17 @@ class OrderController {
     }
 
     @Post(uri = "/{userName}/order", consumes = [MediaType.APPLICATION_JSON], produces = [MediaType.APPLICATION_JSON])
-    fun order(userName: String, @Body @Valid newOrderDetails: CreateOrderDTO): Any? {
+    fun order(userName: String, @Body @Valid newOrderDetails: CreateOrderDTO): HttpResponse<CreateOrderResponse> {
         val user = userService.getUserOrNull(userName) ?: throw UserNotFoundException("User not found")
 
         val order = orderService.placeOrder(newOrderDetails, user)
 
         return HttpResponse.ok(
-            mapOf(
-                "orderId" to order.getOrderID(),
-                "quantity" to order.getQuantity(),
-                "type" to order.getType(),
-                "price" to order.getPrice()
+            CreateOrderResponse(
+                orderId = order.getOrderID(),
+                quantity = order.getQuantity(),
+                type = order.getType(),
+                price = order.getPrice()
             )
         )
     }

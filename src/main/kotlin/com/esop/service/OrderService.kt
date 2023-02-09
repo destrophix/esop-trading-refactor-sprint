@@ -13,7 +13,6 @@ import com.esop.repository.UserRecords
 import com.esop.schema.History
 import com.esop.schema.Order
 import com.esop.schema.User
-import jakarta.inject.Inject
 import jakarta.inject.Singleton
 
 
@@ -21,56 +20,60 @@ import jakarta.inject.Singleton
 class OrderService(private val userRecords: UserRecords, private val orderExecutionPool: OrderExecutionPool) {
 
 
-    fun placeOrder(orderDetails: CreateOrderDTO, orderPlacer: User): Order {
-        val order = createOrder(orderDetails, orderPlacer)
+    fun placeOrder(orderDetails: CreateOrderDTO): Order {
+        val order = createOrder(orderDetails)
         orderExecutionPool.add(order)
 
         return order
     }
 
-    private fun createOrder(orderDetails: CreateOrderDTO, orderPlacer: User): Order {
-        checkOrderPlacementPossible(orderDetails, orderPlacer)
+    private fun createOrder(orderDetails: CreateOrderDTO): Order {
+        val orderPlacer = orderDetails.orderPlacer
 
-        lockResources(orderDetails, orderPlacer)
+        checkOrderPlacementPossible(orderDetails)
+        lockResources(orderDetails)
 
-        val order = Order.from(orderDetails, orderPlacer)
+        val order = Order.from(orderDetails)
         orderPlacer.addOrder(order)
 
         return order
     }
 
-    private fun lockResources(orderDetails: CreateOrderDTO, orderPlacer: User) {
+    private fun lockResources(orderDetails: CreateOrderDTO) {
+        val orderPlacer = orderDetails.orderPlacer
+
         when (orderDetails.type) {
-            "BUY" -> orderPlacer.lockAmount(orderDetails.quantity!! * orderDetails.price!!)
-            "SELL" -> orderPlacer.lockESOPs(orderDetails.esopType!!, orderDetails.quantity!!)
+            "BUY" -> orderPlacer.lockAmount(orderDetails.getTotalAmount())
+            "SELL" -> orderPlacer.lockESOPs(orderDetails.esopType, orderDetails.quantity)
         }
     }
 
-    private fun checkOrderPlacementPossible(orderDetails: CreateOrderDTO, orderPlacer: User) {
+    private fun checkOrderPlacementPossible(orderDetails: CreateOrderDTO) {
         when (orderDetails.type) {
-            "BUY" -> checkBuyOrderPlacementPossible(orderDetails, orderPlacer)
-            "SELL" -> checkSellOrderPlacementPossible(orderDetails, orderPlacer)
+            "BUY" -> checkBuyOrderPlacementPossible(orderDetails)
+            "SELL" -> checkSellOrderPlacementPossible(orderDetails)
         }
     }
 
-    private fun checkSellOrderPlacementPossible(orderDetails: CreateOrderDTO, orderPlacer: User) {
-        checkEnoughFreeESOPsInInventory(orderDetails, orderPlacer)
+    private fun checkSellOrderPlacementPossible(orderDetails: CreateOrderDTO) {
+        checkEnoughFreeESOPsInInventory(orderDetails)
         checkWalletWillNotExceedMaxLimitOnOrderCompletion(
-            orderDetails.quantity!! * orderDetails.price!!,
-            orderPlacer
+            orderDetails.getTotalAmount(),
+            orderPlacer = orderDetails.orderPlacer
         )
     }
 
-    private fun checkEnoughFreeESOPsInInventory(orderDetails: CreateOrderDTO, orderPlacer: User) {
-        if (orderPlacer.getFreeESOPsInInventory(orderDetails.esopType!!) < orderDetails.quantity!!)
+    private fun checkEnoughFreeESOPsInInventory(orderDetails: CreateOrderDTO) {
+        val orderPlacer = orderDetails.orderPlacer
+        if (orderPlacer.getFreeESOPsInInventory(orderDetails.esopType) < orderDetails.quantity)
             throw InsufficientFreeESOPsInInventoryException(
                 "Insufficient ${if (orderDetails.esopType == "PERFORMANCE") "PERFORMANCE" else ""} ESOPs in Inventory"
             )
     }
 
-    private fun checkBuyOrderPlacementPossible(orderDetails: CreateOrderDTO, orderPlacer: User) {
-        checkEnoughFreeAmountInWallet(orderDetails.quantity!! * orderDetails.price!!, orderPlacer)
-        checkInventoryWillNotExceedMaxLimitOnOrderCompletion(orderDetails.quantity!!, orderPlacer)
+    private fun checkBuyOrderPlacementPossible(orderDetails: CreateOrderDTO) {
+        checkEnoughFreeAmountInWallet(orderPlacer = orderDetails.orderPlacer, amount = orderDetails.getTotalAmount())
+        checkInventoryWillNotExceedMaxLimitOnOrderCompletion(orderDetails.quantity, orderDetails.orderPlacer)
     }
 
     private fun checkEnoughFreeAmountInWallet(amount: Long, orderPlacer: User) {

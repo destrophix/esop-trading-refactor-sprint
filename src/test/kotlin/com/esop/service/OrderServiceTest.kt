@@ -5,28 +5,27 @@ import com.esop.WalletLimitExceededException
 import com.esop.constant.MAX_INVENTORY_CAPACITY
 import com.esop.constant.MAX_WALLET_CAPACITY
 import com.esop.dto.AddInventoryDTO
-import com.esop.dto.AddWalletDTO
 import com.esop.dto.CreateOrderDTO
-import com.esop.dto.UserCreationDTO
 import com.esop.exceptions.InsufficientFreeAmountInWalletException
 import com.esop.exceptions.InsufficientFreeESOPsInInventoryException
 import com.esop.repository.UserRecords
-import com.esop.schema.Order
 import com.esop.schema.User
-import org.junit.jupiter.api.*
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertDoesNotThrow
+import org.junit.jupiter.api.assertThrows
 
 class OrderServiceTest {
 
-    lateinit var orderService: OrderService
-    lateinit var userRecords: UserRecords
-    lateinit var orderExecutionPool: OrderExecutionPool
+    private lateinit var orderService: OrderService
+    private lateinit var userRecords: UserRecords
+    private lateinit var orderExecutionPool: OrderExecutionPool
 
     @BeforeEach
-    fun `setup`() {
+    fun setup() {
         userRecords = UserRecords()
         orderExecutionPool = OrderExecutionPool()
         orderService = OrderService(userRecords, orderExecutionPool)
-
     }
 
     @Test
@@ -34,12 +33,12 @@ class OrderServiceTest {
         val sankar = User("Sankaranarayanan", "M", "7550276216", "sankaranarayananm@sahaj.ai", "sankar")
         sankar.addMoneyToWallet(100)
         val order = CreateOrderDTO(
-            quantity = 10, type = "BUY", price = 10
+            quantity = 10, type = "BUY", price = 10, orderPlacer = sankar
         )
 
 
         assertDoesNotThrow {
-            orderService.placeOrder(order, sankar)
+            orderService.placeOrder(order)
         }
     }
 
@@ -47,11 +46,11 @@ class OrderServiceTest {
     fun `it should throw exception if there is insufficient free amount in wallet to place BUY order`() {
         val sankar = User("Sankar", "M", "+917550276216", "sankar@sahaj.ai", "sankar06")
         val order = CreateOrderDTO(
-            quantity = 10, type = "BUY", price = 10
+            quantity = 10, type = "BUY", price = 10, orderPlacer = sankar
         )
         sankar.addMoneyToWallet(99)
 
-        assertThrows<InsufficientFreeAmountInWalletException> { orderService.placeOrder(order, sankar) }
+        assertThrows<InsufficientFreeAmountInWalletException> { orderService.placeOrder(order) }
     }
 
     @Test
@@ -59,13 +58,13 @@ class OrderServiceTest {
         val sankar = User("Sankar", "M", "+917550276216", "sankar@sahaj.ai", "sankar06")
         sankar.addMoneyToWallet(100)
         val order = CreateOrderDTO(
-            quantity = 10, type = "BUY", price = 10
+            quantity = 10, type = "BUY", price = 10, orderPlacer = sankar
         )
 
         sankar.addToInventory(AddInventoryDTO(MAX_INVENTORY_CAPACITY))
 
         assertThrows<InventoryLimitExceededException> {
-            orderService.placeOrder(order, sankar)
+            orderService.placeOrder(order)
         }
     }
 
@@ -74,11 +73,11 @@ class OrderServiceTest {
         val sankar = User("Sankar", "M", "+917550276216", "sankar@sahaj.ai", "sankar06")
         sankar.addToInventory(AddInventoryDTO(10))
         val order = CreateOrderDTO(
-            quantity = 10, type = "SELL", price = 10
+            quantity = 10, type = "SELL", price = 10, orderPlacer = sankar
         )
 
         assertDoesNotThrow {
-            orderService.placeOrder(order, sankar)
+            orderService.placeOrder(order)
         }
     }
 
@@ -87,11 +86,11 @@ class OrderServiceTest {
         val sankar = User("Sankar", "M", "+917550276216", "sankar@sahaj.ai", "sankar06")
         sankar.addToInventory(AddInventoryDTO(10))
         val order = CreateOrderDTO(
-            quantity = 29, type = "SELL", price = 10
+            quantity = 29, type = "SELL", price = 10, orderPlacer = sankar
         )
 
         assertThrows<InsufficientFreeESOPsInInventoryException> {
-            orderService.placeOrder(order, sankar)
+            orderService.placeOrder(order)
         }
     }
 
@@ -100,12 +99,12 @@ class OrderServiceTest {
         val sankar = User("Sankar", "M", "+917550276216", "sankar@sahaj.ai", "sankar06")
         sankar.addToInventory(AddInventoryDTO(10))
         val order = CreateOrderDTO(
-            quantity = 10, type = "SELL", price = 10
+            quantity = 10, type = "SELL", price = 10, orderPlacer = sankar
         )
         sankar.addMoneyToWallet(MAX_WALLET_CAPACITY)
 
         assertThrows<WalletLimitExceededException> {
-            orderService.placeOrder(order, sankar)
+            orderService.placeOrder(order)
         }
     }
 
@@ -115,24 +114,23 @@ class OrderServiceTest {
 
         sankar.addToInventory(AddInventoryDTO(10, "PERFORMANCE"))
         val order = CreateOrderDTO(
-            quantity = 10, type = "SELL", price = 10, esopType = "PERFORMANCE"
+            quantity = 10, type = "SELL", price = 10, esopType = "PERFORMANCE", orderPlacer = sankar
         )
 
         assertDoesNotThrow {
-            orderService.placeOrder(order, sankar)
+            orderService.placeOrder(order)
         }
-
     }
 
     @Test
     fun `it should throw exception when there is insufficient free Performance ESOPs in Inventory`() {
         val sankar = User("Sankar", "M", "+917550276216", "sankar@sahaj.ai", "sankar06")
         val order = CreateOrderDTO(
-            quantity = 29, type = "SELL", price = 10, esopType = "PERFORMANCE"
+            quantity = 29, type = "SELL", price = 10, esopType = "PERFORMANCE", orderPlacer = sankar
         )
 
         assertThrows<InsufficientFreeESOPsInInventoryException> {
-            orderService.placeOrder(order, sankar)
+            orderService.placeOrder(order)
         }
     }
 }

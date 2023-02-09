@@ -1,6 +1,7 @@
 package com.esop.controller
 
 import com.esop.dto.CreateOrderDTO
+import com.esop.dto.CreateOrderRequestBody
 import com.esop.exceptions.InsufficientFreeESOPsInInventoryException
 import com.esop.exceptions.UserNotFoundException
 import com.esop.schema.CreateOrderResponse
@@ -30,11 +31,13 @@ class OrderController {
 
     @Post(uri = "/{userName}/order", consumes = [MediaType.APPLICATION_JSON], produces = [MediaType.APPLICATION_JSON])
     fun placeOrderRouteHandler(
-        userName: String, @Body @Valid newOrderDetails: CreateOrderDTO
+        userName: String, @Body @Valid requestBody: CreateOrderRequestBody
     ): HttpResponse<CreateOrderResponse> {
         val user = userService.getUserOrNull(userName) ?: throw UserNotFoundException("User not found")
 
-        val order = orderService.placeOrder(newOrderDetails, user)
+        val newOrderDetails = CreateOrderDTO.from(requestBody, orderPlacer = user)
+
+        val order = orderService.placeOrder(newOrderDetails)
 
         return HttpResponse.ok(
             CreateOrderResponse(

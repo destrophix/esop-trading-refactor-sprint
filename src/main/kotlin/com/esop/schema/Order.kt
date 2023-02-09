@@ -1,6 +1,7 @@
 package com.esop.schema
 
 import com.esop.dto.CreateOrderDTO
+import com.esop.dto.CreateOrderRequestBody
 import com.esop.schema.InventoryPriority.*
 import com.esop.utils.Counter
 
@@ -24,13 +25,13 @@ class Order(
     private var remainingQuantity = quantity
 
     companion object {
-        fun  from(orderDetails: CreateOrderDTO, orderPlacer: User): Order {
+        fun  from(orderDetails: CreateOrderDTO): Order {
             return Order(
-                quantity = orderDetails.quantity!!,
-                type = orderDetails.type!!,
-                price = orderDetails.price!!,
-                orderPlacer = orderPlacer,
-                esopType = orderDetails.esopType!!
+                quantity = orderDetails.quantity,
+                type = orderDetails.type,
+                price = orderDetails.price,
+                orderPlacer = orderDetails.orderPlacer,
+                esopType = orderDetails.esopType
             )
         }
     }

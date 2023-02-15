@@ -71,7 +71,7 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: /bin/bash start.sh
+          script: /bin/bash /app/start.sh
        
          
         

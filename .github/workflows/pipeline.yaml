@@ -3,7 +3,7 @@ name: Pipeline
 on:
   push:
     branches: 
-      - deploy-arun-amit
+      - deploy
 
 jobs:
   test:
@@ -39,8 +39,7 @@ jobs:
         with:
           name: applicationJar
           path: esop-0.1-all.jar
-        
-   deploy:
+  deploy:
     needs: [build]
     runs-on: ubuntu-latest
     steps: 

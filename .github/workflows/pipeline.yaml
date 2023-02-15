@@ -38,7 +38,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: applicationJar
-          path: esop-0.1-all.jar
+          path: build/libs/esop-0.1-all.jar
   deploy:
     needs: [build]
     runs-on: ubuntu-latest
@@ -61,7 +61,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           port: ${{ secrets.SSH_PORT }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "build/libs/esop-0.1-all.jar,start.sh"
+          source: "esop-0.1-all.jar,start.sh"
           target: "/app/"
        
       - name: startup the application

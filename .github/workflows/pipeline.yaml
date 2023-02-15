@@ -61,7 +61,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           port: ${{ secrets.SSH_PORT }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "esop-0.1-all.jar,start.sh"
+          source: "build/libs/esop-0.1-all.jar,start.sh"
           target: "/app/"
        
       - name: startup the application

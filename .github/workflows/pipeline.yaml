@@ -11,8 +11,7 @@ jobs:
     steps:
       - name: Checkout
         run: |
-          git clone https://github.com/ArunMurugan0/esop-trading-refactor-sprint.git
-          cd esop-trading-refactor-sprint
+          git clone https://github.com/ArunMurugan0/esop-trading-refactor-sprint.git .
           git checkout deploy
           
          

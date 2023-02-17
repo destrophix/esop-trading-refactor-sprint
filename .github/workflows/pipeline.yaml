@@ -11,7 +11,7 @@ jobs:
     steps:
       - name: Checkout
         run: |
-          git clone ${{ github.repository }}
+          git pull
           git checkout deploy
           
          

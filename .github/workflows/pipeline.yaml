@@ -8,12 +8,12 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    steps: 
-      - uses: actions/checkout@v3
-      - uses: actions/setup-java@v3
-        with:
-          distribution: corretto
-          java-version: 17
+    steps:
+      - name: Checkout
+        run: |
+          git clone ${{ github.repository }}
+          git checkout deploy
+          
          
       - name: setup and execute Gradle 'test' task
         uses: gradle/gradle-build-action@v2

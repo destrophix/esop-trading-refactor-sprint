@@ -9,12 +9,8 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        run: |
-          git clone https://github.com/Amit-R-Bhagat/esop-trading-refactor-sprint.git .
-          git checkout deploy
-          
-         
+      - uses: actions/checkout@v3
+   
       - name: setup and execute Gradle 'test' task
         uses: gradle/gradle-build-action@v2
         with: 

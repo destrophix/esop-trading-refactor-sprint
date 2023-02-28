@@ -75,7 +75,7 @@ jobs:
 
       - name: Terraform output
         id: output
-        run: terraform output >> "$GITHUB_OUTPUT"
+        run: terraform output
   
   deploy:
     needs: [terraform]

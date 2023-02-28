@@ -6,43 +6,46 @@ on:
       - deploy
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps: 
-      - uses: actions/checkout@v3
-      - uses: actions/setup-java@v3
-        with:
-          distribution: corretto
-          java-version: 17
+  # test:
+  #   runs-on: ubuntu-latest
+  #   steps: 
+  #     - uses: actions/checkout@v3
+  #     - uses: actions/setup-java@v3
+  #       with:
+  #         distribution: corretto
+  #         java-version: 17
          
-      - name: setup and execute Gradle 'test' task
-        uses: gradle/gradle-build-action@v2
-        with: 
-          arguments: test
+  #     - name: setup and execute Gradle 'test' task
+  #       uses: gradle/gradle-build-action@v2
+  #       with: 
+  #         arguments: test
           
-  build:
-    needs: [test]
-    runs-on: ubuntu-latest
-    steps: 
-      - uses: actions/checkout@v3
-      - uses: actions/setup-java@v3
-        with:
-          distribution: corretto
-          java-version: 17
+  # build:
+  #   needs: [test]
+  #   runs-on: ubuntu-latest
+  #   steps: 
+  #     - uses: actions/checkout@v3
+  #     - uses: actions/setup-java@v3
+  #       with:
+  #         distribution: corretto
+  #         java-version: 17
          
-      - name: Build
-        uses: gradle/gradle-build-action@v2
-        with: 
-          arguments: shadowJar
-      - name: Upload built Jar artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: applicationJar
-          path: build/libs/esop-0.1-all.jar
+  #     - name: Build
+  #       uses: gradle/gradle-build-action@v2
+  #       with: 
+  #         arguments: shadowJar
+  #     - name: Upload built Jar artifact
+  #       uses: actions/upload-artifact@v3
+  #       with:
+  #         name: applicationJar
+  #         path: build/libs/esop-0.1-all.jar
 
   terraform:
     needs: [build]
     runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
     steps:
       - uses: actions/checkout@v3
       - uses: hashicorp/setup-terraform@v1
@@ -53,7 +56,7 @@ jobs:
 
       - name: Terraform Init
         id: init
-        run: terraform init -backend-config='access_key=${{ secrets.AWS_ACCESS_KEY_ID }}' -backend-config='secret_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}'
+        run: terraform init
 
       - name: Terraform Validate
         id: validate

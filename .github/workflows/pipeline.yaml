@@ -50,7 +50,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: hashicorp/setup-terraform@v1
 
-      - name: Terraform Format
+      - name: Terraform Formatting
         id: fmt
         run: terraform fmt -check
 

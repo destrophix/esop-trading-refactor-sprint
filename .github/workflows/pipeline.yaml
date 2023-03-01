@@ -95,7 +95,7 @@ jobs:
           name: applicationJar
          
       - name: Copy built Jar to remote machine instance
-        uses: appleboy/scp-action@v0.1.4
+        uses: appleboy/scp-action@v0.1.3
         with:
           host: ${{ needs.terraform.outputs.output1 }}
           username: ${{ secrets.SSH_USERNAME }}
@@ -105,7 +105,7 @@ jobs:
           target: "/app/"
        
       - name: startup the application
-        uses: appleboy/ssh-action@v0.1.7
+        uses: appleboy/ssh-action@v0.1.8
         with:
           host: ${{ needs.terraform.outputs.output1 }}
           port: ${{ secrets.SSH_PORT }}

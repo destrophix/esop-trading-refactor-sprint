@@ -15,7 +15,6 @@ jobs:
       output1: ${{ steps.get-ip.outputs.t }}
     steps:
       - uses: actions/checkout@v3
-      # - uses: hashicorp/setup-terraform@v1
 
       - name: Terraform Formatting
         id: fmt

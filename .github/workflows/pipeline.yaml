@@ -50,7 +50,6 @@ jobs:
       output1: ${{ steps.get-ip.outputs.ip }}
     steps:
       - uses: actions/checkout@v3
-      - uses: hashicorp/setup-terraform@v1
 
       - name: Terraform Formatting
         id: fmt
@@ -75,7 +74,7 @@ jobs:
 
       - name: Terraform output
         id: get-ip
-        run: 
+        run: echo "ip=$(terraform output instance_public_ip | tr -d '"')" >> $GITHUB_OUTPUT
   
   deploy:
     needs: [terraform]

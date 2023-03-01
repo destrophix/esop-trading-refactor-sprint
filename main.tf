@@ -27,6 +27,11 @@ resource "aws_instance" "app_server" {
   tags = {
     Name = "terraform-instance"
   }
+  provisioner "remote-exec" {
+    inline = [
+      "echo hello >> ~/msg.txt",
+    ]
+  }
 }
 
 resource "aws_security_group" "main" {

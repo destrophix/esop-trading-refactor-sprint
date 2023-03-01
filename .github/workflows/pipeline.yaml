@@ -75,7 +75,9 @@ jobs:
 
       - name: Terraform output
         id: get-ip
-        run: echo "ip=$(terraform output instance_public_ip)" >> $GITHUB_OUTPUT
+        run: |
+          ip=$(terraform output instance_public_ip) | tr -d '"'
+          echo ip=$ip >> $GITHUB_OUTPUT
   
   deploy:
     needs: [terraform]

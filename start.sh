@@ -1,7 +1,5 @@
 #!/bin/bash
 
-sudo yum install -y java-17-amazon-corretto-devel
-
 #kill process running in port 80
 sudo lsof -t -i:80 | sudo xargs kill -9
 

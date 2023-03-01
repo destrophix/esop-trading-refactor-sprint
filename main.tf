@@ -37,7 +37,7 @@ resource "aws_instance" "app_server" {
 
   provisioner "remote-exec" {
     inline = [
-      "echo hello >> ~/msg.txt",
+      "sudo yum install -y java-17-amazon-corretto-devel",
     ]
   }
 }

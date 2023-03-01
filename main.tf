@@ -29,15 +29,15 @@ resource "aws_instance" "app_server" {
   }
 
   connection {
-      type     = "ssh"
-      user     = "ec2-user"
-      private_key = var.pk
-      host = self.public_ip
+    type        = "ssh"
+    user        = "ec2-user"
+    private_key = var.pk
+    host        = self.public_ip
   }
 
   provisioner "remote-exec" {
     inline = [
-	  "echo hello >> ~/msg.txt",
+      "echo hello >> ~/msg.txt",
     ]
   }
 }

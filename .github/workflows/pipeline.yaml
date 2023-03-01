@@ -2,8 +2,9 @@ name: Pipeline
 
 on:
   push:
-    branches: 
-      - deploy
+    branches:
+    - main
+  pull_request:
 
 jobs:
   # test:
@@ -41,16 +42,19 @@ jobs:
   #         path: build/libs/esop-0.1-all.jar
 
   terraform:
-    needs: [build]
+    # needs: [build]
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
     env:
-      AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    outputs:
+      output1: ${{ steps.get-ip.outputs.ip }}
     steps:
       - uses: actions/checkout@v3
-      - uses: hashicorp/setup-terraform@v1
 
-      - name: Terraform Format
+      - name: Terraform Formatting
         id: fmt
         run: terraform fmt -check
 
@@ -62,18 +66,72 @@ jobs:
         id: validate
         run: terraform validate -no-color
 
+      - name: Terraform Plan
+        id: plan
+        if: github.event_name == 'pull_request'
+        run: |
+          plan_output=$(terraform plan -no-color -input=false -var="pk=${{ secrets.SSH_PRIVATE_KEY }}")
+          echo "plan_output<<EOF" >> $GITHUB_OUTPUT
+          echo "$plan_output" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+        continue-on-error: true
+
+      - name: Update Pull Request
+        uses: actions/github-script@v6
+        if: github.event_name == 'pull_request'
+        env:
+          PLAN: "terraform\n${{ steps.plan.outputs.plan_output }}"
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
+            #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
+            #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
+            #### Terraform Validation 🤖\`${{ steps.validate.outcome }}\`
+
+            <details><summary>Show Plan</summary>
+
+            \`\`\`\n
+            ${process.env.PLAN}
+            \`\`\`
+
+            </details>
+
+            *Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            })
+
+      - name: Terraform Plan Status
+        if: steps.plan.outcome == 'failure'
+        run: exit 
+
       - name: Terraform Apply
-        run: terraform apply
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: terraform apply -auto-approve -input=false -var="pk=${{ secrets.SSH_PRIVATE_KEY }}"
+
+      - name: Terraform output
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        id: get-ip
+        run: echo "ip=$(terraform output instance_public_ip | tr -d '"')" >> $GITHUB_OUTPUT
   
   deploy:
-    needs: [build]
+    needs: [terraform]
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     steps: 
       - uses: actions/checkout@v3
       - uses: actions/setup-java@v3
         with:
           distribution: corretto
           java-version: 17
+
+      - name: echo host
+        run: echo ${{ needs.terraform.outputs.output1 }}
          
       - name: Download built Jar artifact
         uses: actions/download-artifact@v3
@@ -81,23 +139,23 @@ jobs:
           name: applicationJar
          
       - name: Copy built Jar to remote machine instance
-        uses: appleboy/scp-action@master
+        uses: appleboy/scp-action@v0.1.3
         with:
-          host: ${{ secrets.SSH_HOST }}
+          host: ${{ needs.terraform.outputs.output1 }}
           username: ${{ secrets.SSH_USERNAME }}
           port: ${{ secrets.SSH_PORT }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: "esop-0.1-all.jar,start.sh"
-          target: "/app/"
+          target: "~/app/"
        
       - name: startup the application
-        uses: appleboy/ssh-action@v0.1.7
+        uses: appleboy/ssh-action@v0.1.8
         with:
-          host: ${{ secrets.SSH_HOST }}
+          host: ${{ needs.terraform.outputs.output1 }}
           port: ${{ secrets.SSH_PORT }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: /bin/bash /app/start.sh
+          script: /bin/bash ~/app/start.sh
        
          
         

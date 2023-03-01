@@ -1,0 +1,3 @@
+variable "pk" {
+  type = string
+}

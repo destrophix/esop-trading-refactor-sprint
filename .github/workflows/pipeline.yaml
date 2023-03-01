@@ -19,35 +19,29 @@ jobs:
         uses: gradle/gradle-build-action@v2
         with: 
           arguments: test
-      
+          
+  build:
+    needs: [test]
+    runs-on: ubuntu-latest
+    steps: 
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
+        with:
+          distribution: corretto
+          java-version: 17
+         
+      - name: Build
+        uses: gradle/gradle-build-action@v2
+        with: 
+          arguments: shadowJar
       - name: Upload built Jar artifact
         uses: actions/upload-artifact@v3
         with:
           name: applicationJar
           path: build/libs/esop-0.1-all.jar
-          
-  # build:
-  #   needs: [test]
-  #   runs-on: ubuntu-latest
-  #   steps: 
-  #     - uses: actions/checkout@v3
-  #     - uses: actions/setup-java@v3
-  #       with:
-  #         distribution: corretto
-  #         java-version: 17
-         
-  #     - name: Build
-  #       uses: gradle/gradle-build-action@v2
-  #       with: 
-  #         arguments: shadowJar
-  #     - name: Upload built Jar artifact
-  #       uses: actions/upload-artifact@v3
-  #       with:
-  #         name: applicationJar
-  #         path: build/libs/esop-0.1-all.jar
 
   terraform:
-    needs: [test]
+    needs: [build]
     runs-on: ubuntu-latest
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}

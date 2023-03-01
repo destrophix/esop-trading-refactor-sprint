@@ -19,7 +19,7 @@ provider "aws" {
 }
 
 resource "aws_instance" "app_server" {
-  ami                    = "ami-093407aedabc3d647"
+  ami                    = "ami-0b029b1931b347543"
   instance_type          = "t2.micro"
   key_name               = "gurukul-amit"
   vpc_security_group_ids = [aws_security_group.main.id]

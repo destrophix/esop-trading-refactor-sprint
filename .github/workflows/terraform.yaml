@@ -12,7 +12,7 @@ jobs:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
     outputs:
-      output1: ${{ steps.get-ip.outputs.ip }}
+      output1: ${{ steps.get-ip.outputs.t }}
     steps:
       - uses: actions/checkout@v3
       - uses: hashicorp/setup-terraform@v1
@@ -40,10 +40,10 @@ jobs:
 
       - name: Terraform output
         id: get-ip
-        run: echo "ip=$(terraform output instance_public_ip | tr -d '"')" >> $GITHUB_OUTPUT
+        run: echo "t=$(terraform output instance_ip_addr | tr -d '"')" >> $GITHUB_OUTPUT
       
       - name: echo host ip
-        run: echo ${{ steps.get-ip.outputs.ip }}
+        run: echo ${{ steps.get-ip.outputs.t }}
   
   deploy:
     needs: [terraform]

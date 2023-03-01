@@ -41,7 +41,7 @@ jobs:
       - name: Terraform output
         id: get-ip
         run: |
-          t=$(terraform output instance_public_ip | tr -d '"')
+          t="$(terraform output instance_public_ip | tr -d '"')"
           echo t=$t >> $GITHUB_OUTPUT
       
       - name: echo host ip

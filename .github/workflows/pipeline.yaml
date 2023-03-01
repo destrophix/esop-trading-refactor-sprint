@@ -102,7 +102,7 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: "esop-0.1-all.jar,start.sh"
-          target: "/app/"
+          target: "~/app/"
        
       - name: startup the application
         uses: appleboy/ssh-action@v0.1.8
@@ -111,7 +111,7 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: /bin/bash /app/start.sh
+          script: /bin/bash ~/app/start.sh
        
          
         
